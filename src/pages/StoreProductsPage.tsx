@@ -24,6 +24,7 @@ interface Product {
     description: string;
     price: number;
     stock: number;
+    sku: string;
     category: string;
     variants?: any[];
 }
@@ -47,6 +48,7 @@ export default function StoreProductsPage() {
         description: "",
         price: "",
         stock: "",
+        sku_part: "",
         category_slug: "",
         store_id: id || ""
     });
@@ -272,7 +274,7 @@ export default function StoreProductsPage() {
             if (res.ok) {
                 toast.success(`${BRANDING.productName} creado exitosamente`);
                 setIsCreateOpen(false);
-                setFormData({ name: "", description: "", price: "", stock: "", category_slug: "", store_id: id || "" });
+                setFormData({ name: "", description: "", price: "", stock: "", sku_part: "", category_slug: "", store_id: id || "" });
                 setVariants([]);
                 fetchProducts();
             } else {
@@ -314,15 +316,15 @@ export default function StoreProductsPage() {
                     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                         <DialogTrigger asChild>
                             <MinimalButton
-                                className="h-10 px-6 rounded-full bg-white text-black font-bold text-[10px] uppercase tracking-widest hover:scale-105 transition-transform"
+                                className="h-10 px-6 rounded-full bg-white text-black font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-transform"
                                 icon={<Plus className="w-4 h-4" />}
                             >
-                                Nuevo Item
+                                Nuevo Drop
                             </MinimalButton>
                         </DialogTrigger>
                         <DialogContent className="bg-zinc-950 border-zinc-800 text-white sm:max-w-[500px] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
                             <DialogHeader>
-                                <DialogTitle className="text-lg md:text-xl font-bold uppercase italic">Publicar Nuevo Artículo</DialogTitle>
+                                <DialogTitle className="text-xl md:text-2xl font-black uppercase italic tracking-tighter">Publicar Nuevo Drop</DialogTitle>
                             </DialogHeader>
 
                             <div className="grid gap-4 py-4">
@@ -373,6 +375,9 @@ export default function StoreProductsPage() {
                                         />
                                     </div>
                                 </div>
+
+                                <p className="text-[8px] text-zinc-600 font-mono">El SKU final será: {`{ID}-${formData.sku_part || 'GEN'}`}</p>
+
 
                                 <div className="grid gap-2">
                                     <Label className="text-zinc-500 text-[9px] font-black uppercase">Precio ({BRANDING.currencySymbol})</Label>
@@ -475,7 +480,7 @@ export default function StoreProductsPage() {
                         </DialogContent>
                     </Dialog>
                 </div>
-            </PageHeader>
+            </PageHeader >
 
             <main className={`pt-8 md:pt-32 pb-20 px-4 md:px-10 max-w-7xl mx-auto transition-all duration-500 ${isDragging ? 'lg:pr-[320px] opacity-50 scale-[0.98]' : ''}`}>
                 {loading ? (
@@ -525,7 +530,7 @@ export default function StoreProductsPage() {
                                     <div className="space-y-0.5 md:space-y-1 overflow-hidden flex-1">
                                         <div className="flex items-center gap-2 md:gap-3">
                                             <span className="text-[8px] md:text-[9px] font-black text-primary uppercase tracking-[0.2em]">{product.category}</span>
-                                            <span className="text-[8px] md:text-[9px] font-mono text-zinc-700">PID-{product.id.slice(0, 8)}</span>
+                                            <span className="text-[8px] md:text-[9px] font-mono text-zinc-500 uppercase tracking-wider">{product.sku || `PID-${product.id.slice(0, 8)}`}</span>
                                         </div>
                                         <h3 className="text-sm md:text-xl font-bold text-white group-hover:translate-x-1 transition-transform truncate">{product.name}</h3>
                                         <p className="text-[10px] md:text-xs text-zinc-600 font-medium line-clamp-1">{product.description}</p>
@@ -593,79 +598,81 @@ export default function StoreProductsPage() {
 
             {/* Drag Destination Sidebar */}
             {/* Drag Destination Sidebar (Desktop) */}
-            {!isMobile && (
-                <aside className={`fixed top-0 right-0 bottom-0 w-[320px] bg-zinc-950/95 backdrop-blur-2xl border-l border-white/5 z-[70] transition-transform duration-500 p-8 flex flex-col ${isDragging ? 'translate-x-0' : 'translate-x-full'}`}>
-                    <button
-                        onClick={() => {
-                            setIsDragging(false);
-                            setDraggedProductId(null);
-                            setDropTargetId(null);
-                        }}
-                        className="absolute top-6 right-6 p-2 text-zinc-600 hover:text-white transition-colors"
-                    >
-                        <X className="w-6 h-6" />
-                    </button>
-
-                    <div className="mb-10 text-center pt-4">
-                        <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20 animate-pulse">
-                            <ArrowRightLeft className="w-8 h-8 text-emerald-500" />
-                        </div>
-                        <h3 className="text-lg font-black uppercase italic tracking-tighter text-white">Transferir {BRANDING.productName}</h3>
-                        <p className="text-zinc-500 text-[9px] font-mono mt-1 px-4">Selecciona el destino para el despliegue del activo</p>
-                    </div>
-
-                    <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar pr-2">
-                        {otherStores.length === 0 ? (
-                            <div className="text-center py-10 opacity-30">
-                                <Store className="w-10 h-10 mx-auto mb-3" />
-                                <p className="text-[9px] font-bold uppercase tracking-widest">Sin otros locales</p>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 gap-2 md:gap-3">
-                                {otherStores.map(store => (
-                                    <button
-                                        key={store.id}
-                                        onClick={() => handleTransfer(store.id)}
-                                        onDragOver={(e) => {
-                                            e.preventDefault();
-                                            setDropTargetId(store.id);
-                                        }}
-                                        onDragLeave={() => setDropTargetId(null)}
-                                        onDrop={() => handleTransfer(store.id)}
-                                        className={`group p-4 md:p-5 rounded-2xl md:rounded-3xl border-2 transition-all duration-300 flex flex-col gap-2 text-left relative overflow-hidden ${dropTargetId === store.id ? 'bg-emerald-500/10 border-emerald-500' : 'bg-zinc-900/50 border-transparent hover:border-white/10'}`}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${dropTargetId === store.id ? 'bg-emerald-500 text-black' : 'bg-zinc-800 text-zinc-600 group-hover:text-white'}`}>
-                                                <Store className="w-4 h-4" />
-                                            </div>
-                                            <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wider transition-colors ${dropTargetId === store.id ? 'text-white' : 'text-zinc-400 group-hover:text-white'}`}>
-                                                {store.name}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center justify-between mt-1">
-                                            <span className="text-[8px] font-mono text-zinc-700 uppercase">Protocolo de Entrega</span>
-                                            {dropTargetId === store.id && <Plus className="w-3 h-3 text-emerald-500 animate-bounce" />}
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="mt-6 pt-6 border-t border-white/5">
+            {
+                !isMobile && (
+                    <aside className={`fixed top-0 right-0 bottom-0 w-[320px] bg-zinc-950/95 backdrop-blur-2xl border-l border-white/5 z-[70] transition-transform duration-500 p-8 flex flex-col ${isDragging ? 'translate-x-0' : 'translate-x-full'}`}>
                         <button
                             onClick={() => {
                                 setIsDragging(false);
                                 setDraggedProductId(null);
                                 setDropTargetId(null);
                             }}
-                            className="w-full py-4 text-[9px] font-black uppercase tracking-[0.3em] text-zinc-700 hover:text-white transition-colors border border-white/5 rounded-xl"
+                            className="absolute top-6 right-6 p-2 text-zinc-600 hover:text-white transition-colors"
                         >
-                            CANCELAR OPERACIÓN
+                            <X className="w-6 h-6" />
                         </button>
-                    </div>
-                </aside>
-            )}
+
+                        <div className="mb-10 text-center pt-4">
+                            <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20 animate-pulse">
+                                <ArrowRightLeft className="w-8 h-8 text-emerald-500" />
+                            </div>
+                            <h3 className="text-lg font-black uppercase italic tracking-tighter text-white">Transferir {BRANDING.productName}</h3>
+                            <p className="text-zinc-500 text-[9px] font-mono mt-1 px-4">Selecciona el destino para el despliegue del activo</p>
+                        </div>
+
+                        <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar pr-2">
+                            {otherStores.length === 0 ? (
+                                <div className="text-center py-10 opacity-30">
+                                    <Store className="w-10 h-10 mx-auto mb-3" />
+                                    <p className="text-[9px] font-bold uppercase tracking-widest">Sin otros locales</p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 gap-2 md:gap-3">
+                                    {otherStores.map(store => (
+                                        <button
+                                            key={store.id}
+                                            onClick={() => handleTransfer(store.id)}
+                                            onDragOver={(e) => {
+                                                e.preventDefault();
+                                                setDropTargetId(store.id);
+                                            }}
+                                            onDragLeave={() => setDropTargetId(null)}
+                                            onDrop={() => handleTransfer(store.id)}
+                                            className={`group p-4 md:p-5 rounded-2xl md:rounded-3xl border-2 transition-all duration-300 flex flex-col gap-2 text-left relative overflow-hidden ${dropTargetId === store.id ? 'bg-emerald-500/10 border-emerald-500' : 'bg-zinc-900/50 border-transparent hover:border-white/10'}`}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${dropTargetId === store.id ? 'bg-emerald-500 text-black' : 'bg-zinc-800 text-zinc-600 group-hover:text-white'}`}>
+                                                    <Store className="w-4 h-4" />
+                                                </div>
+                                                <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wider transition-colors ${dropTargetId === store.id ? 'text-white' : 'text-zinc-400 group-hover:text-white'}`}>
+                                                    {store.name}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between mt-1">
+                                                <span className="text-[8px] font-mono text-zinc-700 uppercase">Protocolo de Entrega</span>
+                                                {dropTargetId === store.id && <Plus className="w-3 h-3 text-emerald-500 animate-bounce" />}
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="mt-6 pt-6 border-t border-white/5">
+                            <button
+                                onClick={() => {
+                                    setIsDragging(false);
+                                    setDraggedProductId(null);
+                                    setDropTargetId(null);
+                                }}
+                                className="w-full py-4 text-[9px] font-black uppercase tracking-[0.3em] text-zinc-700 hover:text-white transition-colors border border-white/5 rounded-xl"
+                            >
+                                CANCELAR OPERACIÓN
+                            </button>
+                        </div>
+                    </aside>
+                )
+            }
 
             {/* Transfer Dialog (Mobile Bottom Sheet) */}
             <Dialog open={isMobile && isDragging} onOpenChange={(open) => {
@@ -778,6 +785,6 @@ export default function StoreProductsPage() {
                 </div>
                 <div className="truncate max-w-[150px] md:max-w-none">{BRANDING.appName} Supply Manager</div>
             </div>
-        </div>
+        </div >
     );
 }
