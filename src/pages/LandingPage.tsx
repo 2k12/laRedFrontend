@@ -58,8 +58,8 @@ export default function LandingPage() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4 md:pt-8 w-full sm:w-auto px-6 sm:px-0">
                         <Link to="/login" className="w-full sm:w-auto">
                             <div className="magnetic-btn hero-btn block sm:inline-block w-full sm:w-auto">
-                                <Button className="h-14 md:h-16 w-full sm:w-auto px-8 md:px-10 rounded-full bg-primary text-primary-foreground hover:bg-white hover:text-black text-base md:text-lg font-bold transition-all duration-300">
-                                    Comenzar Ahora <ArrowRight className="ml-2 w-5 h-5" />
+                                <Button className="h-12 md:h-16 w-full sm:w-auto px-6 md:px-10 rounded-full bg-primary text-primary-foreground hover:bg-white hover:text-black text-sm md:text-lg font-bold transition-all duration-300">
+                                    Comenzar Ahora <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5" />
                                 </Button>
                             </div>
                         </Link>

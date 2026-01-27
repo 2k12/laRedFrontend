@@ -212,6 +212,14 @@ export default function StoreProductsPage() {
 
     const handleUpdate = async () => {
         if (!editingProduct) return;
+
+        // Validation for Price Limit
+        const cat = categories.find((c: any) => c.slug === editingProduct.category);
+        if (cat && editingProduct.price > cat.max_price) {
+            toast.error(`El precio excede el límite de ${cat.max_price} ${BRANDING.currencySymbol} para ${cat.name}`);
+            return;
+        }
+
         setSubmitting(true);
         const token = localStorage.getItem('token');
         try {
@@ -752,6 +760,18 @@ export default function StoreProductsPage() {
                                         onChange={e => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) })}
                                         className="bg-zinc-900 border-zinc-800"
                                     />
+                                    {(() => {
+                                        const cat = categories.find((c: any) => c.slug === editingProduct.category);
+                                        const maxPrice = cat ? cat.max_price : 0;
+                                        if (cat && editingProduct.price > maxPrice) {
+                                            return (
+                                                <p className="text-[9px] text-red-500 font-bold mt-1">
+                                                    Máximo permitido: {maxPrice} {BRANDING.currencySymbol}
+                                                </p>
+                                            );
+                                        }
+                                        return null;
+                                    })()}
                                 </div>
                                 <div className="grid gap-2">
                                     <Label className="text-[9px] font-black uppercase text-zinc-500">Stock</Label>
