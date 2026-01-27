@@ -59,17 +59,23 @@ export default function StoreProductsPage() {
     const [dropTargetId, setDropTargetId] = useState<string | null>(null);
     const [otherStores, setOtherStores] = useState<any[]>([]);
 
+    // Edit Product State
+    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
     useEffect(() => {
+        if (!user) return; // Wait for user to be loaded to know roles
         fetchProducts();
         fetchStoreTitle();
         fetchFormData();
         fetchOtherStores();
-    }, [id, isCreateOpen]);
+    }, [id, isCreateOpen, user?.id]);
 
     const fetchOtherStores = async () => {
         const token = localStorage.getItem('token');
+        const isAdmin = user?.roles?.includes('ADMIN') || user?.roles?.includes('SYSTEM');
         try {
-            const res = await fetch(`${API_BASE_URL}/api/stores/me`, {
+            const endpoint = isAdmin ? `${API_BASE_URL}/api/stores/all` : `${API_BASE_URL}/api/stores/me`;
+            const res = await fetch(endpoint, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -139,8 +145,10 @@ export default function StoreProductsPage() {
 
     const fetchStoreTitle = async () => {
         const token = localStorage.getItem('token');
+        const isAdmin = user?.roles?.includes('ADMIN');
         try {
-            const res = await fetch(`${API_BASE_URL}/api/stores/me`, {
+            const endpoint = isAdmin ? `${API_BASE_URL}/api/stores/all` : `${API_BASE_URL}/api/stores/me`;
+            const res = await fetch(endpoint, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -152,6 +160,7 @@ export default function StoreProductsPage() {
     };
 
     const fetchProducts = async () => {
+        setLoading(true);
         const token = localStorage.getItem('token');
         try {
             const res = await fetch(`${API_BASE_URL}/api/stores/${id}/products`, {
@@ -160,11 +169,61 @@ export default function StoreProductsPage() {
             const data = await res.json();
             if (res.ok) {
                 setProducts(data.products || []);
+            } else {
+                toast.error(data.error || "Error al cargar productos");
             }
         } catch (e) {
-            toast.error("Error al cargar productos");
+            toast.error("Error de conexión");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDelete = async (productId: string) => {
+        if (!confirm("¿Estás seguro de eliminar este drop?")) return;
+
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/products/${productId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                toast.success("Drop eliminado correctamente");
+                setProducts(prev => prev.filter(p => p.id !== productId));
+            } else {
+                toast.error("Error al eliminar");
+            }
+        } catch (e) {
+            toast.error("Error de conexión");
+        }
+    };
+
+    const handleUpdate = async () => {
+        if (!editingProduct) return;
+        setSubmitting(true);
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/products/${editingProduct.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(editingProduct)
+            });
+            if (res.ok) {
+                toast.success("Drop actualizado");
+                setEditingProduct(null);
+                fetchProducts();
+            } else {
+                const data = await res.json();
+                toast.error(data.error || "Error al actualizar");
+            }
+        } catch (e) {
+            toast.error("Error de conexión");
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -496,10 +555,16 @@ export default function StoreProductsPage() {
                                             <span className="hidden sm:inline">Transferir</span>
                                         </MinimalButton>
 
-                                        <button className="p-2.5 md:p-3 bg-zinc-950 border border-white/5 rounded-full hover:bg-zinc-900 text-zinc-600 transition-colors">
+                                        <button
+                                            onClick={() => setEditingProduct(product)}
+                                            className="p-2.5 md:p-3 bg-zinc-950 border border-white/5 rounded-full hover:bg-zinc-900 text-zinc-600 transition-colors"
+                                        >
                                             <Edit2 className="w-3.5 h-3.5" />
                                         </button>
-                                        <button className="p-2.5 md:p-3 bg-zinc-950 border border-white/5 rounded-full hover:bg-red-500/10 hover:text-red-500 text-zinc-600 transition-colors">
+                                        <button
+                                            onClick={() => handleDelete(product.id)}
+                                            className="p-2.5 md:p-3 bg-zinc-950 border border-white/5 rounded-full hover:bg-red-500/10 hover:text-red-500 text-zinc-600 transition-colors"
+                                        >
                                             <Trash2 className="w-3.5 h-3.5" />
                                         </button>
                                     </div>
@@ -585,6 +650,64 @@ export default function StoreProductsPage() {
                     </button>
                 </div>
             </aside>
+
+            {/* Edit Dialog */}
+            <Dialog open={!!editingProduct} onOpenChange={(open) => !open && setEditingProduct(null)}>
+                <DialogContent className="bg-zinc-950 border-zinc-900 text-white sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle className="uppercase italic">Editar Drop</DialogTitle>
+                    </DialogHeader>
+                    {editingProduct && (
+                        <div className="grid gap-4 py-4">
+                            <div className="grid gap-2">
+                                <Label className="text-[9px] font-black uppercase text-zinc-500">Nombre</Label>
+                                <Input
+                                    value={editingProduct.name}
+                                    onChange={e => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                                    className="bg-zinc-900 border-zinc-800"
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label className="text-[9px] font-black uppercase text-zinc-500">Descripción</Label>
+                                <Input
+                                    value={editingProduct.description}
+                                    onChange={e => setEditingProduct({ ...editingProduct, description: e.target.value })}
+                                    className="bg-zinc-900 border-zinc-800"
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="grid gap-2">
+                                    <Label className="text-[9px] font-black uppercase text-zinc-500">Precio</Label>
+                                    <Input
+                                        type="number"
+                                        value={editingProduct.price}
+                                        onChange={e => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) })}
+                                        className="bg-zinc-900 border-zinc-800"
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label className="text-[9px] font-black uppercase text-zinc-500">Stock</Label>
+                                    <Input
+                                        type="number"
+                                        value={editingProduct.stock}
+                                        onChange={e => setEditingProduct({ ...editingProduct, stock: parseInt(e.target.value) })}
+                                        className="bg-zinc-900 border-zinc-800"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <DialogFooter>
+                        <MinimalButton
+                            onClick={handleUpdate}
+                            disabled={submitting}
+                            className="w-full h-12 bg-white text-black font-black uppercase text-[10px] tracking-widest rounded-xl"
+                        >
+                            {submitting ? "Guardando..." : "Guardar Cambios"}
+                        </MinimalButton>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Status Footer */}
             <div className="fixed bottom-0 left-0 right-0 h-8 md:h-10 bg-zinc-950 border-t border-white/5 flex items-center justify-between px-4 md:px-10 text-[7px] md:text-[9px] font-mono text-zinc-700 uppercase tracking-[0.1em] md:tracking-[0.3em] z-50">
