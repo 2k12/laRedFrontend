@@ -66,14 +66,14 @@ export default function AdminCoinsPage() {
                 }
                 `}
             </style>
-            <main className="container mx-auto max-w-7xl px-4 pb-20 relative z-10">
+            <main className="container mx-auto max-w-7xl px-4 sm:px-6 pb-20 relative z-10">
                 <PageHeader
-                    title="Control de Activos"
+                    title="Bóveda de Activos"
                     description={`Gestión de Liquidez y ${BRANDING.currencyNamePlural} de ${BRANDING.appName}.`}
                     icon={<Wallet className="w-8 h-8" />}
                 >
                     {user?.roles?.includes('ADMIN') && (
-                        <div className="relative group">
+                        <div className="relative group w-full sm:w-auto mt-4 sm:mt-0">
                             {/* Outer Glow */}
                             <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full blur opacity-30 group-hover:opacity-75 transition duration-1000 group-hover:duration-200 animate-pulse" />
 
@@ -83,10 +83,10 @@ export default function AdminCoinsPage() {
                                     <div className="absolute inset-0 bg-white/40 blur-sm rounded-full scale-0 group-hover:scale-150 transition-transform duration-700" />
                                 </div>}
                                 onClick={() => navigate('/dashboard/mint')}
-                                className="relative bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-black font-black border-none px-8 py-6 shadow-[0_10px_20px_rgba(245,158,11,0.3)] hover:shadow-[0_15px_30px_rgba(245,158,11,0.5)] transition-all duration-500 rounded-full overflow-hidden"
+                                className="w-full sm:relative bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-black font-black border-none px-6 sm:px-8 py-5 sm:py-6 shadow-[0_10px_20px_rgba(245,158,11,0.3)] hover:shadow-[0_15px_30px_rgba(245,158,11,0.5)] transition-all duration-500 rounded-full overflow-hidden text-xs sm:text-sm"
                             >
-                                <span className="relative z-10 flex items-center gap-2">
-                                    AGREGAR {BRANDING.currencyNamePlural?.toUpperCase() || BRANDING.currencyName.toUpperCase() + 'S'}
+                                <span className="relative z-10 flex items-center justify-center gap-2">
+                                    MINT {BRANDING.currencySymbol}
                                     <span className="w-1.5 h-1.5 rounded-full bg-black/20 animate-ping" />
                                 </span>
 
@@ -98,14 +98,14 @@ export default function AdminCoinsPage() {
                 </PageHeader>
 
                 {/* Interactive Piggy Bank Visualization - Adapted Style */}
-                <div className="relative z-10 max-w-6xl mx-auto mt-20">
-                    <div className="grid lg:grid-cols-2 gap-24 items-center">
+                <div className="relative z-10 max-w-6xl mx-auto mt-12 md:mt-20">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
 
                         {/* Liquid Fill Container */}
-                        <div className="relative group">
+                        <div className="relative group order-2 lg:order-1">
                             <div className="absolute inset-0 bg-gradient-to-b from-primary/20 to-transparent blur-3xl opacity-20 group-hover:opacity-40 transition-opacity" />
 
-                            <div className="relative w-full aspect-[4/5] max-w-sm mx-auto bg-zinc-900/50 backdrop-blur-xl rounded-[2.5rem] border border-white/10 overflow-hidden shadow-2xl">
+                            <div className="relative w-full aspect-[4/5] max-w-[280px] sm:max-w-sm mx-auto bg-zinc-900/50 backdrop-blur-xl rounded-[2rem] md:rounded-[2.5rem] border border-white/10 overflow-hidden shadow-2xl">
                                 {/* Fill Animation */}
                                 <div
                                     className="absolute bottom-0 left-0 right-0 transition-all duration-[2000ms] ease-out"
@@ -116,7 +116,7 @@ export default function AdminCoinsPage() {
                                     }}
                                 >
                                     {/* Liquid Wave Effect */}
-                                    <div className="absolute top-0 left-0 right-0 h-20 -translate-y-[85%] pointer-events-none overflow-hidden">
+                                    <div className="absolute top-0 left-0 right-0 h-16 md:h-20 -translate-y-[85%] pointer-events-none overflow-hidden">
                                         {/* Layer 1 - Back Wave */}
                                         <svg className="absolute bottom-0 left-0 w-[400%] h-full animate-wave-slow opacity-30" viewBox="0 0 1200 120" preserveAspectRatio="none">
                                             <path d="M0,60 C150,110 350,10 600,60 C850,110 1050,10 1200,60 L1200,120 L0,120 Z" fill={colors.to} />
@@ -133,15 +133,15 @@ export default function AdminCoinsPage() {
                                 </div>
 
                                 {/* Content Overlay */}
-                                <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-                                    <div className="w-24 h-24 rounded-full bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center mb-6 shadow-xl">
-                                        <Wallet className={`w-12 h-12 ${colors.text} animate-pulse`} />
+                                <div className="absolute inset-0 flex flex-col items-center justify-center p-6 md:p-8">
+                                    <div className="w-16 h-16 md:w-24 md:h-24 rounded-full bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center mb-4 md:mb-6 shadow-xl">
+                                        <Wallet className={`w-8 h-8 md:w-12 md:h-12 ${colors.text} animate-pulse`} />
                                     </div>
                                     <div className="text-center space-y-1">
-                                        <div className="text-6xl font-black text-white tracking-tighter tabular-nums drop-shadow-2xl">
+                                        <div className="text-4xl md:text-6xl font-black text-white tracking-tighter tabular-nums drop-shadow-2xl">
                                             {animatedBalance.toLocaleString()}
                                         </div>
-                                        <div className="text-zinc-400 font-medium tracking-widest uppercase text-xs">
+                                        <div className="text-zinc-400 font-medium tracking-widest uppercase text-[10px] md:text-xs">
                                             {BRANDING.currencyNamePlural}
                                         </div>
                                     </div>
@@ -153,23 +153,23 @@ export default function AdminCoinsPage() {
                         </div>
 
                         {/* Info Section */}
-                        <div className="space-y-12">
+                        <div className="space-y-8 md:space-y-12 order-1 lg:order-2">
                             <div className="space-y-4">
-                                <h3 className="text-4xl font-black text-white leading-tight">
+                                <h3 className="text-3xl md:text-4xl font-black text-white leading-tight">
                                     Reserva<br />Monetaria
                                 </h3>
-                                <p className="text-zinc-400 text-lg leading-relaxed max-w-md">
-                                    Visualización en tiempo real del sumunistro circulante. La tasa de llenado indica la proximidad al límite semestral establecido.
+                                <p className="text-zinc-400 text-base md:text-lg leading-relaxed max-w-md">
+                                    Visualización en tiempo real del sumunistro circulante. La tasa de llenado indica la proximidad al límite semestral.
                                 </p>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-8">
+                            <div className="grid grid-cols-2 gap-4 md:gap-8">
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2 text-zinc-400">
-                                        <TrendingUp className="w-4 h-4" />
-                                        <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Tasa de Uso</span>
+                                        <TrendingUp className="w-3.5 h-3.5" />
+                                        <span className="text-[9px] md:text-xs font-bold uppercase tracking-widest text-zinc-500">Tasa Uso</span>
                                     </div>
-                                    <div className="text-2xl font-bold text-white">
+                                    <div className="text-xl md:text-2xl font-bold text-white">
                                         {fillPercentage.toFixed(1)}%
                                     </div>
                                     <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
@@ -185,21 +185,21 @@ export default function AdminCoinsPage() {
 
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2 text-zinc-400">
-                                        <Lock className="w-4 h-4" />
-                                        <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Límite Soft</span>
+                                        <Lock className="w-3.5 h-3.5" />
+                                        <span className="text-[9px] md:text-xs font-bold uppercase tracking-widest text-zinc-500">Límite Soft</span>
                                     </div>
-                                    <div className="text-2xl font-bold text-white">
-                                        {MAX_COINS.toLocaleString()} {BRANDING.currencySymbol}
+                                    <div className="text-xl md:text-2xl font-bold text-white">
+                                        {MAX_COINS.toLocaleString()}
                                     </div>
-                                    <div className="text-[10px] text-zinc-500 leading-tight">
-                                        Ajustable vía panel de configuración Rectoría.
+                                    <div className="text-[9px] md:text-[10px] text-zinc-500 leading-tight">
+                                        Ajustable vía panel Rectoría.
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-zinc-800/50 backdrop-blur-sm group hover:border-zinc-700/50 transition-colors">
-                                <p className="text-zinc-400 italic text-sm leading-relaxed">
-                                    "La economía universitaria se basa en el intercambio de valor académico y social. Cada moneda representa una interacción real."
+                            <div className="p-6 md:p-8 rounded-2xl md:rounded-3xl bg-zinc-900/30 border border-zinc-800/50 backdrop-blur-sm">
+                                <p className="text-zinc-400 italic text-xs md:text-sm leading-relaxed">
+                                    "La economía universitaria se basa en el intercambio de valor académico y social."
                                 </p>
                             </div>
                         </div>

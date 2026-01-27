@@ -230,17 +230,17 @@ export default function AdminRewardsPage() {
                             <DialogTitle>Crear Evento de Recompensa</DialogTitle>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-3 gap-3 mb-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:grid-cols-3 md:gap-3 mb-2">
                                 <div className="p-3 bg-zinc-900 border border-white/5 rounded-xl text-center">
-                                    <p className="text-[8px] font-black uppercase text-zinc-500 mb-1">Físico</p>
+                                    <p className="text-[8px] font-black uppercase text-zinc-500 mb-0.5 md:mb-1">Físico</p>
                                     <p className="text-sm font-bold text-white">{vaultData.physical}</p>
                                 </div>
                                 <div className="p-3 bg-zinc-900 border border-white/5 rounded-xl text-center">
-                                    <p className="text-[8px] font-black uppercase text-orange-500/60 mb-1">Comprom.</p>
+                                    <p className="text-[8px] font-black uppercase text-orange-500/60 mb-0.5 md:mb-1">Compro.</p>
                                     <p className="text-sm font-bold text-orange-400">-{vaultData.committed}</p>
                                 </div>
                                 <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-center">
-                                    <p className="text-[8px] font-black uppercase text-emerald-500 mb-1">Disponible</p>
+                                    <p className="text-[8px] font-black uppercase text-emerald-500 mb-0.5 md:mb-1">Disp.</p>
                                     <p className="text-sm font-bold text-emerald-400">{vaultData.available}</p>
                                 </div>
                             </div>
@@ -293,14 +293,14 @@ export default function AdminRewardsPage() {
                 </Dialog>
             </PageHeader>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 mt-6 md:mt-8">
                 {/* Events List */}
                 <div className="lg:col-span-1 space-y-4">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-zinc-500 mb-6">Eventos Activos</h3>
+                    <h3 className="text-[10px] md:text-sm font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 md:mb-6">Eventos Activos</h3>
                     {loading ? (
-                        <div className="p-8 text-center text-zinc-600 animate-pulse">Cargando eventos...</div>
+                        <div className="p-8 text-center text-zinc-600 animate-pulse text-xs">Cargando eventos...</div>
                     ) : events.length === 0 ? (
-                        <div className="p-8 text-center border border-dashed border-zinc-800 rounded-2xl text-zinc-600">
+                        <div className="p-8 text-center border border-dashed border-zinc-800 rounded-3xl text-zinc-600 text-xs">
                             No hay eventos configurados.
                         </div>
                     ) : events.map(event => (
@@ -308,10 +308,10 @@ export default function AdminRewardsPage() {
                             key={event.id}
                             onClick={() => setSelectedEvent(event)}
                             className={cn(
-                                "p-5 rounded-3xl border transition-all duration-300 cursor-pointer group relative overflow-hidden",
+                                "p-4 md:p-5 rounded-2xl md:rounded-3xl border transition-all duration-300 cursor-pointer group relative overflow-hidden",
                                 !event.is_active && "opacity-50 grayscale",
                                 selectedEvent?.id === event.id
-                                    ? "bg-emerald-500/5 border-emerald-500/30 shadow-[0_20px_40px_-15px_rgba(16,185,129,0.1)]"
+                                    ? "bg-emerald-500/5 border-emerald-500/30 shadow-xl"
                                     : "bg-zinc-900/20 border-white/5 hover:bg-white/5 hover:border-white/10"
                             )}
                         >
@@ -321,17 +321,17 @@ export default function AdminRewardsPage() {
                             )}
                             <div className="flex justify-between items-start mb-2">
                                 <h4 className={cn(
-                                    "font-bold transition-all duration-300",
+                                    "font-bold text-sm md:text-base transition-all duration-300",
                                     selectedEvent?.id === event.id ? "text-emerald-400" : "text-zinc-300 group-hover:text-white"
                                 )}>
-                                    {event.name} {!event.is_active && <span className="text-[7px] bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded-full ml-2 border border-white/5">FINALIZADO</span>}
+                                    {event.name} {!event.is_active && <span className="text-[7px] bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded-full ml-1 md:ml-2 border border-white/5">FINALIZADO</span>}
                                 </h4>
                                 <div className="flex items-center gap-1 relative z-10">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <button
                                                 onClick={(e) => e.stopPropagation()}
-                                                className="opacity-0 group-hover:opacity-100 p-2 hover:bg-white/5 rounded-xl transition-all text-zinc-500 hover:text-white border border-transparent hover:border-white/10"
+                                                className="opacity-100 lg:opacity-0 group-hover:opacity-100 p-1.5 md:p-2 hover:bg-white/5 rounded-xl transition-all text-zinc-500 hover:text-white border border-transparent hover:border-white/10"
                                             >
                                                 <MoreHorizontal className="w-4 h-4" />
                                             </button>
@@ -356,9 +356,9 @@ export default function AdminRewardsPage() {
                                     </DropdownMenu>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-4 text-[10px] font-mono text-zinc-500 uppercase">
-                                <span className="flex items-center gap-1"><Wallet className="w-3 h-3" /> {event.remaining_budget} / {event.total_budget} {BRANDING.currencySymbol}</span>
-                                <span className="flex items-center gap-1"><RefreshCw className="w-3 h-3" /> {event.reward_amount} {BRANDING.currencySymbol}/SCAN</span>
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[9px] md:text-[10px] font-mono text-zinc-500 uppercase">
+                                <span className="flex items-center gap-1"><Wallet className="w-3 h-3 text-emerald-500/50" /> {event.remaining_budget}/{event.total_budget} {BRANDING.currencySymbol}</span>
+                                <span className="flex items-center gap-1"><RefreshCw className="w-3 h-3 text-emerald-500/50" /> {event.reward_amount} {BRANDING.currencySymbol}/SCAN</span>
                             </div>
                         </div>
                     ))}
@@ -367,47 +367,47 @@ export default function AdminRewardsPage() {
                 {/* QR Display Area */}
                 <div className="lg:col-span-2">
                     {selectedEvent ? (
-                        <div className="bg-zinc-900/50 border border-white/5 rounded-[2.5rem] p-12 flex flex-col items-center justify-center text-center relative overflow-hidden min-h-[600px]">
+                        <div className="bg-zinc-900/50 border border-white/5 rounded-[2rem] md:rounded-[3rem] p-6 md:p-12 flex flex-col items-center justify-center text-center relative overflow-hidden min-h-[400px] md:min-h-[600px]">
                             {/* Decorative logic */}
                             <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent pointer-events-none" />
 
-                            <div className="z-10 bg-white p-8 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-8 border-white mb-8 group relative">
-                                <QRCodeSVG value={qrUrl} size={300} level="H" />
+                            <div className="z-10 bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl border-4 md:border-8 border-white mb-6 md:mb-8 group relative">
+                                <QRCodeSVG value={qrUrl} size={180} className="md:w-[300px] md:h-[300px]" level="H" />
                                 <div className="absolute inset-0 flex items-center justify-center bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <div className="bg-black text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                                        <RefreshCw className="w-3 h-3 animate-spin" /> Escanear Ahora
+                                    <div className="bg-black text-white px-3 md:px-4 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                                        <RefreshCw className="w-3 h-3 animate-spin" /> Escanear
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="z-10 space-y-4">
-                                <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase">{selectedEvent.name}</h2>
-                                <p className="text-zinc-500 max-w-md mx-auto">{selectedEvent.description || 'Escanea el código para recibir tu recompensa instantánea.'}</p>
+                            <div className="z-10 space-y-3 md:space-y-4">
+                                <h2 className="text-2xl md:text-3xl font-black text-white italic tracking-tighter uppercase">{selectedEvent.name}</h2>
+                                <p className="text-zinc-500 text-sm max-w-xs md:max-w-md mx-auto">{selectedEvent.description || 'Escanea el código para recibir tu recompensa instantánea.'}</p>
 
-                                <div className="inline-flex items-center gap-4 px-6 py-3 bg-black/40 border border-white/5 rounded-full text-xs font-mono uppercase tracking-widest text-emerald-400">
-                                    <Clock className="w-4 h-4" />
-                                    El código se actualiza en: <span className="text-white font-black w-4">{countdown}s</span>
+                                <div className="inline-flex items-center gap-3 md:gap-4 px-5 md:px-6 py-2 md:py-3 bg-black/40 border border-white/5 rounded-full text-[10px] md:text-xs font-mono uppercase tracking-widest text-emerald-400">
+                                    <Clock className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                                    Actualización en: <span className="text-white font-black w-3 md:w-4">{countdown}s</span>
                                 </div>
                             </div>
 
-                            <div className="mt-12 grid grid-cols-2 gap-8 z-10 w-full max-w-lg">
-                                <div className="text-center">
-                                    <div className="text-[10px] font-black uppercase text-zinc-500 mb-1 tracking-[0.2em]">Presupuesto Restante</div>
-                                    <div className="text-3xl font-black text-white">{selectedEvent.remaining_budget} <span className="text-emerald-500">{BRANDING.currencySymbol}</span></div>
+                            <div className="mt-8 md:mt-12 grid grid-cols-2 gap-4 md:gap-8 z-10 w-full max-w-lg">
+                                <div className="p-4 rounded-2xl bg-black/40 border border-white/5">
+                                    <div className="text-[8px] md:text-[10px] font-black uppercase text-zinc-500 mb-1 tracking-[0.1em]">Restante</div>
+                                    <div className="text-xl md:text-3xl font-black text-white">{selectedEvent.remaining_budget} <span className="text-emerald-500 text-xs md:text-sm">{BRANDING.currencySymbol}</span></div>
                                 </div>
-                                <div className="text-center">
-                                    <div className="text-[10px] font-black uppercase text-zinc-500 mb-1 tracking-[0.2em]">Valor Unitario</div>
-                                    <div className="text-3xl font-black text-white">{selectedEvent.reward_amount} <span className="text-emerald-500">{BRANDING.currencySymbol}</span></div>
+                                <div className="p-4 rounded-2xl bg-black/40 border border-white/5">
+                                    <div className="text-[8px] md:text-[10px] font-black uppercase text-zinc-500 mb-1 tracking-[0.1em]">Valor Scan</div>
+                                    <div className="text-xl md:text-3xl font-black text-white">{selectedEvent.reward_amount} <span className="text-emerald-500 text-xs md:text-sm">{BRANDING.currencySymbol}</span></div>
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        <div className="bg-zinc-950 border border-dashed border-zinc-800 rounded-[2.5rem] p-12 flex flex-col items-center justify-center text-center min-h-[600px] text-zinc-700">
-                            <div className="w-20 h-20 rounded-full border border-zinc-800 flex items-center justify-center mb-6">
-                                <TrendingUp className="w-10 h-10" />
+                        <div className="bg-zinc-950 border border-dashed border-zinc-800 rounded-[2rem] md:rounded-[3rem] p-8 md:p-12 flex flex-col items-center justify-center text-center min-h-[400px] md:min-h-[600px] text-zinc-700">
+                            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-zinc-800 flex items-center justify-center mb-6">
+                                <TrendingUp className="w-8 h-8 md:w-10 md:h-10" />
                             </div>
-                            <h3 className="text-xl font-bold text-zinc-500 uppercase tracking-widest">Selecciona un evento</h3>
-                            <p className="max-w-xs mx-auto mt-2 text-sm">El código QR dinámico aparecerá aquí para que los asistentes puedan escanearlo.</p>
+                            <h3 className="text-lg md:text-xl font-bold text-zinc-500 uppercase tracking-widest">Selecciona un evento</h3>
+                            <p className="max-w-xs mx-auto mt-2 text-xs md:text-sm">El código QR dinámico aparecerá aquí para que los asistentes puedan escanearlo.</p>
                         </div>
                     )}
                 </div>

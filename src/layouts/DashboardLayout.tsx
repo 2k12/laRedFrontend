@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
 import { FloatingNavbar } from "@/components/FloatingNavbar";
+import { cn } from "@/lib/utils";
 
 // Custom type extension for FloatingNavbar to accept onToggleSidebar
 // We might need to modify FloatingNavbar to accept this prop.
@@ -19,20 +20,23 @@ export default function DashboardLayout() {
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-white/[0.03] via-white/[0.01] to-transparent blur-3xl" />
       </div>
-      {/* Sidebar */}
-      <AppSidebar collapsed={sidebarCollapsed} width="w-56" />
+
+      {/* Sidebar - AppSidebar now handles its own responsive visibility */}
+      <AppSidebar collapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
 
       {/* Main Content Area */}
-      <div className={`transition-all duration-300 ${sidebarCollapsed ? 'pl-20' : 'pl-56'}`}>
+      <div className={cn(
+        "transition-all duration-300 min-h-screen flex flex-col",
+        "lg:pt-0", // No extra top padding on large screens (navbar is absolute)
+        sidebarCollapsed ? "lg:pl-20" : "lg:pl-72" // Fixed padding only on large screens
+      )}>
 
-        {/* Pass toggle handler to Navbar */}
-        {/* We need to modify FloatingNavbar to accept onToggleSidebar */}
         <FloatingNavbar
           title=""
           onToggleSidebar={toggleSidebar}
         />
 
-        <main className="relative pt-28 pb-10">
+        <main className="relative pt-20 pb-10 px-4 sm:px-6 lg:px-8">
           <Outlet />
         </main>
       </div>

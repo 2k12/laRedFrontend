@@ -59,50 +59,50 @@ export default function QRScannerPage() {
                 icon={<QrCode className="w-8 h-8 text-primary" />}
             />
 
-            <div className="relative mt-8 group">
+            <div className="relative mt-4 lg:mt-8 group">
                 {/* Visual Scanner Overlay */}
-                <div className="absolute inset-x-0 -top-8 flex justify-center z-10">
-                    <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900 border border-white/5 rounded-full text-[10px] font-black uppercase tracking-widest text-zinc-500 shadow-2xl">
-                        <Camera className="w-3 h-3 text-primary animate-pulse" />
+                <div className="absolute inset-x-0 -top-6 lg:-top-8 flex justify-center z-10">
+                    <div className="flex items-center gap-2 px-3 lg:px-4 py-1.5 lg:py-2 bg-zinc-900 border border-white/5 rounded-full text-[8px] lg:text-[10px] font-black uppercase tracking-widest text-zinc-500 shadow-2xl">
+                        <Camera className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-primary animate-pulse" />
                         Buscando Código QR
                     </div>
                 </div>
 
-                <div className="bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-[2.5rem] overflow-hidden relative shadow-2xl">
-                    <div id="reader" className="w-full h-full min-h-[400px]"></div>
+                <div className="bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-[1.5rem] lg:rounded-[2.5rem] overflow-hidden relative shadow-2xl mx-auto max-w-[500px]">
+                    <div id="reader" className="w-full aspect-square min-h-[300px] lg:min-h-[400px]"></div>
 
-                    {/* Decorative Scanner Corners (Native CSS) */}
+                    {/* Detección Status Overlay */}
                     {!isScanning && (
-                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-center p-8 z-20">
+                        <div className="absolute inset-0 bg-black/80 flex items-center justify-center text-center p-6 lg:p-8 z-20 animate-in fade-in duration-300">
                             <div className="space-y-4">
-                                <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto border border-emerald-500/50">
-                                    <QrCode className="w-8 h-8 text-emerald-500" />
+                                <div className="w-12 h-12 lg:w-16 lg:h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto border border-emerald-500/50">
+                                    <QrCode className="w-6 h-6 lg:w-8 lg:h-8 text-emerald-500" />
                                 </div>
-                                <h3 className="text-xl font-bold">Escaneo Completado</h3>
-                                <p className="text-zinc-500 text-sm">Redirigiendo a tu recompensa...</p>
+                                <h3 className="text-lg lg:text-xl font-bold uppercase italic tracking-tighter">Escaneo Completado</h3>
+                                <p className="text-zinc-500 text-[10px] lg:text-sm font-mono uppercase tracking-widest">Sincronizando con la red principal...</p>
                             </div>
                         </div>
                     )}
                 </div>
 
                 {/* Legend */}
-                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-6 rounded-3xl bg-zinc-900/20 border border-white/5 flex items-start gap-4">
-                        <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20 text-primary">
-                            <Camera className="w-5 h-5" />
+                <div className="mt-6 lg:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
+                    <div className="p-4 lg:p-6 rounded-[1.5rem] lg:rounded-3xl bg-zinc-900/20 border border-white/5 flex items-start gap-4 transition-colors hover:bg-zinc-900/40">
+                        <div className="p-2.5 lg:p-3 rounded-xl lg:rounded-2xl bg-primary/10 border border-primary/20 text-primary shrink-0">
+                            <Camera className="w-4 h-4 lg:w-5 lg:h-5" />
                         </div>
                         <div>
-                            <h4 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">Cámara Activa</h4>
-                            <p className="text-xs text-zinc-500 leading-relaxed">Asegúrate de permitir el acceso a la cámara y tener buena iluminación.</p>
+                            <h4 className="text-[10px] lg:text-sm font-bold text-white mb-1 uppercase tracking-tight">Cámara Activa</h4>
+                            <p className="text-[9px] lg:text-xs text-zinc-600 leading-relaxed">Asegúrate de permitir el acceso y tener buena iluminación.</p>
                         </div>
                     </div>
-                    <div className="p-6 rounded-3xl bg-emerald-500/5 border border-emerald-500/10 flex items-start gap-4">
-                        <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
-                            <QrCode className="w-5 h-5" />
+                    <div className="p-4 lg:p-6 rounded-[1.5rem] lg:rounded-3xl bg-emerald-500/5 border border-emerald-500/10 flex items-start gap-4 transition-colors hover:bg-emerald-500/10">
+                        <div className="p-2.5 lg:p-3 rounded-xl lg:rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 shrink-0">
+                            <QrCode className="w-4 h-4 lg:w-5 lg:h-5" />
                         </div>
                         <div>
-                            <h4 className="text-sm font-bold text-emerald-400 mb-1 uppercase tracking-tight">Detección Automática</h4>
-                            <p className="text-xs text-zinc-500 leading-relaxed">El sistema detectará el premio instantáneamente apenas aparezca en el recuadro.</p>
+                            <h4 className="text-[10px] lg:text-sm font-bold text-emerald-400 mb-1 uppercase tracking-tight">Detección Auto</h4>
+                            <p className="text-[9px] lg:text-xs text-zinc-600 leading-relaxed">El sistema detectará el premio apenas aparezca en el recuadro.</p>
                         </div>
                     </div>
                 </div>

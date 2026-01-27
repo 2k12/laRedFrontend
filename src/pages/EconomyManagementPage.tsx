@@ -91,89 +91,92 @@ export default function EconomyManagementPage() {
                 />
 
                 {/* Stats Grid */}
+                {/* Stats Grid */}
                 {stats && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="p-6 rounded-3xl bg-zinc-900/50 border border-white/5 space-y-2">
-                            <div className="flex items-center gap-2 text-zinc-500 text-xs font-bold uppercase tracking-widest">
-                                <Coins className="w-4 h-4" /> Oferta Total
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+                        <div className="p-5 lg:p-6 rounded-[1.5rem] lg:rounded-3xl bg-zinc-900/50 border border-white/5 space-y-1 lg:space-y-2">
+                            <div className="flex items-center gap-2 text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
+                                <Coins className="w-3.5 h-3.5" /> Oferta Total
                             </div>
-                            <p className="text-3xl font-black text-white">{stats.total_coins} <span className="text-primary text-sm">{BRANDING.currencySymbol}</span></p>
+                            <p className="text-2xl lg:text-3xl font-black text-white">{stats.total_coins} <span className="text-primary text-xs lg:text-sm">{BRANDING.currencySymbol}</span></p>
                         </div>
-                        <div className="p-6 rounded-3xl bg-zinc-900/50 border border-white/5 space-y-2">
-                            <div className="flex items-center gap-2 text-zinc-500 text-xs font-bold uppercase tracking-widest">
-                                <Users className="w-4 h-4" /> Usuarios Activos
+                        <div className="p-5 lg:p-6 rounded-[1.5rem] lg:rounded-3xl bg-zinc-900/50 border border-white/5 space-y-1 lg:space-y-2">
+                            <div className="flex items-center gap-2 text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
+                                <Users className="w-3.5 h-3.5" /> Usuarios Activos
                             </div>
-                            <p className="text-3xl font-black text-white">{stats.total_users}</p>
+                            <p className="text-2xl lg:text-3xl font-black text-white">{stats.total_users}</p>
                         </div>
-                        <div className="p-6 rounded-3xl bg-primary/10 border border-primary/20 space-y-2">
-                            <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
-                                <TrendingUp className="w-4 h-4" /> Riqueza Promedio (RP)
+                        <div className="p-5 lg:p-6 rounded-[1.5rem] lg:rounded-3xl bg-primary/10 border border-primary/20 space-y-1 lg:space-y-2 sm:col-span-2 lg:col-span-1">
+                            <div className="flex items-center gap-2 text-primary font-bold text-[10px] uppercase tracking-widest">
+                                <TrendingUp className="w-3.5 h-3.5" /> Riqueza Promedio (RP)
                             </div>
-                            <p className="text-3xl font-black text-white">{stats.average_wealth} <span className="text-primary text-sm">{BRANDING.currencySymbol}</span></p>
+                            <p className="text-2xl lg:text-3xl font-black text-white">{stats.average_wealth} <span className="text-primary text-xs lg:text-sm">{BRANDING.currencySymbol}</span></p>
                         </div>
                     </div>
                 )}
 
                 {/* Categories Table */}
-                <div className="bg-zinc-900/40 border border-white/5 rounded-[2rem] overflow-hidden backdrop-blur-md">
-                    <Table>
-                        <TableHeader className="bg-white/5">
-                            <TableRow className="border-white/5 hover:bg-transparent">
-                                <TableHead className="text-zinc-500 font-bold px-8 py-6">CATEGORÍA</TableHead>
-                                <TableHead className="text-zinc-500 font-bold">FACTOR ACTUAL</TableHead>
-                                <TableHead className="text-zinc-500 font-bold">LÍMITE DE PRECIO (F × RP)</TableHead>
-                                <TableHead className="text-zinc-500 font-bold text-right px-8">ACCIONES</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {loading ? (
-                                <TableRow><TableCell colSpan={4} className="text-center py-20 text-zinc-500">Cargando parámetros...</TableCell></TableRow>
-                            ) : categories.map((cat) => (
-                                <TableRow key={cat.slug} className="border-white/5 hover:bg-white/[0.02] transition-colors group">
-                                    <TableCell className="px-8 py-8">
-                                        <div className="space-y-1">
-                                            <p className="font-bold text-white uppercase tracking-wide">{cat.name}</p>
-                                            <p className="text-xs text-zinc-500 italic lowercase">{cat.slug}</p>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center gap-3">
-                                            <Input
-                                                defaultValue={cat.factor}
-                                                id={`factor-${cat.slug}`}
-                                                className="w-24 bg-black border-zinc-800 focus:border-primary text-white font-bold"
-                                                type="number"
-                                                step="0.1"
-                                            />
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center gap-2 font-mono">
-                                            <span className="text-2xl font-black text-primary">{cat.max_price}</span>
-                                            <span className="text-[10px] text-zinc-600 font-bold uppercase">{BRANDING.currencySymbol} Máximo</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-right px-8">
-                                        <MinimalButton
-                                            onClick={() => {
-                                                const input = document.getElementById(`factor-${cat.slug}`) as HTMLInputElement;
-                                                handleUpdateFactor(cat.slug, input.value);
-                                            }}
-                                            disabled={updatingId === cat.slug}
-                                            className="bg-white/5 text-white hover:bg-primary hover:text-white border-white/10 hover:border-primary text-[9px] font-black uppercase tracking-[0.2em] px-6 py-4 h-10 shadow-2xl transition-all duration-500"
-                                        >
-                                            {updatingId === cat.slug ? (
-                                                <Loader2 className="w-3.5 h-3.5 animate-spin mr-2 text-primary group-hover:text-white" />
-                                            ) : (
-                                                <TrendingUp className="w-3.5 h-3.5 mr-2 opacity-50 group-hover:opacity-100 transition-opacity" />
-                                            )}
-                                            {updatingId === cat.slug ? "PROCESANDO" : "AJUSTAR FACTOR"}
-                                        </MinimalButton>
-                                    </TableCell>
+                <div className="bg-zinc-900/40 border border-white/5 rounded-[1.5rem] lg:rounded-[2rem] overflow-hidden backdrop-blur-md">
+                    <div className="overflow-x-auto custom-scrollbar">
+                        <Table>
+                            <TableHeader className="bg-white/5">
+                                <TableRow className="border-white/5 hover:bg-transparent">
+                                    <TableHead className="text-zinc-500 font-bold px-6 lg:px-8 py-4 lg:py-6 text-[10px] uppercase tracking-widest">Categoría</TableHead>
+                                    <TableHead className="text-zinc-500 font-bold text-[10px] uppercase tracking-widest">Factor</TableHead>
+                                    <TableHead className="text-zinc-500 font-bold text-[10px] uppercase tracking-widest">Precio Máx</TableHead>
+                                    <TableHead className="text-zinc-500 font-bold text-right px-6 lg:px-8 text-[10px] uppercase tracking-widest">Acciones</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {loading ? (
+                                    <TableRow><TableCell colSpan={4} className="text-center py-20 text-zinc-500 font-mono text-xs uppercase">Cargando parámetros...</TableCell></TableRow>
+                                ) : categories.map((cat) => (
+                                    <TableRow key={cat.slug} className="border-white/5 hover:bg-white/[0.02] transition-colors group">
+                                        <TableCell className="px-6 lg:px-8 py-6 lg:py-8 min-w-[150px]">
+                                            <div className="space-y-1">
+                                                <p className="font-bold text-white uppercase tracking-wide text-sm">{cat.name}</p>
+                                                <p className="text-[10px] text-zinc-600 italic lowercase font-mono">{cat.slug}</p>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="min-w-[100px]">
+                                            <div className="flex items-center gap-3">
+                                                <Input
+                                                    defaultValue={cat.factor}
+                                                    id={`factor-${cat.slug}`}
+                                                    className="w-20 lg:w-24 bg-black border-zinc-800 focus:border-primary text-white font-bold h-9 text-xs"
+                                                    type="number"
+                                                    step="0.1"
+                                                />
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="min-w-[120px]">
+                                            <div className="flex items-center gap-2 font-mono">
+                                                <span className="text-xl lg:text-2xl font-black text-primary">{cat.max_price}</span>
+                                                <span className="text-[8px] lg:text-[10px] text-zinc-600 font-bold uppercase">{BRANDING.currencySymbol}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-right px-6 lg:px-8 min-w-[160px]">
+                                            <MinimalButton
+                                                onClick={() => {
+                                                    const input = document.getElementById(`factor-${cat.slug}`) as HTMLInputElement;
+                                                    handleUpdateFactor(cat.slug, input.value);
+                                                }}
+                                                disabled={updatingId === cat.slug}
+                                                className="bg-zinc-800 text-white hover:bg-white hover:text-black border-white/5 text-[8px] font-black uppercase tracking-[0.1em] px-4 py-2 h-9 transition-all duration-300"
+                                            >
+                                                {updatingId === cat.slug ? (
+                                                    <Loader2 className="w-3 h-3 animate-spin mr-2" />
+                                                ) : (
+                                                    <TrendingUp className="w-3 h-3 mr-2" />
+                                                )}
+                                                {updatingId === cat.slug ? "PROCESANDO" : "AJUSTAR"}
+                                            </MinimalButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </div>
 
                 {/* Footer Info */}

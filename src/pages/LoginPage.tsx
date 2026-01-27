@@ -60,8 +60,14 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-background flex flex-col justify-center items-center p-4 selection:bg-primary selection:text-primary-foreground">
-            <div className="w-full max-w-[350px] space-y-8">
+        <div className="min-h-screen bg-background flex flex-col justify-center items-center p-4 selection:bg-primary selection:text-primary-foreground overflow-hidden relative">
+            {/* Background Blobs for Consistency */}
+            <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-[10%] left-[-10%] w-[300px] h-[300px] bg-white/[0.03] rounded-full blur-[100px]" />
+                <div className="absolute bottom-[10%] right-[-10%] w-[250px] h-[250px] bg-white/[0.02] rounded-full blur-[80px]" />
+            </div>
+
+            <div className="w-full max-w-[350px] space-y-8 relative z-10">
                 <Link to="/" className="login-element inline-flex items-center text-xs font-mono text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest mb-4">
                     <ArrowLeft className="w-3 h-3 mr-2" /> Volver
                 </Link>

@@ -107,30 +107,30 @@ export default function ProductTransferPage() {
                 </PageHeader>
 
                 {/* Transfer Bridge */}
-                <div className="flex flex-col md:flex-row items-center justify-between gap-12 pt-8">
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-12 pt-4 lg:pt-8 w-full">
                     {/* Source */}
-                    <div className="flex-1 w-full p-10 rounded-[2.5rem] bg-zinc-900/30 border border-white/5 space-y-6 text-center">
-                        <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Origen</span>
-                        <div className="w-12 h-12 bg-zinc-950 rounded-xl border border-white/5 flex items-center justify-center mx-auto">
-                            <Store className="w-6 h-6 text-zinc-500" />
+                    <div className="flex-1 w-full p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] bg-zinc-900/30 border border-white/5 space-y-4 lg:space-y-6 text-center">
+                        <span className="text-[8px] lg:text-[9px] font-black text-zinc-600 uppercase tracking-widest">Origen</span>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-zinc-950 rounded-xl border border-white/5 flex items-center justify-center mx-auto">
+                            <Store className="w-5 h-5 lg:w-6 lg:h-6 text-zinc-500" />
                         </div>
-                        <h3 className="text-xl font-bold text-white line-clamp-1">{sourceStore?.name || "Tienda Actual"}</h3>
+                        <h3 className="text-lg lg:text-xl font-bold text-white line-clamp-1">{sourceStore?.name || "Tienda Actual"}</h3>
                     </div>
 
                     {/* Arrow / Connector */}
-                    <div className="hidden md:block">
-                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 animate-pulse">
-                            <ArrowRightLeft className="w-5 h-5 text-primary" />
+                    <div className="lg:block">
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 animate-pulse rotate-90 lg:rotate-0">
+                            <ArrowRightLeft className="w-4 h-4 lg:w-5 lg:h-5 text-primary" />
                         </div>
                     </div>
 
                     {/* Target */}
-                    <div className="flex-1 w-full p-10 rounded-[2.5rem] bg-zinc-900/30 border border-white/5 space-y-6 text-center">
-                        <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Destino</span>
+                    <div className="flex-1 w-full p-6 lg:p-10 rounded-[2rem] lg:rounded-[2.5rem] bg-zinc-900/30 border border-white/5 space-y-4 lg:space-y-6 text-center">
+                        <span className="text-[8px] lg:text-[9px] font-black text-zinc-600 uppercase tracking-widest">Destino</span>
                         <div className="space-y-4">
                             <Select onValueChange={setTargetStoreId} value={targetStoreId}>
-                                <SelectTrigger className="bg-zinc-950 border-white/5 h-14 rounded-2xl text-center">
-                                    <SelectValue placeholder="Seleccionar Tienda Target" />
+                                <SelectTrigger className="bg-zinc-950 border-white/5 h-12 lg:h-14 rounded-xl lg:rounded-2xl text-center text-xs">
+                                    <SelectValue placeholder="Seleccionar Destino" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-zinc-950 border-white/5 text-white">
                                     {myStores.filter(s => s.id !== product.store_id).map(s => (
@@ -143,22 +143,22 @@ export default function ProductTransferPage() {
                 </div>
 
                 {/* Product Preview Card */}
-                <div className="p-8 rounded-[2rem] bg-zinc-950 border border-white/5 flex items-center gap-6">
-                    <div className="w-14 h-14 bg-zinc-900 rounded-xl flex items-center justify-center text-zinc-700">
-                        <Package className="w-6 h-6" />
+                <div className="p-5 lg:p-8 rounded-[1.5rem] lg:rounded-[2rem] bg-zinc-950 border border-white/5 flex items-center gap-4 lg:gap-6">
+                    <div className="w-12 h-12 lg:w-14 lg:h-14 bg-zinc-900 rounded-xl flex items-center justify-center text-zinc-700 shrink-0">
+                        <Package className="w-5 h-5 lg:w-6 lg:h-6" />
                     </div>
-                    <div className="flex-1">
-                        <h4 className="font-bold text-white">{product.name}</h4>
-                        <p className="text-xs text-zinc-500">{product.description}</p>
+                    <div className="flex-1 min-w-0">
+                        <h4 className="font-bold text-white text-sm lg:text-base truncate">{product.name}</h4>
+                        <p className="text-[10px] lg:text-xs text-zinc-500 line-clamp-1">{product.description}</p>
                     </div>
                 </div>
 
                 {/* Action button */}
-                <div className="pt-8">
+                <div className="pt-4 lg:pt-8 w-full">
                     <MinimalButton
                         disabled={!targetStoreId}
                         onClick={() => setIsConfirmOpen(true)}
-                        className="w-full h-20 rounded-full bg-white text-black font-black uppercase tracking-[0.2em] border-none hover:bg-zinc-200 transition-all disabled:opacity-30"
+                        className="w-full h-16 lg:h-20 rounded-full bg-white text-black font-black uppercase tracking-[0.1em] lg:tracking-[0.2em] border-none hover:bg-zinc-200 transition-all disabled:opacity-30 text-xs lg:text-base"
                     >
                         Solicitar Transferencia
                     </MinimalButton>

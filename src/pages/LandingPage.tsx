@@ -41,24 +41,24 @@ export default function LandingPage() {
                 <div className="absolute bottom-[20%] right-[20%] w-[300px] h-[300px] bg-white/[0.02] rounded-full blur-[80px]" />
             </div>
 
-            <section className="relative h-screen flex flex-col items-center justify-center px-6">
-                <div className="max-w-5xl w-full space-y-12 text-center z-10">
+            <section className="relative min-h-[90vh] md:h-screen flex flex-col items-center justify-center px-6 pt-20">
+                <div className="max-w-5xl w-full space-y-8 md:space-y-12 text-center z-10">
                     {/* Minimalist Header */}
-                    <h1 className="hero-text text-6xl md:text-9xl font-bold tracking-tighter leading-[0.9] mix-blend-difference text-foreground">
+                    <h1 className="hero-text text-5xl sm:text-7xl md:text-9xl font-bold tracking-tighter leading-[0.9] mix-blend-difference text-foreground">
                         <ScrambleText text={BRANDING.appName} autoStart duration={0.8} revealDuration={0.8} /><br />
                         {/* <ScrambleText text={BRANDING.appName.toUpperCase()} autoStart duration={0.8} revealDuration={0.8} /><br /> */}
                         {/* <ScrambleText text="UNIVERSITARIA" autoStart duration={0.8} revealDuration={0.8} /> */}
                     </h1>
 
-                    <p className="hero-text text-lg md:text-xl text-muted-foreground max-w-xl mx-auto font-light tracking-wide uppercase">
-                        La próxima generación de comercio universitario.<br />
+                    <p className="hero-text text-base md:text-xl text-muted-foreground max-w-xl mx-auto font-light tracking-wide uppercase px-4">
+                        La próxima generación de comercio universitario.<br className="hidden sm:block" />
                         {BRANDING.productNamePlural} • {BRANDING.currencyNamePlural} • Instantáneo.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8">
-                        <Link to="/login">
-                            <div className="magnetic-btn hero-btn inline-block">
-                                <Button className="h-16 px-10 rounded-full bg-primary text-primary-foreground hover:bg-white hover:text-black text-lg font-bold transition-all duration-300">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4 md:pt-8 w-full sm:w-auto px-6 sm:px-0">
+                        <Link to="/login" className="w-full sm:w-auto">
+                            <div className="magnetic-btn hero-btn block sm:inline-block w-full sm:w-auto">
+                                <Button className="h-14 md:h-16 w-full sm:w-auto px-8 md:px-10 rounded-full bg-primary text-primary-foreground hover:bg-white hover:text-black text-base md:text-lg font-bold transition-all duration-300">
                                     Comenzar Ahora <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
                             </div>
@@ -67,8 +67,8 @@ export default function LandingPage() {
                 </div>
 
                 {/* Minimalist Stats/Features */}
-                <div className="absolute bottom-12 w-full max-w-7xl px-6 flex justify-between text-muted-foreground text-xs font-mono uppercase tracking-widest">
-                    <div className="flex gap-8">
+                <div className="absolute bottom-6 md:bottom-12 w-full max-w-7xl px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-[10px] md:text-xs font-mono uppercase tracking-widest">
+                    <div className="flex gap-4 md:gap-8">
                         <span>[ Ledger {BRANDING.currencySymbol} ]</span>
                         <span>[ {BRANDING.productName} Mint ]</span>
                     </div>
@@ -79,11 +79,11 @@ export default function LandingPage() {
             </section>
 
             {/* Grid Section - Banking Professional */}
-            <section className="py-40 px-6 border-t border-white/5 bg-black">
+            <section className="py-20 md:py-40 px-6 border-t border-white/5 bg-black">
                 <div className="max-w-7xl mx-auto">
-                    <div className="mb-20 space-y-4">
-                        <h2 className="text-zinc-500 text-xs font-mono uppercase tracking-[0.4em] mb-4">Core Infrastructure</h2>
-                        <h3 className="text-4xl md:text-5xl font-light tracking-tight text-white max-w-2xl leading-tight">
+                    <div className="mb-12 md:mb-20 space-y-4">
+                        <h2 className="text-zinc-500 text-[10px] md:text-xs font-mono uppercase tracking-[0.4em] mb-4">Core Infrastructure</h2>
+                        <h3 className="text-3xl md:text-5xl font-light tracking-tight text-white max-w-2xl leading-tight">
                             Nivel bancario. Alcance <span className="text-zinc-500 italic">ultrarápido</span>.
                         </h3>
                     </div>
@@ -121,18 +121,18 @@ function BankingCard({ icon, title, desc, index }: { icon: any, title: string, d
         <div
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            className="bg-black p-12 hover:bg-zinc-900/50 transition-all duration-700 group cursor-default relative overflow-hidden"
+            className="bg-black p-8 md:p-12 hover:bg-zinc-900/50 transition-all duration-700 group cursor-default relative overflow-hidden"
         >
             {/* Index Number */}
-            <div className="absolute top-8 right-8 text-[10px] font-mono text-zinc-800 group-hover:text-zinc-600 transition-colors">
+            <div className="absolute top-6 md:top-8 right-6 md:right-8 text-[10px] font-mono text-zinc-800 group-hover:text-zinc-600 transition-colors">
                 0{index} /
             </div>
 
-            <div className="mb-12 text-zinc-500 group-hover:text-white transition-all duration-500 group-hover:scale-110 origin-left">
+            <div className="mb-8 md:mb-12 text-zinc-500 group-hover:text-white transition-all duration-500 group-hover:scale-110 origin-left">
                 {icon}
             </div>
 
-            <h3 className="text-lg font-bold mb-4 text-white tracking-tight uppercase">
+            <h3 className="text-base md:text-lg font-bold mb-4 text-white tracking-tight uppercase">
                 <ScrambleText text={title} trigger={isHovered} autoStart duration={0.3} revealDuration={0.4} />
             </h3>
 

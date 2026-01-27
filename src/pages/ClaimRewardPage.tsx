@@ -87,39 +87,39 @@ export default function ClaimRewardPage() {
                 )}
 
                 {status === 'success' && (
-                    <div className="space-y-8 animate-in fade-in zoom-in duration-700 relative z-10 w-full">
+                    <div className="space-y-6 lg:space-y-8 animate-in fade-in zoom-in duration-700 relative z-10 w-full px-2">
                         <div className="relative">
-                            <div className="w-32 h-32 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto border border-emerald-500/50 shadow-[0_0_60px_rgba(16,185,129,0.3)] group">
-                                <CheckCircle2 className="w-16 h-16 text-emerald-500 group-hover:scale-110 transition-transform duration-500" />
+                            <div className="w-24 h-24 lg:w-32 lg:h-32 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto border border-emerald-500/50 shadow-[0_0_60px_rgba(16,185,129,0.3)] group">
+                                <CheckCircle2 className="w-12 h-12 lg:w-16 lg:h-16 text-emerald-500 group-hover:scale-110 transition-transform duration-500" />
                             </div>
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full border-2 border-emerald-500/20 animate-ping opacity-20" />
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-24 lg:w-32 lg:h-32 rounded-full border-2 border-emerald-500/20 animate-ping opacity-20" />
                         </div>
 
-                        <div className="space-y-4">
-                            <h2 className="text-5xl font-black uppercase italic tracking-tighter leading-none drop-shadow-2xl">¡ÉXITO TOTAL!</h2>
+                        <div className="space-y-3 lg:space-y-4">
+                            <h2 className="text-3xl lg:text-5xl font-black uppercase italic tracking-tighter leading-none drop-shadow-2xl">¡ÉXITO TOTAL!</h2>
                             <div className="flex flex-col items-center">
-                                <div className="text-7xl font-black text-white tabular-nums flex items-center gap-4">
+                                <div className="text-5xl lg:text-7xl font-black text-white tabular-nums flex items-center gap-3 lg:gap-4">
                                     <span className="text-emerald-400">+</span>
                                     {rewardAmount}
-                                    <span className="text-2xl text-zinc-600 font-mono">{BRANDING.currencySymbol}</span>
+                                    <span className="text-xl lg:text-2xl text-zinc-600 font-mono">{BRANDING.currencySymbol}</span>
                                 </div>
-                                <div className="h-1 w-24 bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent mt-2" />
+                                <div className="h-1 w-16 lg:w-24 bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent mt-2" />
                             </div>
-                            <p className="text-zinc-500 text-sm max-w-sm mx-auto leading-relaxed pt-2">
+                            <p className="text-zinc-500 text-xs lg:text-sm max-w-sm mx-auto leading-relaxed pt-2">
                                 {message} Los activos han sido transferidos exitosamente a tu bóveda personal.
                             </p>
                         </div>
 
-                        <div className="pt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                        <div className="pt-6 lg:pt-8 flex flex-col sm:flex-row gap-3 lg:gap-4 justify-center">
                             <MinimalButton
-                                className="h-16 px-10 bg-white text-black hover:bg-zinc-200 font-black text-base rounded-2xl border-none shadow-xl"
+                                className="h-14 lg:h-16 px-8 lg:px-10 bg-white text-black hover:bg-zinc-200 font-black text-sm lg:text-base rounded-2xl border-none shadow-xl"
                                 onClick={() => navigate('/dashboard/coins')}
                                 icon={<ArrowRight className="w-5 h-5" />}
                             >
                                 Ver mi Bóveda
                             </MinimalButton>
                             <MinimalButton
-                                className="h-16 px-10 bg-zinc-900 border-white/5 text-zinc-400 hover:text-white rounded-2xl transition-all"
+                                className="h-14 lg:h-16 px-8 lg:px-10 bg-zinc-900 border-white/5 text-zinc-400 hover:text-white rounded-2xl transition-all text-sm lg:text-base"
                                 onClick={() => navigate('/feed')}
                             >
                                 Ir al Marketplace
@@ -129,28 +129,28 @@ export default function ClaimRewardPage() {
                 )}
 
                 {status === 'error' && (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-500 relative z-10">
-                        <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mx-auto border border-red-500/20 shadow-2xl">
-                            <AlertCircle className="w-12 h-12 text-red-500" />
+                    <div className="space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-500 relative z-10 px-4">
+                        <div className="w-20 h-20 lg:w-24 lg:h-24 bg-red-500/10 rounded-full flex items-center justify-center mx-auto border border-red-500/20 shadow-2xl">
+                            <AlertCircle className="w-10 h-10 lg:w-12 lg:h-12 text-red-500" />
                         </div>
 
-                        <div className="space-y-3">
-                            <h2 className="text-3xl font-black uppercase italic tracking-tighter">Fallo de Validación</h2>
-                            <p className="text-zinc-400 text-sm leading-relaxed px-4 max-w-sm mx-auto">
+                        <div className="space-y-2 lg:space-y-3">
+                            <h2 className="text-2xl lg:text-3xl font-black uppercase italic tracking-tighter">Fallo de Validación</h2>
+                            <p className="text-zinc-400 text-xs lg:text-sm leading-relaxed max-w-sm mx-auto">
                                 {message}
                             </p>
                         </div>
 
-                        <div className="pt-8 space-y-4">
+                        <div className="pt-6 lg:pt-8 space-y-3 lg:space-y-4">
                             <MinimalButton
-                                className="w-full h-14 bg-white/5 border-white/10 hover:bg-white/10 rounded-2xl text-white font-bold"
+                                className="w-full h-12 lg:h-14 bg-white/5 border-white/10 hover:bg-white/10 rounded-2xl text-white font-bold text-sm"
                                 onClick={() => navigate('/dashboard/scan')}
                             >
                                 Reintentar Escaneo
                             </MinimalButton>
                             <button
                                 onClick={() => navigate('/feed')}
-                                className="text-xs text-zinc-600 uppercase font-black hover:text-zinc-400 transition-colors tracking-widest"
+                                className="text-[10px] lg:text-xs text-zinc-600 uppercase font-black hover:text-zinc-400 transition-colors tracking-widest w-full"
                             >
                                 Cancelar y salir
                             </button>

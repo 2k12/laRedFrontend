@@ -95,8 +95,8 @@ export default function MarketplaceFeed() {
     }, { scope: container, dependencies: [loading, products] });
 
     return (
-        <div ref={container} className="container mx-auto max-w-[1600px] px-6">
-            <main className="relative z-10 flex gap-8">
+        <div ref={container} className="container mx-auto max-w-[1600px] px-4 sm:px-6">
+            <main className="relative z-10 flex gap-4 md:gap-8">
 
                 {/* Left Vertical Pagination (Sticky) */}
                 <div className="hidden xl:flex flex-col shrink-0 w-16 pt-20">
@@ -106,18 +106,18 @@ export default function MarketplaceFeed() {
                 </div>
 
                 {/* Product Grid Area */}
-                <div className="flex-1">
+                <div className="flex-1 w-full overflow-hidden">
                     <PageHeader
                         title={BRANDING.productNamePlural}
-                        description={`Explora ${BRANDING.productNamePlural.toLowerCase()} de la comunidad universitaria y gestiona tus adquisiciones de forma segura.`}
+                        description={`Explora ${BRANDING.productNamePlural.toLowerCase()} de la comunidad universitaria.`}
                     >
                         <div className="hidden sm:flex gap-2 text-xs font-mono text-zinc-500">
-                            {!loading && <span>{products.length} Resultados (Página {page})</span>}
+                            {!loading && <span>{products.length} Resultados</span>}
                         </div>
                     </PageHeader>
 
                     {/* Modern Grid - Optimized Density */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-6">
                         {loading ? (
                             // SKELETON LOADING STATE
                             Array.from({ length: 12 }).map((_, i) => (

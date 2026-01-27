@@ -7,9 +7,10 @@ import { BRANDING } from "@/config/branding";
 interface AppSidebarProps {
   collapsed: boolean;
   width?: string;
+  toggleSidebar?: () => void;
 }
 
-export function AppSidebar({ collapsed, width = "w-72" }: AppSidebarProps) {
+export function AppSidebar({ collapsed, width = "w-72", toggleSidebar }: AppSidebarProps) {
   const { pathname } = useLocation();
   const { user } = useAuth();
 
@@ -30,72 +31,70 @@ export function AppSidebar({ collapsed, width = "w-72" }: AppSidebarProps) {
   ];
 
   return (
-    <aside
-      className={cn(
-        "fixed left-0 top-0 h-full z-30 flex flex-col justify-between pt-24 pb-8 transition-all duration-500 ease-out border-r border-white/5 bg-transparent backdrop-blur-sm",
-        collapsed ? "w-20" : width
+    <>
+      {/* Mobile Backdrop */}
+      {!collapsed && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          onClick={toggleSidebar}
+        />
       )}
-    >
-      <nav className="flex flex-col gap-2 px-3">
-        {links.map((link) => {
-          const Icon = link.icon;
-          const isActive = pathname === link.href;
 
-          return (
-            <Link
-              key={link.href}
-              to={link.href}
-              className={cn(
-                "flex items-center gap-4 p-3 rounded-xl transition-all duration-300 group relative",
-                collapsed ? "justify-center" : "",
-                isActive
-                  ? "bg-zinc-800 text-white border border-white/10"
-                  : "text-zinc-400 hover:text-white hover:bg-white/5"
-              )}
-            >
-              <div className={cn(
-                "w-6 h-6 flex items-center justify-center transition-transform duration-300",
-                // No need for mx-auto if parent is justify-center
-              )}>
-                <Icon className="w-5 h-5" />
-              </div>
+      <aside
+        className={cn(
+          "fixed left-0 top-0 h-full z-50 flex flex-col justify-between pt-24 pb-8 transition-all duration-500 ease-out border-r border-white/5 bg-black lg:bg-transparent backdrop-blur-xl lg:backdrop-blur-sm",
+          // Mobile: Hidden by default (collapsed on mobile means off-screen)
+          // lg: On screen, either narrow (20) or wide (width)
+          collapsed
+            ? "-translate-x-full lg:translate-x-0 lg:w-20"
+            : "translate-x-0 w-[280px] lg:w-72"
+        )}
+      >
+        <nav className="flex flex-col gap-2 px-3">
+          {links.map((link) => {
+            const Icon = link.icon;
+            const isActive = pathname === link.href;
 
-              <span className={cn(
-                "whitespace-nowrap transition-all duration-300 overflow-hidden",
-                collapsed ? "opacity-0 w-0 translate-x-4" : "opacity-100 w-auto translate-x-0"
-              )}>
-                {link.label}
-              </span>
-
-              {/* Tooltip for collapsed state */}
-              {collapsed && (
-                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-3 py-1.5 bg-zinc-900 border border-white/10 rounded-lg text-xs font-medium text-white opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
-                  {link.label}
+            return (
+              <Link
+                key={link.href}
+                to={link.href}
+                onClick={() => {
+                  // Close sidebar on mobile when navigating
+                  if (window.innerWidth < 1024) toggleSidebar?.();
+                }}
+                className={cn(
+                  "flex items-center gap-4 p-3 rounded-xl transition-all duration-300 group relative",
+                  collapsed ? "lg:justify-center" : "",
+                  isActive
+                    ? "bg-zinc-800 text-white border border-white/10"
+                    : "text-zinc-400 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <div className={cn(
+                  "w-6 h-6 flex items-center justify-center transition-transform duration-300",
+                )}>
+                  <Icon className="w-5 h-5" />
                 </div>
-              )}
-            </Link>
-          );
-        })}
-      </nav>
-      {/* 
-      <div className="px-3">
-        <Button
-          variant="ghost"
-          className={cn(
-            "w-full text-red-500 hover:text-red-400 hover:bg-red-500/10 transition-all",
-            collapsed ? "justify-center px-0" : "justify-start gap-3"
-          )}
-          onClick={logout}
-        >
-          <LogOut className="w-5 h-5" />
-          <span className={cn(
-            "transition-all duration-300 overflow-hidden",
-            collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
-          )}>
-            Cerrar Sesión
-          </span>
-        </Button>
-      </div> */}
-    </aside>
+
+                <span className={cn(
+                  "whitespace-nowrap transition-all duration-300 overflow-hidden",
+                  collapsed ? "lg:opacity-0 lg:w-0 lg:translate-x-4" : "opacity-100 w-auto translate-x-0"
+                )}>
+                  {link.label}
+                </span>
+
+                {/* Tooltip for collapsed state (Desktop only) */}
+                {collapsed && (
+                  <div className="hidden lg:block absolute left-full top-1/2 -translate-y-1/2 ml-4 px-3 py-1.5 bg-zinc-900 border border-white/10 rounded-lg text-xs font-medium text-white opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+                    {link.label}
+                  </div>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+      </aside>
+    </>
   );
 }
