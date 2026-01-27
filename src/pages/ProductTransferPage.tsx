@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/PageHeader";
+import { API_BASE_URL } from "@/config/api";
 
 interface Product {
     id: string;
@@ -36,7 +37,7 @@ export default function ProductTransferPage() {
 
     const fetchProduct = async () => {
         try {
-            const res = await fetch(`http://localhost:3001/api/store/products/${productId}`);
+            const res = await fetch(`${API_BASE_URL}/api/store/products/${productId}`);
             const data = await res.json();
             if (res.ok) setProduct(data);
         } catch (e) {
@@ -47,7 +48,7 @@ export default function ProductTransferPage() {
     const fetchMyStores = async () => {
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch('http://localhost:3001/api/stores/me', {
+            const res = await fetch(`${API_BASE_URL}/api/stores/me`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -61,7 +62,7 @@ export default function ProductTransferPage() {
         setLoading(true);
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch(`http://localhost:3001/api/products/${productId}/transfer`, {
+            const res = await fetch(`${API_BASE_URL}/api/products/${productId}/transfer`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

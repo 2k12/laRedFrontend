@@ -5,6 +5,7 @@ import { MinimalButton } from "@/components/MinimalButton";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { Skeleton } from "@/components/ui/skeleton";
+import { API_BASE_URL } from "@/config/api";
 
 export default function ProductDetailPage() {
     const { id } = useParams();
@@ -47,7 +48,7 @@ export default function ProductDetailPage() {
         if (!id) return;
         setLoading(true);
         // Mock fetch or real endpoint
-        fetch(`http://localhost:3001/api/store/products/${id}`)
+        fetch(`${API_BASE_URL}/api/store/products/${id}`)
             .then(res => res.json())
             .then(data => {
                 setProduct(data);

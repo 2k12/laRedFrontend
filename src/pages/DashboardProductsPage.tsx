@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { PageHeader } from "@/components/PageHeader";
 import { BRANDING } from "@/config/branding";
+import { API_BASE_URL } from "@/config/api";
 
 interface Category {
     slug: string;
@@ -43,12 +44,12 @@ export default function DashboardProductsPage() {
         if (!token) return;
 
         // Load Stores
-        fetch('http://localhost:3001/api/stores/me', {
+        fetch(`${API_BASE_URL}/api/stores/me`, {
             headers: { Authorization: `Bearer ${token}` }
         }).then(r => r.json()).then(d => setStores(d.stores || []));
 
         // Load Categories & Caps
-        fetch('http://localhost:3001/api/products/categories', {
+        fetch(`${API_BASE_URL}/api/products/categories`, {
             headers: { Authorization: `Bearer ${token}` }
         }).then(r => r.json()).then(d => setCategories(d.categories || []));
 
@@ -67,7 +68,7 @@ export default function DashboardProductsPage() {
 
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch('http://localhost:3001/api/products', {
+            const res = await fetch(`${API_BASE_URL}/api/products`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

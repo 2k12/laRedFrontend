@@ -10,6 +10,7 @@ import { TrendingUp, Settings2, Users, Coins, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/PageHeader";
 import { BRANDING } from "@/config/branding";
+import { API_BASE_URL } from "@/config/api";
 
 export default function EconomyManagementPage() {
     const { token, user } = useAuth();
@@ -21,7 +22,7 @@ export default function EconomyManagementPage() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const capsRes = await fetch("http://localhost:3001/api/products/categories", {
+            const capsRes = await fetch(`${API_BASE_URL}/api/products/categories`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const capsData = await capsRes.json();
@@ -42,7 +43,7 @@ export default function EconomyManagementPage() {
     const handleUpdateFactor = async (id: string, factor: string) => {
         setUpdatingId(id);
         try {
-            const res = await fetch(`http://localhost:3001/api/categories/${id}`, {
+            const res = await fetch(`${API_BASE_URL}/api/categories/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

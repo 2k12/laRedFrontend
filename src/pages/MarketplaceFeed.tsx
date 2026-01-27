@@ -8,6 +8,7 @@ import { VerticalPagination } from "@/components/VerticalPagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/PageHeader";
 import { BRANDING } from "@/config/branding";
+import { API_BASE_URL } from "@/config/api";
 
 export default function MarketplaceFeed() {
     const container = useRef<HTMLDivElement>(null);
@@ -61,7 +62,7 @@ export default function MarketplaceFeed() {
         const storeIdParam = new URLSearchParams(window.location.search).get('storeId');
         if (storeIdParam) params.append('storeId', storeIdParam);
 
-        fetch(`http://localhost:3001/api/store/products/public?${params.toString()}`)
+        fetch(`${API_BASE_URL}/api/store/products/public?${params.toString()}`)
             .then(res => res.json())
             .then(data => {
                 if (data.data && Array.isArray(data.data)) {

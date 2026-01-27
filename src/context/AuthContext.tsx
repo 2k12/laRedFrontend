@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/config/api';
 
 interface User {
   id: string;
@@ -35,28 +36,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshProfile = async () => {
-      if (!token) return;
-      try {
-          const res = await fetch('http://localhost:3001/api/users/me', {
-              headers: { Authorization: `Bearer ${token}` }
-          });
-          if (res.ok) {
-              const data = await res.json();
-              setUser(data.user);
-              setWallet(data.wallet);
-          } else {
-              logout();
-          }
-      } catch (e) {
-          console.error(e);
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/users/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+        setWallet(data.wallet);
+      } else {
+        logout();
       }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   useEffect(() => {
     if (token) {
-        refreshProfile().finally(() => setIsLoading(false));
+      refreshProfile().finally(() => setIsLoading(false));
     } else {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   }, [token]);
 

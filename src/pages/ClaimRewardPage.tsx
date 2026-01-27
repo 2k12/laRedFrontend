@@ -6,6 +6,7 @@ import confetti from 'canvas-confetti';
 import { PageHeader } from '@/components/PageHeader';
 import { BRANDING } from '@/config/branding';
 import { MinimalButton } from '@/components/MinimalButton';
+import { API_BASE_URL } from '@/config/api';
 
 export default function ClaimRewardPage() {
     const [searchParams] = useSearchParams();
@@ -26,7 +27,7 @@ export default function ClaimRewardPage() {
             }
 
             try {
-                const res = await fetch(`${(import.meta as any).env.VITE_API_URL || 'http://localhost:3001'}/api/rewards/claim`, {
+                const res = await fetch(`${API_BASE_URL}/api/rewards/claim`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

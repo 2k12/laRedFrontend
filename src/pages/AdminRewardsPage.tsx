@@ -3,6 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { PageHeader } from '@/components/PageHeader';
 import { BRANDING } from '@/config/branding';
 import { TrendingUp, Plus, Trash2, RefreshCw, Clock, Wallet, MoreHorizontal } from 'lucide-react';
+import { API_BASE_URL } from '@/config/api';
 import { cn } from "@/lib/utils";
 import { MinimalButton } from '@/components/MinimalButton';
 import {
@@ -61,7 +62,7 @@ export default function AdminRewardsPage() {
 
     const fetchEvents = useCallback(async () => {
         try {
-            const res = await fetch(`${(import.meta as any).env.VITE_API_URL || 'http://localhost:3001'}/api/rewards/events`, {
+            const res = await fetch(`${API_BASE_URL}/api/rewards/events`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             if (res.ok) {
@@ -77,7 +78,7 @@ export default function AdminRewardsPage() {
 
     const fetchToken = useCallback(async (eventId: string) => {
         try {
-            const res = await fetch(`${(import.meta as any).env.VITE_API_URL || 'http://localhost:3001'}/api/rewards/token/${eventId}`, {
+            const res = await fetch(`${API_BASE_URL}/api/rewards/token/${eventId}`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             if (res.ok) {
@@ -93,7 +94,7 @@ export default function AdminRewardsPage() {
 
     const fetchVaultBalance = useCallback(async () => {
         try {
-            const res = await fetch(`${(import.meta as any).env.VITE_API_URL || 'http://localhost:3001'}/api/coins/me?vault=true`, {
+            const res = await fetch(`${API_BASE_URL}/api/coins/me?vault=true`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             if (res.ok) {
@@ -134,7 +135,7 @@ export default function AdminRewardsPage() {
     const handleCreate = async () => {
         setSubmitting(true);
         try {
-            const res = await fetch(`${(import.meta as any).env.VITE_API_URL || 'http://localhost:3001'}/api/rewards/events`, {
+            const res = await fetch(`${API_BASE_URL}/api/rewards/events`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -165,7 +166,7 @@ export default function AdminRewardsPage() {
 
     const handleDelete = async (id: string) => {
         try {
-            const res = await fetch(`${(import.meta as any).env.VITE_API_URL || 'http://localhost:3001'}/api/rewards/events/${id}`, {
+            const res = await fetch(`${API_BASE_URL}/api/rewards/events/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
@@ -184,7 +185,7 @@ export default function AdminRewardsPage() {
 
     const handleToggleStatus = async (id: string, currentStatus: boolean) => {
         try {
-            const res = await fetch(`${(import.meta as any).env.VITE_API_URL || 'http://localhost:3001'}/api/rewards/events/${id}/status`, {
+            const res = await fetch(`${API_BASE_URL}/api/rewards/events/${id}/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { BRANDING } from "@/config/branding";
+import { API_BASE_URL } from "@/config/api";
 
 export default function MintConfirmPage() {
     const navigate = useNavigate();
@@ -38,7 +39,7 @@ export default function MintConfirmPage() {
         setLoading(true);
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch('http://localhost:3001/api/economy/mint', {
+            const res = await fetch(`${API_BASE_URL}/api/economy/mint`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

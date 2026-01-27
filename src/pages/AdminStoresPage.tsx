@@ -9,6 +9,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/PageHeader";
 import { BRANDING } from "@/config/branding";
+import { API_BASE_URL } from "@/config/api";
 
 interface StoreData {
   id: string;
@@ -53,8 +54,8 @@ export default function AdminStoresPage() {
       // 'all' -> All stores (Directory)
       // 'mine' -> My stores (Management)
       const endpoint = viewMode === 'all'
-        ? 'http://localhost:3001/api/stores/all'
-        : 'http://localhost:3001/api/stores/me';
+        ? `${API_BASE_URL}/api/stores/all`
+        : `${API_BASE_URL}/api/stores/me`;
 
       const res = await fetch(endpoint, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -73,7 +74,7 @@ export default function AdminStoresPage() {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3001/api/users/list', {
+      const res = await fetch(`${API_BASE_URL}/api/users/list`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -93,7 +94,7 @@ export default function AdminStoresPage() {
     setSubmitting(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3001/api/stores', {
+      const res = await fetch(`${API_BASE_URL}/api/stores`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -124,7 +125,7 @@ export default function AdminStoresPage() {
     setSubmitting(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3001/api/stores/${editingStore.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/stores/${editingStore.id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -154,7 +155,7 @@ export default function AdminStoresPage() {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3001/api/stores/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/stores/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

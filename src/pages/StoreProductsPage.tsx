@@ -10,6 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { MinimalButton } from "@/components/MinimalButton";
 import { PageHeader } from "@/components/PageHeader";
 import { BRANDING } from "@/config/branding";
+import { API_BASE_URL } from "@/config/api";
 
 interface Category {
     slug: string;
@@ -68,7 +69,7 @@ export default function StoreProductsPage() {
     const fetchOtherStores = async () => {
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch(`http://localhost:3001/api/stores/me`, {
+            const res = await fetch(`${API_BASE_URL}/api/stores/me`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -86,7 +87,7 @@ export default function StoreProductsPage() {
         const targetStore = otherStores.find(s => s.id === targetStoreId);
 
         try {
-            const res = await fetch(`http://localhost:3001/api/products/${draggedProductId}/transfer`, {
+            const res = await fetch(`${API_BASE_URL}/api/products/${draggedProductId}/transfer`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -124,13 +125,13 @@ export default function StoreProductsPage() {
         const token = localStorage.getItem('token');
 
         // Load Categories
-        fetch('http://localhost:3001/api/products/categories', {
+        fetch(`${API_BASE_URL}/api/products/categories`, {
             headers: { Authorization: `Bearer ${token}` }
         }).then(r => r.json()).then(d => setCategories(d.categories || []));
 
         // Load All Stores if ADMIN
         if (user?.roles.includes('ADMIN')) {
-            fetch('http://localhost:3001/api/stores/all', {
+            fetch(`${API_BASE_URL}/api/stores/all`, {
                 headers: { Authorization: `Bearer ${token}` }
             }).then(r => r.json()).then(d => setStores(d.stores || []));
         }
@@ -139,7 +140,7 @@ export default function StoreProductsPage() {
     const fetchStoreTitle = async () => {
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch(`http://localhost:3001/api/stores/me`, {
+            const res = await fetch(`${API_BASE_URL}/api/stores/me`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -153,7 +154,7 @@ export default function StoreProductsPage() {
     const fetchProducts = async () => {
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch(`http://localhost:3001/api/stores/${id}/products`, {
+            const res = await fetch(`${API_BASE_URL}/api/stores/${id}/products`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -186,7 +187,7 @@ export default function StoreProductsPage() {
         setSubmitting(true);
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch('http://localhost:3001/api/products', {
+            const res = await fetch(`${API_BASE_URL}/api/products`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

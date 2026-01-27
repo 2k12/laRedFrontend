@@ -9,6 +9,7 @@ import { MinimalButton } from "@/components/MinimalButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/PageHeader";
+import { API_BASE_URL } from "@/config/api";
 
 export default function DashboardPage() {
     const { user, wallet, refreshProfile } = useAuth();
@@ -38,7 +39,7 @@ export default function DashboardPage() {
         try {
             // @ts-ignore
             const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:3001/api/users/me', {
+            const res = await fetch(`${API_BASE_URL}/api/users/me`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

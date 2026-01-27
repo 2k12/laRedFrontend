@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
 interface FilterContextType {
   searchTerm: string;
@@ -21,7 +21,7 @@ const FilterContext = createContext<FilterContextType | undefined>(undefined);
 
 export function FilterProvider({ children }: { children: ReactNode }) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [priceRange, setPriceRange] = useState(5000); 
+  const [priceRange, setPriceRange] = useState(5000);
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [page, setPage] = useState(1);
