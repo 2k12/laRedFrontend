@@ -42,14 +42,16 @@ export function FloatingNavbar({ title, onToggleSidebar }: FloatingNavbarProps) 
         <div className="fixed top-0 left-0 right-0 h-16 z-50 flex items-center justify-center bg-background/40 backdrop-blur-3xl border-b border-white/5 transition-all">
             <div className="w-full px-6 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4 shrink-0">
-                    {/* Sidebar Toggle */}
+                    {/* Sidebar Toggle - Only on Desktop now */}
                     {isAuthenticated && onToggleSidebar && (
-                        <MinimalButton
-                            size="icon"
-                            onClick={onToggleSidebar}
-                            className="mr-2 text-zinc-400 hover:text-white"
-                            icon={<Menu className="w-5 h-5" />}
-                        />
+                        <div className="hidden lg:block">
+                            <MinimalButton
+                                size="icon"
+                                onClick={onToggleSidebar}
+                                className="mr-2 text-zinc-400 hover:text-white"
+                                icon={<Menu className="w-5 h-5" />}
+                            />
+                        </div>
                     )}
 
                     <a href="#" onClick={handleLogoClick} className="font-bold tracking-tight text-xl text-white flex items-center gap-2">

@@ -10,7 +10,7 @@ interface AppSidebarProps {
   toggleSidebar?: () => void;
 }
 
-export function AppSidebar({ collapsed, width = "w-72", toggleSidebar }: AppSidebarProps) {
+export function AppSidebar({ collapsed, toggleSidebar }: AppSidebarProps) {
   const { pathname } = useLocation();
   const { user } = useAuth();
 

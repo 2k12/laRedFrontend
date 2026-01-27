@@ -528,7 +528,7 @@ export default function StoreProductsPage() {
 
                 <div className="mb-8 md:mb-10 text-center pt-8 md:pt-4">
                     <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary/20 animate-pulse">
-                        <ArrowRightLeft className="w-6 h-6 md:w-8 h-8 text-primary" />
+                        <ArrowRightLeft className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                     </div>
                     <h3 className="text-base md:text-lg font-black uppercase italic tracking-tighter text-white">Transferir {BRANDING.productName}</h3>
                     <p className="text-zinc-500 text-[9px] font-mono mt-1 px-4">Selecciona el destino para el despliegue del activo</p>

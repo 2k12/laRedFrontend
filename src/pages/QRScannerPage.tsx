@@ -1,140 +1,132 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import QrScanner from 'qr-scanner';
 import { PageHeader } from '@/components/PageHeader';
-import { QrCode, Camera } from 'lucide-react';
+import { Camera, ShieldCheck, AlertCircle, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function QRScannerPage() {
     const navigate = useNavigate();
-    const [isScanning, setIsScanning] = useState(true);
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const [hasCamera, setHasCamera] = useState<boolean | null>(null);
 
     useEffect(() => {
-        const scanner = new Html5QrcodeScanner(
-            "reader",
+        if (!videoRef.current) return;
+
+        const scanner = new QrScanner(
+            videoRef.current,
+            result => onScanSuccess(result.data),
             {
-                fps: 10,
-                qrbox: { width: 250, height: 250 },
-                aspectRatio: 1.0,
-                showTorchButtonIfSupported: true
-            },
-            /* verbose= */ false
+                highlightScanRegion: true,
+                highlightCodeOutline: true,
+                maxScansPerSecond: 5,
+                preferredCamera: 'environment'
+            }
         );
 
-        scanner.render(onScanSuccess, onScanFailure);
+        scanner.start().then(() => setHasCamera(true)).catch(() => setHasCamera(false));
 
         function onScanSuccess(decodedText: string) {
-            // El texto decodificado debe ser una URL que contenga la ruta de reclamo
             try {
                 const url = new URL(decodedText);
                 if (url.pathname.endsWith('/rewards/claim')) {
-                    scanner.clear();
-                    setIsScanning(false);
-                    // Navegar a la URL de reclamo (extrayendo params para seguridad)
+                    scanner.stop();
                     const eventId = url.searchParams.get('eventId');
                     const token = url.searchParams.get('token');
+
+                    // Simple Haptic Feedback
+                    if ('vibrate' in navigator) navigator.vibrate(200);
+
                     navigate(`/dashboard/rewards/claim?eventId=${eventId}&token=${token}`);
                 } else {
-                    toast.error("Este código QR no parece ser un premio válido de LaRed");
+                    toast.error("QR no válido para recompensas");
                 }
             } catch (e) {
-                toast.error("Código QR inválido");
+                // Silently ignore if it's not a URL
             }
         }
 
-        function onScanFailure() {
-            // No hacemos nada en cada frame fallido para no saturar la consola
-        }
-
         return () => {
-            scanner.clear().catch(e => console.error("Error al limpiar scanner", e));
+            scanner.destroy();
         };
     }, [navigate]);
 
     return (
-        <div className="container mx-auto max-w-4xl px-4 pb-20">
+        <div className="container mx-auto max-w-4xl px-4 min-h-[85vh] flex flex-col items-center justify-center pb-32 lg:pb-12">
             <PageHeader
-                title="Escanear Premio"
-                description="Apunta con tu cámara al código QR dinámico generado por el administrador para recibir tus recompensas instantáneas."
-                icon={<QrCode className="w-8 h-8 text-primary" />}
+                title="Portal de Escaneo"
+                description="Apunta al código QR para sincronizar tu recompensa en la boveda."
+                icon={<Camera className="w-8 h-8 text-primary" />}
+                className="mb-8"
             />
 
-            <div className="relative mt-4 lg:mt-8 group">
-                {/* Visual Scanner Overlay */}
-                <div className="absolute inset-x-0 -top-6 lg:-top-8 flex justify-center z-10">
-                    <div className="flex items-center gap-2 px-3 lg:px-4 py-1.5 lg:py-2 bg-zinc-900 border border-white/5 rounded-full text-[8px] lg:text-[10px] font-black uppercase tracking-widest text-zinc-500 shadow-2xl">
-                        <Camera className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-primary animate-pulse" />
-                        Buscando Código QR
+            <div className="relative w-full max-w-[400px] aspect-square group">
+                {/* Minimalist Scanner Frame */}
+                <div className="absolute inset-0 z-10 pointer-events-none border-[12px] border-black/40 backdrop-blur-[2px] rounded-[3rem]">
+                    {/* Scanning Animation */}
+                    <div className="absolute inset-[2px] overflow-hidden rounded-[2.5rem]">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-primary/40 shadow-[0_0_15px_rgba(255,255,255,0.5)] animate-[scanline_3s_linear_infinite]" />
                     </div>
+
+                    {/* Corners */}
+                    <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-primary/60 rounded-tl-[2.4rem]" />
+                    <div className="absolute top-0 right-0 w-12 h-12 border-t-2 border-r-2 border-primary/60 rounded-tr-[2.4rem]" />
+                    <div className="absolute bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 border-primary/60 rounded-bl-[2.4rem]" />
+                    <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-primary/60 rounded-br-[2.4rem]" />
                 </div>
 
-                <div className="bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-[1.5rem] lg:rounded-[2.5rem] overflow-hidden relative shadow-2xl mx-auto max-w-[500px]">
-                    <div id="reader" className="w-full aspect-square min-h-[300px] lg:min-h-[400px]"></div>
+                <div className="w-full h-full bg-zinc-950 rounded-[3rem] overflow-hidden shadow-2xl relative border border-white/5">
+                    <video
+                        ref={videoRef}
+                        className="w-full h-full object-cover grayscale-[0.5] contrast-125"
+                    />
 
-                    {/* Detección Status Overlay */}
-                    {!isScanning && (
-                        <div className="absolute inset-0 bg-black/80 flex items-center justify-center text-center p-6 lg:p-8 z-20 animate-in fade-in duration-300">
-                            <div className="space-y-4">
-                                <div className="w-12 h-12 lg:w-16 lg:h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto border border-emerald-500/50">
-                                    <QrCode className="w-6 h-6 lg:w-8 lg:h-8 text-emerald-500" />
-                                </div>
-                                <h3 className="text-lg lg:text-xl font-bold uppercase italic tracking-tighter">Escaneo Completado</h3>
-                                <p className="text-zinc-500 text-[10px] lg:text-sm font-mono uppercase tracking-widest">Sincronizando con la red principal...</p>
-                            </div>
+                    {/* No Camera Access State */}
+                    {hasCamera === false && (
+                        <div className="absolute inset-0 bg-zinc-900 flex flex-col items-center justify-center text-center p-8 z-20">
+                            <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+                            <h3 className="text-lg font-bold uppercase mb-2">Error de Acceso</h3>
+                            <p className="text-xs text-zinc-500 max-w-[200px]">No pudimos acceder a tu cámara. Revisa los permisos de tu navegador.</p>
                         </div>
                     )}
                 </div>
 
-                {/* Legend */}
-                <div className="mt-6 lg:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
-                    <div className="p-4 lg:p-6 rounded-[1.5rem] lg:rounded-3xl bg-zinc-900/20 border border-white/5 flex items-start gap-4 transition-colors hover:bg-zinc-900/40">
-                        <div className="p-2.5 lg:p-3 rounded-xl lg:rounded-2xl bg-primary/10 border border-primary/20 text-primary shrink-0">
-                            <Camera className="w-4 h-4 lg:w-5 lg:h-5" />
-                        </div>
-                        <div>
-                            <h4 className="text-[10px] lg:text-sm font-bold text-white mb-1 uppercase tracking-tight">Cámara Activa</h4>
-                            <p className="text-[9px] lg:text-xs text-zinc-600 leading-relaxed">Asegúrate de permitir el acceso y tener buena iluminación.</p>
-                        </div>
+                {/* Status Indicator */}
+                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3 px-6 py-2.5 bg-black border border-white/10 rounded-full shadow-2xl whitespace-nowrap overflow-hidden">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Escaneo activo</span>
+                </div>
+            </div>
+
+            {/* Micro-instructions */}
+            <div className="mt-16 grid grid-cols-2 gap-8 lg:gap-12 w-full max-w-lg">
+                <div className="text-center space-y-2">
+                    <div className="w-10 h-10 bg-zinc-900 border border-white/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                        <ShieldCheck className="w-5 h-5 text-emerald-500" />
                     </div>
-                    <div className="p-4 lg:p-6 rounded-[1.5rem] lg:rounded-3xl bg-emerald-500/5 border border-emerald-500/10 flex items-start gap-4 transition-colors hover:bg-emerald-500/10">
-                        <div className="p-2.5 lg:p-3 rounded-xl lg:rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 shrink-0">
-                            <QrCode className="w-4 h-4 lg:w-5 lg:h-5" />
-                        </div>
-                        <div>
-                            <h4 className="text-[10px] lg:text-sm font-bold text-emerald-400 mb-1 uppercase tracking-tight">Detección Auto</h4>
-                            <p className="text-[9px] lg:text-xs text-zinc-600 leading-relaxed">El sistema detectará el premio apenas aparezca en el recuadro.</p>
-                        </div>
+                    <h4 className="text-[10px] font-bold text-white uppercase tracking-wider">Cifrado</h4>
+                    <p className="text-[9px] text-zinc-600 leading-tight">Transacción verificada por el protocolo de red.</p>
+                </div>
+                <div className="text-center space-y-2">
+                    <div className="w-10 h-10 bg-zinc-900 border border-white/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                        <QrCode className="w-5 h-5 text-primary" />
                     </div>
+                    <h4 className="text-[10px] font-bold text-white uppercase tracking-wider">Dinámico</h4>
+                    <p className="text-[9px] text-zinc-600 leading-tight">Códigos de un solo uso para máxima seguridad.</p>
                 </div>
             </div>
 
             <style dangerouslySetInnerHTML={{
                 __html: `
-                #reader { border: none !important; }
-                #reader video { 
-                    border-radius: 2rem; 
-                    object-fit: cover !important;
-                    width: 100% !important;
-                    height: 100% !important;
+                @keyframes scanline {
+                    0% { transform: translateY(0); opacity: 0; }
+                    10% { opacity: 1; }
+                    90% { opacity: 1; }
+                    100% { transform: translateY(380px); opacity: 0; }
                 }
-                #reader__scan_region {
-                    background: transparent !important;
+                .qr-scanner-overlay {
+                    display: none !important;
                 }
-                #reader__dashboard {
-                   padding: 2rem !important;
-                   background: transparent !important;
-                }
-                #reader__dashboard_section_csr button {
-                   background: white !important;
-                   color: black !important;
-                   border-radius: 1rem !important;
-                   text-transform: uppercase !important;
-                   font-weight: 900 !important;
-                   font-size: 0.75rem !important;
-                   padding: 0.75rem 1.5rem !important;
-                   border: none !important;
-                }
-                #reader__status_span { color: #888 !important; font-size: 0.7rem !important; }
             `}} />
         </div>
     );
