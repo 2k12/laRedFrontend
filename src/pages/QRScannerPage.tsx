@@ -24,12 +24,10 @@ export default function QRScannerPage() {
         scanner.render(onScanSuccess, onScanFailure);
 
         function onScanSuccess(decodedText: string) {
-            // El texto decodificado debe ser una URL como:
-            // http://localhost:5173/dashboard/rewards/claim?eventId=...&token=...
-
+            // El texto decodificado debe ser una URL que contenga la ruta de reclamo
             try {
                 const url = new URL(decodedText);
-                if (url.pathname.includes('/rewards/claim')) {
+                if (url.pathname.endsWith('/rewards/claim')) {
                     scanner.clear();
                     setIsScanning(false);
                     // Navegar a la URL de reclamo (extrayendo params para seguridad)
