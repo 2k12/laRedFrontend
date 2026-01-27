@@ -9,6 +9,7 @@ import gsap from "gsap";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { API_BASE_URL } from "@/config/api";
+import PulseCoin from "@/components/PulseCoin";
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -61,10 +62,12 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen bg-background flex flex-col justify-center items-center p-4 selection:bg-primary selection:text-primary-foreground overflow-hidden relative">
-            {/* Background Blobs for Consistency */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[10%] left-[-10%] w-[300px] h-[300px] bg-white/[0.03] rounded-full blur-[100px]" />
-                <div className="absolute bottom-[10%] right-[-10%] w-[250px] h-[250px] bg-white/[0.02] rounded-full blur-[80px]" />
+            {/* Background PulseCoins - EXCLUSIVELY BOTTOM RIGHT */}
+            <div className="absolute inset-0 pointer-events-none z-0">
+                {/* Main Cluster Bottom Right */}
+                <PulseCoin className="bottom-[-10%] right-[-5%] opacity-30" size={180} xMove={-50} yMove={-120} duration={14} delay={0} />
+                <PulseCoin className="bottom-[25%] right-[5%] opacity-25" size={120} xMove={-60} yMove={-100} duration={16} delay={1} />
+                <PulseCoin className="bottom-[50%] right-[10%] opacity-20 blur-[1px]" size={80} xMove={-40} yMove={-80} duration={18} delay={0.5} />
             </div>
 
             <div className="w-full max-w-[350px] space-y-8 relative z-10">
@@ -74,7 +77,7 @@ export default function LoginPage() {
 
                 <div className="login-element space-y-2 text-center">
                     <h1 className="text-3xl font-bold tracking-tighter text-foreground">Bienvenido</h1>
-                    <p className="text-muted-foreground text-sm">Ingresa credenciales para acceder al ledger.</p>
+                    <p className="text-muted-foreground text-sm">Ingresa credenciales para acceder.</p>
                 </div>
 
                 <form onSubmit={handleLogin} className="login-element space-y-6">

@@ -21,6 +21,8 @@ import QRScannerPage from "@/pages/QRScannerPage";
 import { AuthProvider } from "@/context/AuthContext";
 
 import { Toaster } from "@/components/ui/sonner";
+import PrivacyPolicyPage from "@/pages/PrivacyPolicyPage";
+import TermsPage from "@/pages/TermsPage";
 
 function App() {
   return (
@@ -31,6 +33,8 @@ function App() {
             <Route path="/" element={<LandingPage />} />
           </Route>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
 
           {/* Authenticated Routes with Sidebar/Layout */}
           <Route element={<DashboardLayout />}>

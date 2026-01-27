@@ -25,8 +25,8 @@ export default function Footer() {
 
         {/* Right: Links */}
         <nav className="flex items-center gap-6">
-          <Link to="#" className="text-xs text-zinc-600 hover:text-white transition-colors duration-300">Política de Privacidad</Link>
-          <Link to="#" className="text-xs text-zinc-600 hover:text-white transition-colors duration-300">Términos y Condiciones</Link>
+          <Link to="/privacy" className="text-xs text-zinc-600 hover:text-white transition-colors duration-300">Política de Privacidad</Link>
+          <Link to="/terms" className="text-xs text-zinc-600 hover:text-white transition-colors duration-300">Términos y Condiciones</Link>
           {/* <a href="#" className="text-xs text-zinc-600 hover:text-white transition-colors duration-300">GitHub</a> */}
         </nav>
 
