@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useSpring, useTransform } from "framer-motion";
-import { Fingerprint, Check, X, Smartphone, ShieldCheck } from "lucide-react";
+import { Fingerprint, X, Smartphone, ShieldCheck } from "lucide-react";
 import { API_BASE_URL } from "@/config/api";
 import { useAuth } from "@/context/AuthContext";
 import confetti from "canvas-confetti"; // Assuming this might be installed or I can use a simple particle effect
@@ -31,8 +31,7 @@ export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOver
         progressSpring.set(progress);
     }, [progress, progressSpring]);
 
-    const fillBackground = useTransform(progressSpring, [0, 100], ["#000000", "#10b981"]);
-    const fillOpacity = useTransform(progressSpring, [0, 100], [0, 0.2]);
+    // progressSpring is used directly in useTransform inside return JSX
 
     const handleStart = () => {
         if (status === 'SUCCESS' || status === 'PROCESSING') return;
