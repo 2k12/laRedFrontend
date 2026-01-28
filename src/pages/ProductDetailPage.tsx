@@ -4,6 +4,7 @@ import { ShoppingCart, Heart, Share2, ShieldCheck, ChevronLeft, ChevronRight, X 
 import { MinimalButton } from "@/components/MinimalButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { API_BASE_URL } from "@/config/api";
+import { BRANDING } from "@/config/branding";
 import { AnimatePresence, motion } from "framer-motion";
 import { PurchaseQuantumOverlay } from "@/components/PurchaseQuantumOverlay";
 import { cn } from "@/lib/utils";
@@ -246,7 +247,7 @@ export default function ProductDetailPage() {
                                         transition={{ delay: 0.4 }}
                                         className="gsap-price flex items-baseline gap-4"
                                     >
-                                        <span className="text-3xl md:text-4xl font-bold text-white tracking-tight">{product.price} UC</span>
+                                        <span className="text-3xl md:text-4xl font-bold text-white tracking-tight">{product.price} {BRANDING.currencySymbol}</span>
                                         <div className="flex flex-col gap-0.5">
                                             <span className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-widest font-medium">Precio Final</span>
                                             {product.stock <= 5 && product.stock > 0 && (

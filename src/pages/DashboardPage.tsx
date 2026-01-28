@@ -257,7 +257,7 @@ export default function DashboardPage() {
                                 <p className="text-[8px] md:text-[10px] text-zinc-500 uppercase tracking-widest mb-1">Disponible</p>
                                 <div className="flex items-baseline gap-1">
                                     <span className="text-2xl md:text-3xl font-bold text-white tracking-tighter">{wallet?.balance?.toLocaleString() || 0}</span>
-                                    <span className="text-xs md:text-sm font-medium text-zinc-500">{wallet?.currency_symbol || 'UC'}</span>
+                                    <span className="text-xs md:text-sm font-medium text-zinc-500">{wallet?.currency_symbol || BRANDING.currencySymbol}</span>
                                 </div>
                             </div>
                             <MinimalButton className="w-full sm:w-auto justify-center">

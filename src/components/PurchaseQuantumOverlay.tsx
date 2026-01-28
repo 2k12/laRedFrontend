@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useSpring, useTransform } from "framer-motion"
 import { Fingerprint, X, Smartphone, ShieldCheck } from "lucide-react";
 import { API_BASE_URL } from "@/config/api";
 import { useAuth } from "@/context/AuthContext";
+import { BRANDING } from "@/config/branding";
 import confetti from "canvas-confetti";
 
 interface PurchaseQuantumOverlayProps {
@@ -106,8 +107,8 @@ export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOver
             )}
 
             <div className="relative w-full max-w-md py-12 flex flex-col items-center">
-                <AnimatePresence mode="wait">
-                    {status === 'SUCCESS' && resultData ? (
+                <AnimatePresence mode="popLayout">
+                    {status === 'SUCCESS' ? (
                         <motion.div
                             key="success"
                             initial={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -123,17 +124,23 @@ export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOver
                                 <p className="text-zinc-400">Tu compra ha sido procesada correctamente.</p>
                             </div>
 
-                            <div className="p-8 rounded-3xl bg-zinc-900/50 border border-white/5 space-y-4 backdrop-blur-sm">
-                                <div className="space-y-1">
-                                    <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Código Maestro de Entrega</p>
-                                    <p className="text-5xl font-mono font-black text-white tracking-[0.2em]">{resultData.delivery_code}</p>
+                            {resultData ? (
+                                <div className="p-8 rounded-3xl bg-zinc-900/50 border border-white/5 space-y-4 backdrop-blur-sm">
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Código Maestro de Entrega</p>
+                                        <p className="text-5xl font-mono font-black text-white tracking-[0.2em]">{resultData.delivery_code}</p>
+                                    </div>
+                                    <div className="text-[10px] text-zinc-500 bg-black/40 p-3 rounded-xl uppercase tracking-tighter leading-relaxed">
+                                        Presenta este código al vendedor para validar la recepción de tu producto.
+                                    </div>
                                 </div>
-                                <div className="text-[10px] text-zinc-500 bg-black/40 p-3 rounded-xl uppercase tracking-tighter leading-relaxed">
-                                    Presenta este código al vendedor para validar la recepción de tu producto.
+                            ) : (
+                                <div className="p-8 rounded-3xl bg-zinc-900/50 border border-white/5 h-40 flex items-center justify-center">
+                                    <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                                 </div>
-                            </div>
+                            )}
 
-                            {resultData.whatsapp_url ? (
+                            {resultData?.whatsapp_url && (
                                 <a
                                     href={resultData.whatsapp_url}
                                     target="_blank"
@@ -143,10 +150,6 @@ export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOver
                                     <Smartphone className="w-5 h-5" />
                                     Coordinar Entrega
                                 </a>
-                            ) : (
-                                <div className="p-4 bg-amber-500/10 border border-amber-500/20 text-amber-500 rounded-2xl text-xs font-bold">
-                                    El vendedor no tiene WhatsApp configurado.
-                                </div>
                             )}
 
                             <button
@@ -166,7 +169,7 @@ export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOver
                         >
                             <div className="space-y-3 text-center">
                                 <h3 className="text-zinc-500 font-black uppercase tracking-[0.3em] text-[10px]">Verificación de Pago</h3>
-                                <h2 className="text-6xl font-black text-white tracking-tighter">{product.price} UC</h2>
+                                <h2 className="text-6xl font-black text-white tracking-tighter">{product.price} {BRANDING.currencySymbol}</h2>
                                 <p className="text-zinc-400 font-medium text-sm">{product.name}</p>
                             </div>
 
@@ -180,7 +183,7 @@ export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOver
                                     onPointerDown={handleStart}
                                     onPointerUp={handleEnd}
                                     onPointerLeave={handleEnd}
-                                    className={`relative w-40 h-40 rounded-full border border-white/10 bg-zinc-900 flex items-center justify-center overflow-hidden transition-all duration-200 select-none touch-none shadow-2xl ${status === 'PROCESSING' || status === 'SUCCESS' ? 'pointer-events-none scale-95 opacity-50' : 'active:scale-95'
+                                    className={`relative w-40 h-40 rounded-full border border-white/10 bg-zinc-900 flex items-center justify-center overflow-hidden transition-all duration-200 select-none touch-none shadow-2xl ${status === 'PROCESSING' ? 'pointer-events-none scale-95 opacity-50' : 'active:scale-95'
                                         }`}
                                     style={{ WebkitTapHighlightColor: 'transparent' }}
                                 >
