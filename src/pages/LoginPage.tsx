@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import PulseCoin from "@/components/PulseCoin";
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const location = useLocation();
     const [isLoading, setIsLoading] = useState(false);
 
     useGSAP(() => {
@@ -50,7 +51,9 @@ export default function LoginPage() {
 
             login(data.token, data.user);
             toast.success(`¡Bienvenido, ${data.user.name.split(' ')[0]}!`);
-            navigate('/feed');
+
+            const from = (location.state as any)?.from?.pathname || "/feed";
+            navigate(from, { replace: true });
 
         } catch (err: any) {
             setError(err.message);
@@ -112,8 +115,11 @@ export default function LoginPage() {
                     </Button>
                 </form>
 
-                <div className="login-element text-center">
+                <div className="login-element text-center flex flex-col gap-2">
                     <a href="#" className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">¿Olvidaste tu contraseña?</a>
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-widest mt-2">
+                        ¿No tienes cuenta? <Link to="/register" className="text-white hover:underline ml-1">Regístrate</Link>
+                    </p>
                 </div>
             </div>
         </div>

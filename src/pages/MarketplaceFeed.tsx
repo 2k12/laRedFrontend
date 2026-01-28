@@ -18,14 +18,23 @@ export default function MarketplaceFeed() {
 
     // Use Global Filters
     const {
-        searchTerm, priceRange, selectedStatus, selectedCategory,
+        searchTerm, priceRange, selectedStatus, selectedCategory, selectedStore, setSelectedStore,
         page, setPage, setTotalPages, limit
     } = useFilters();
+
+    // Sync storeId from URL to global filter state on mount
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const storeIdFromUrl = urlParams.get('storeId');
+        if (storeIdFromUrl && storeIdFromUrl !== selectedStore) {
+            setSelectedStore(storeIdFromUrl);
+        }
+    }, []);
 
     // Reset page when filters change (except page itself)
     useEffect(() => {
         setPage(1);
-    }, [searchTerm, priceRange, selectedStatus, selectedCategory, limit, setPage]);
+    }, [searchTerm, priceRange, selectedStatus, selectedCategory, selectedStore, limit, setPage]);
 
     // Fetch Products
     useEffect(() => {
@@ -39,10 +48,7 @@ export default function MarketplaceFeed() {
         if (priceRange < 5000) params.append('maxPrice', priceRange.toString());
         if (selectedStatus !== 'all') params.append('status', selectedStatus);
         if (selectedCategory) params.append('category', selectedCategory);
-
-        // Pick up storeId from URL if present
-        const storeIdParam = new URLSearchParams(window.location.search).get('storeId');
-        if (storeIdParam) params.append('storeId', storeIdParam);
+        if (selectedStore) params.append('storeId', selectedStore);
 
         fetch(`${API_BASE_URL}/api/store/products/public?${params.toString()}`)
             .then(res => res.json())
@@ -61,7 +67,7 @@ export default function MarketplaceFeed() {
                 console.error("Error fetching products:", err);
                 setLoading(false);
             });
-    }, [page, limit, searchTerm, priceRange, selectedStatus, selectedCategory, setTotalPages]);
+    }, [page, limit, searchTerm, priceRange, selectedStatus, selectedCategory, selectedStore, setTotalPages]);
 
     const handleProductClick = async (productId: number) => {
         setIsExiting(true);

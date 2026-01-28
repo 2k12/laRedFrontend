@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Wallet, Mail, Smartphone, Edit2, ShieldCheck, Store, Coins, ArrowRight } from "lucide-react";
+import { User, Wallet, Mail, Smartphone, Edit2, ShieldCheck, Store, Coins, ArrowRight, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { MinimalButton } from "@/components/MinimalButton";
@@ -11,6 +12,7 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/PageHeader";
 import { API_BASE_URL } from "@/config/api";
 import { BRANDING } from "@/config/branding";
+import { HistoryModal } from "@/components/HistoryModal";
 
 export default function DashboardPage() {
     const { user, wallet, refreshProfile } = useAuth();
@@ -22,6 +24,13 @@ export default function DashboardPage() {
         email: "",
         phone: ""
     });
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+    });
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+    const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -59,6 +68,41 @@ export default function DashboardPage() {
         } catch (e) {
             console.error(e);
             toast.error("Ocurrió un error inesperado");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePasswordChange = async () => {
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            toast.error("Las nuevas contraseñas no coinciden");
+            return;
+        }
+        setLoading(true);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${API_BASE_URL}/api/users/me/password`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    currentPassword: passwordData.currentPassword,
+                    newPassword: passwordData.newPassword
+                })
+            });
+
+            if (res.ok) {
+                setIsChangingPassword(false);
+                setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+                toast.success("Contraseña actualizada correctamente");
+            } else {
+                const data = await res.json();
+                toast.error(data.error || "Error al actualizar contraseña");
+            }
+        } catch (e) {
+            toast.error("Error de conexión");
         } finally {
             setLoading(false);
         }
@@ -240,6 +284,69 @@ export default function DashboardPage() {
                                     <p className="text-xs md:text-sm font-medium text-white truncate">{formData.phone || '--'}</p>
                                 </div>
                             </div>
+
+                            <Dialog open={isChangingPassword} onOpenChange={setIsChangingPassword}>
+                                <DialogTrigger asChild>
+                                    <button className="w-full flex items-center justify-between p-3 md:p-4 rounded-xl md:rounded-2xl bg-zinc-950/40 border border-white/5 hover:border-white/10 transition-all text-left group">
+                                        <div className="flex items-center gap-4">
+                                            <div className="shrink-0 w-9 h-9 md:w-10 md:h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 group-hover:text-red-400">
+                                                <ShieldCheck className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] text-zinc-400 uppercase tracking-widest">Seguridad</p>
+                                                <p className="text-xs md:text-sm font-medium text-white">Cambiar Contraseña</p>
+                                            </div>
+                                        </div>
+                                        <ArrowRight className="w-4 h-4 text-zinc-700 group-hover:text-white transition-all transform group-hover:translate-x-1" />
+                                    </button>
+                                </DialogTrigger>
+                                <DialogContent className="bg-zinc-950 border-zinc-800 text-white w-[90vw] max-w-[425px] rounded-2xl">
+                                    <DialogHeader>
+                                        <DialogTitle>Actualizar Contraseña</DialogTitle>
+                                        <DialogDescription className="text-zinc-400 text-xs">
+                                            Ingresa tu contraseña actual y la nueva para continuar.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                        <div className="grid gap-2">
+                                            <Label className="text-zinc-400 text-[10px] uppercase font-black">Contraseña Actual</Label>
+                                            <Input
+                                                type="password"
+                                                value={passwordData.currentPassword}
+                                                onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                                                className="bg-zinc-900 border-zinc-800 text-white h-12"
+                                            />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label className="text-zinc-400 text-[10px] uppercase font-black">Nueva Contraseña</Label>
+                                            <Input
+                                                type="password"
+                                                value={passwordData.newPassword}
+                                                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                                className="bg-zinc-900 border-zinc-800 text-white h-12"
+                                            />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label className="text-zinc-400 text-[10px] uppercase font-black">Confirmar Nueva Contraseña</Label>
+                                            <Input
+                                                type="password"
+                                                value={passwordData.confirmPassword}
+                                                onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                                className="bg-zinc-900 border-zinc-800 text-white h-12"
+                                            />
+                                        </div>
+                                    </div>
+                                    <DialogFooter>
+                                        <Button
+                                            onClick={handlePasswordChange}
+                                            disabled={loading}
+                                            className="w-full h-12 bg-white text-black hover:bg-zinc-200 font-bold uppercase text-xs"
+                                        >
+                                            {loading ? <Loader2 className="animate-spin w-4 h-4" /> : "Actualizar Seguridad"}
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
                         </div>
                     </div>
 
@@ -260,13 +367,21 @@ export default function DashboardPage() {
                                     <span className="text-xs md:text-sm font-medium text-zinc-500">{wallet?.currency_symbol || BRANDING.currencySymbol}</span>
                                 </div>
                             </div>
-                            <MinimalButton className="w-full sm:w-auto justify-center">
+                            <MinimalButton
+                                onClick={() => setIsHistoryOpen(true)}
+                                className="w-full sm:w-auto justify-center"
+                            >
                                 Ver Historial
                             </MinimalButton>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <HistoryModal
+                isOpen={isHistoryOpen}
+                onClose={() => setIsHistoryOpen(false)}
+            />
         </main>
     );
 }

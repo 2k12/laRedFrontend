@@ -6,6 +6,9 @@ import { MinimalButton } from "@/components/MinimalButton";
 import { useFilters } from "@/context/FilterContext";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { API_BASE_URL } from "@/config/api";
+import { useState, useEffect } from "react";
 import { BRANDING } from "@/config/branding";
 import { ReactNode } from "react";
 
@@ -20,8 +23,18 @@ const FeedFilterSheet = ({ children }: { children: ReactNode }) => {
     const {
         priceRange, setPriceRange,
         selectedStatus, setSelectedStatus,
-        selectedCategory, setSelectedCategory
+        selectedCategory, setSelectedCategory,
+        selectedStore, setSelectedStore
     } = useFilters();
+
+    const [stores, setStores] = useState<{ id: string, name: string }[]>([]);
+
+    useEffect(() => {
+        fetch(`${API_BASE_URL}/api/stores/public`)
+            .then(res => res.json())
+            .then(data => setStores(data.stores || []))
+            .catch(err => console.error("Error fetching stores:", err));
+    }, []);
 
     return (
         <Sheet>
@@ -72,6 +85,27 @@ const FeedFilterSheet = ({ children }: { children: ReactNode }) => {
                             onChange={(e) => setPriceRange(Number(e.target.value))}
                             className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white"
                         />
+                    </div>
+
+                    {/* Store Selector */}
+                    <div className="space-y-4 pt-4 border-t border-white/5">
+                        <Label className="text-sm font-bold uppercase tracking-wider text-zinc-500">Filtrar por Tienda</Label>
+                        <Select
+                            value={selectedStore || "all"}
+                            onValueChange={(v) => setSelectedStore(v === "all" ? null : v)}
+                        >
+                            <SelectTrigger className="bg-zinc-900 border-zinc-800 h-12 rounded-xl text-white">
+                                <SelectValue placeholder="Todas las tiendas" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-zinc-950 border-zinc-800 text-white">
+                                <SelectItem value="all">Todas las tiendas</SelectItem>
+                                {stores.map(store => (
+                                    <SelectItem key={store.id} value={store.id}>
+                                        {store.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     {/* Status */}

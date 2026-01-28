@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ShoppingBag, Tag, Smartphone, CheckCircle2, Clock, X } from "lucide-react";
+import { ShoppingBag, Tag, Smartphone, CheckCircle2, Clock, X, History } from "lucide-react";
 import { motion } from "framer-motion";
 import { API_BASE_URL } from "@/config/api";
 import { useAuth } from "@/context/AuthContext";
@@ -8,12 +8,14 @@ import { MinimalButton } from "@/components/MinimalButton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { BRANDING } from "@/config/branding";
+import { HistoryModal } from "@/components/HistoryModal";
 
 export default function OrdersPage() {
     const { token } = useAuth();
     const [purchases, setPurchases] = useState<any[]>([]);
     const [sales, setSales] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -71,7 +73,14 @@ export default function OrdersPage() {
             <PageHeader
                 title="Centro de Actividades"
                 description="Gestiona tus compras, ventas y coordinaciones de entrega."
-            />
+            >
+                <MinimalButton
+                    onClick={() => setIsHistoryOpen(true)}
+                    icon={<History className="w-4 h-4" />}
+                >
+                    Historial
+                </MinimalButton>
+            </PageHeader>
 
             <Tabs defaultValue="purchases" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 bg-zinc-900 border border-white/5 h-14 p-1 rounded-2xl">
@@ -120,6 +129,11 @@ export default function OrdersPage() {
                     </TabsContent>
                 </div>
             </Tabs>
+
+            <HistoryModal
+                isOpen={isHistoryOpen}
+                onClose={() => setIsHistoryOpen(false)}
+            />
         </div>
     );
 }
@@ -213,14 +227,16 @@ function OrderCard({ order, type, onConfirm }: { order: any, type: 'purchase' | 
                                         onChange={(e) => setTempCode(e.target.value.replace(/\D/g, ''))}
                                     />
                                     <MinimalButton
-                                        className="bg-primary text-black flex-1"
+                                        className="bg-primary text-black flex-1 font-black italic uppercase text-[10px] tracking-tighter"
                                         onClick={() => onConfirm?.(order.id, tempCode)}
+                                        icon={<CheckCircle2 className="w-4 h-4" />}
                                     >
-                                        OK
+                                        VERIFICAR
                                     </MinimalButton>
                                     <MinimalButton
                                         variant="outline"
                                         onClick={() => setShowCodeInput(false)}
+                                        className="w-10 h-10 px-0 flex items-center justify-center border-red-500/20 text-red-500 hover:bg-red-500/10 hover:border-red-500/40"
                                     >
                                         <X className="w-4 h-4" />
                                     </MinimalButton>

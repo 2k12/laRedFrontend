@@ -8,6 +8,7 @@ import { BRANDING } from "@/config/branding";
 import { AnimatePresence, motion } from "framer-motion";
 import { PurchaseQuantumOverlay } from "@/components/PurchaseQuantumOverlay";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -57,6 +58,15 @@ export default function ProductDetailPage() {
                 }, 800);
             });
     }, [id]);
+
+    const handleShare = () => {
+        const url = `${window.location.origin}/feed/product/${id}`;
+        navigator.clipboard.writeText(url);
+        toast.success("Link generado", {
+            description: "El enlace directo ha sido copiado al portapapeles.",
+            icon: <Share2 className="w-4 h-4 text-emerald-400" />
+        });
+    };
 
     return (
         <div className="w-full min-h-screen bg-zinc-950 relative overflow-hidden">
@@ -329,7 +339,7 @@ export default function ProductDetailPage() {
                                             {product.stock <= 0 ? "Agotado" : "Comprar"}
                                         </MinimalButton>
                                         <MinimalButton size="icon" className="h-14 w-14 hover:text-pink-500 hover:border-pink-500/50 transition-all" icon={<Heart className="w-5 h-5" />} />
-                                        <MinimalButton size="icon" className="h-14 w-14" icon={<Share2 className="w-5 h-5" />} />
+                                        <MinimalButton size="icon" className="h-14 w-14" onClick={handleShare} icon={<Share2 className="w-5 h-5" />} />
                                     </motion.div>
                                 </div>
 

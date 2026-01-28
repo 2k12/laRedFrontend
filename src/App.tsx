@@ -3,6 +3,7 @@ import LandingLayout from "@/layouts/LandingLayout";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import LandingPage from "@/pages/LandingPage";
 import LoginPage from "@/pages/LoginPage";
+import RegisterPage from "@/pages/RegisterPage";
 import MarketplaceFeed from "@/pages/MarketplaceFeed";
 import DashboardPage from "@/pages/DashboardPage";
 
@@ -18,6 +19,8 @@ import AdminRewardsPage from "@/pages/AdminRewardsPage";
 import ClaimRewardPage from "@/pages/ClaimRewardPage";
 import QRScannerPage from "@/pages/QRScannerPage";
 import OrdersPage from "@/pages/OrdersPage";
+import AdminUsersPage from "@/pages/AdminUsersPage";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 import { AuthProvider } from "@/context/AuthContext";
 
@@ -34,11 +37,18 @@ function App() {
             <Route path="/" element={<LandingPage />} />
           </Route>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/terms" element={<TermsPage />} />
 
           {/* Authenticated Routes with Sidebar/Layout */}
-          <Route element={<DashboardLayout />}>
+          <Route
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route path="/feed" element={<MarketplaceFeed />} />
             <Route path="/feed/product/:id" element={<ProductDetailPage />} />
 
@@ -55,6 +65,7 @@ function App() {
               <Route path="rewards" element={<AdminRewardsPage />} />
               <Route path="rewards/claim" element={<ClaimRewardPage />} />
               <Route path="scan" element={<QRScannerPage />} />
+              <Route path="users" element={<AdminUsersPage />} />
             </Route>
 
             <Route path="/economy" element={<EconomyManagementPage />} />

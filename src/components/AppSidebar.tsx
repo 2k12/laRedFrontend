@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, Store, Coins, Settings, TrendingUp, QrCode, ShoppingBag } from "lucide-react";
+import { LayoutGrid, Store, Coins, Settings, TrendingUp, QrCode, ShoppingBag, Users } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { BRANDING } from "@/config/branding";
 
@@ -23,7 +23,8 @@ export function AppSidebar({ collapsed, toggleSidebar }: AppSidebarProps) {
       { href: "/dashboard/rewards", label: BRANDING.rewardSystemName, icon: TrendingUp }
     ] : []),
     ...(user?.roles?.includes('SYSTEM') ? [
-      { href: "/economy", label: "Gestión Económica", icon: TrendingUp }
+      { href: "/economy", label: "Gestión Económica", icon: TrendingUp },
+      { href: "/dashboard/users", label: "Gestión de Usuarios", icon: Users }
     ] : []),
     { href: "/dashboard/scan", label: "Escanear Premio", icon: QrCode },
     { href: "/dashboard", label: "Configuración", icon: Settings },

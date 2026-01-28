@@ -6,7 +6,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Package, ArrowLeft, Edit2, Trash2, ArrowRightLeft, Search, Plus, Store, AlertTriangle, Info, X, ShieldAlert } from "lucide-react";
+import { Package, ArrowLeft, Edit2, Trash2, ArrowRightLeft, Search, Plus, Store, AlertTriangle, Info, X, ShieldAlert, Share2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { MinimalButton } from "@/components/MinimalButton";
 import { PageHeader } from "@/components/PageHeader";
@@ -28,6 +28,7 @@ interface Product {
     stock: number;
     sku: string;
     category: string;
+    condition: string;
     variants?: any[];
 }
 
@@ -52,7 +53,8 @@ export default function StoreProductsPage() {
         stock: "",
         sku_part: "",
         category_slug: "",
-        store_id: id || ""
+        store_id: id || "",
+        condition: "NEW"
     });
     const [variants, setVariants] = useState<{ name: string, sku: string, price_modifier: string, stock: string }[]>([]);
     const [newVariant, setNewVariant] = useState({ name: "", sku: "", price_modifier: "0", stock: "0" });
@@ -85,6 +87,15 @@ export default function StoreProductsPage() {
         fetchFormData();
         fetchOtherStores();
     }, [id, isCreateOpen, user?.id]);
+
+    const handleShareStore = () => {
+        const url = `${window.location.origin}/feed?storeId=${id}`;
+        navigator.clipboard.writeText(url);
+        toast.success("Link de tienda generado", {
+            description: "El enlace público de la tienda ha sido copiado al portapapeles.",
+            icon: <Share2 className="w-4 h-4 text-emerald-400" />
+        });
+    };
 
     const fetchOtherStores = async () => {
         const token = localStorage.getItem('token');
@@ -236,7 +247,14 @@ export default function StoreProductsPage() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(editingProduct)
+                body: JSON.stringify({
+                    name: editingProduct.name,
+                    description: editingProduct.description,
+                    price: editingProduct.price,
+                    stock: editingProduct.stock,
+                    category: editingProduct.category,
+                    condition: editingProduct.condition
+                })
             });
             if (res.ok) {
                 toast.success("Drop actualizado");
@@ -282,6 +300,7 @@ export default function StoreProductsPage() {
                     ...formData,
                     price: parseFloat(formData.price),
                     stock: parseInt(formData.stock),
+                    condition: formData.condition,
                     variants: variants
                 })
             });
@@ -289,7 +308,7 @@ export default function StoreProductsPage() {
             if (res.ok) {
                 toast.success(`${BRANDING.productName} creado exitosamente`);
                 setIsCreateOpen(false);
-                setFormData({ name: "", description: "", price: "", stock: "", sku_part: "", category_slug: "", store_id: id || "" });
+                setFormData({ name: "", description: "", price: "", stock: "", sku_part: "", category_slug: "", store_id: id || "", condition: "NEW" });
                 setVariants([]);
                 fetchProducts();
             } else {
@@ -377,6 +396,18 @@ export default function StoreProductsPage() {
                                             </SelectTrigger>
                                             <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
                                                 {categories.map((c: any) => <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label className="text-zinc-500 text-[9px] font-black uppercase">Estado</Label>
+                                        <Select value={formData.condition} onValueChange={(v: string) => setFormData({ ...formData, condition: v })}>
+                                            <SelectTrigger className="bg-zinc-900 border-zinc-800 h-10 md:h-12 rounded-xl text-xs">
+                                                <SelectValue placeholder="Estado" />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+                                                <SelectItem value="NEW">Nuevo (Boxed)</SelectItem>
+                                                <SelectItem value="USED">Usado (Open Box)</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>
@@ -494,6 +525,14 @@ export default function StoreProductsPage() {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
+
+                    <MinimalButton
+                        onClick={handleShareStore}
+                        icon={<Share2 className="w-4 h-4" />}
+                        className="text-xs"
+                    >
+                        Compartir Tienda
+                    </MinimalButton>
                 </div>
             </PageHeader >
 
@@ -550,6 +589,7 @@ export default function StoreProductsPage() {
                                     <div className="space-y-0.5 md:space-y-1 overflow-hidden flex-1">
                                         <div className="flex items-center gap-2 md:gap-3">
                                             <span className="text-[8px] md:text-[9px] font-black text-primary uppercase tracking-[0.2em]">{product.category}</span>
+                                            <span className="text-[8px] md:text-[9px] font-black px-1.5 py-0.5 bg-zinc-800 text-zinc-400 rounded uppercase tracking-[0.1em]">{product.condition === 'NEW' ? 'Nuevo' : 'Usado'}</span>
                                             <span className="text-[8px] md:text-[9px] font-mono text-zinc-500 uppercase tracking-wider">{product.sku || `PID-${product.id.slice(0, 8)}`}</span>
                                         </div>
                                         <h3 className="text-sm md:text-xl font-bold text-white group-hover:translate-x-1 transition-transform truncate">{product.name}</h3>
@@ -795,6 +835,21 @@ export default function StoreProductsPage() {
                                         </SelectTrigger>
                                         <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
                                             {categories.map((c: any) => <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label className="text-[9px] font-black uppercase text-zinc-500">Estado</Label>
+                                    <Select
+                                        value={editingProduct.condition}
+                                        onValueChange={(v) => setEditingProduct({ ...editingProduct, condition: v })}
+                                    >
+                                        <SelectTrigger className="bg-zinc-900 border-zinc-800 h-10 rounded-xl text-xs">
+                                            <SelectValue placeholder="Estado" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+                                            <SelectItem value="NEW">Nuevo (Boxed)</SelectItem>
+                                            <SelectItem value="USED">Usado (Open Box)</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>

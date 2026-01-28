@@ -9,6 +9,8 @@ interface FilterContextType {
   setSelectedStatus: (status: string) => void;
   selectedCategory: string | null;
   setSelectedCategory: (cat: string | null) => void;
+  selectedStore: string | null;
+  setSelectedStore: (storeId: string | null) => void;
   page: number;
   setPage: (page: number) => void;
   totalPages: number;
@@ -24,6 +26,7 @@ export function FilterProvider({ children }: { children: ReactNode }) {
   const [priceRange, setPriceRange] = useState(5000);
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedStore, setSelectedStore] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(12);
@@ -37,6 +40,8 @@ export function FilterProvider({ children }: { children: ReactNode }) {
     setSelectedStatus,
     selectedCategory,
     setSelectedCategory,
+    selectedStore,
+    setSelectedStore,
     page,
     setPage,
     totalPages,
