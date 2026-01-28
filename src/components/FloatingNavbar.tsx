@@ -7,6 +7,7 @@ import { useFilters } from "@/context/FilterContext";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { BRANDING } from "@/config/branding";
+import { ReactNode } from "react";
 
 interface FloatingNavbarProps {
     title?: string;
@@ -14,18 +15,102 @@ interface FloatingNavbarProps {
     onToggleSidebar?: () => void;
 }
 
+// Reusable Filter Sheet Component
+const FeedFilterSheet = ({ children }: { children: ReactNode }) => {
+    const {
+        priceRange, setPriceRange,
+        selectedStatus, setSelectedStatus,
+        selectedCategory, setSelectedCategory
+    } = useFilters();
+
+    return (
+        <Sheet>
+            <SheetTrigger asChild>
+                {children}
+            </SheetTrigger>
+            <SheetContent className="bg-zinc-950 border-zinc-800 text-white w-[400px] sm:w-[540px]">
+                <SheetHeader className="mb-8">
+                    <SheetTitle className="text-2xl font-bold text-white">Filtros Avanzados</SheetTitle>
+                    <SheetDescription className="text-zinc-400">
+                        Ajusta los parámetros de búsqueda.
+                    </SheetDescription>
+                </SheetHeader>
+
+                <div className="space-y-8">
+                    {/* Categories */}
+                    <div className="space-y-4">
+                        <Label className="text-sm font-bold uppercase tracking-wider text-zinc-500">Categorías</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                            {['Todos', 'Tecnología', 'Ropa', 'Libros', 'Servicios', 'Comida', 'Otros'].map((cat) => {
+                                const isSelected = selectedCategory === cat || (cat === 'Todos' && selectedCategory === null);
+                                return (
+                                    <div
+                                        key={cat}
+                                        onClick={() => setSelectedCategory(cat === 'Todos' ? null : cat)}
+                                        className={`flex items-center space-x-2 p-3 rounded-xl border transition-colors cursor-pointer group ${isSelected ? 'bg-zinc-800 border-white/20' : 'bg-zinc-900/50 border-white/5 hover:border-white/10'}`}
+                                    >
+                                        <div className={`h-4 w-4 rounded-full border transition-colors ${isSelected ? 'border-primary bg-primary' : 'border-zinc-600'}`} />
+                                        <span className={`text-sm ${isSelected ? 'text-white' : 'text-zinc-300 group-hover:text-white'}`}>{cat}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Price Range */}
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <Label className="text-sm font-bold uppercase tracking-wider text-zinc-500">Precio Máximo</Label>
+                            <span className="text-xs font-mono text-white bg-white/10 px-2 py-1 rounded">{priceRange} {BRANDING.currencySymbol}</span>
+                        </div>
+                        <input
+                            type="range"
+                            min="0"
+                            max="5000"
+                            step="100"
+                            value={priceRange}
+                            onChange={(e) => setPriceRange(Number(e.target.value))}
+                            className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white"
+                        />
+                    </div>
+
+                    {/* Status */}
+                    <div className="space-y-4">
+                        <Label className="text-sm font-bold uppercase tracking-wider text-zinc-500">Estado</Label>
+                        <div className="space-y-2">
+                            {[
+                                { id: 'all', label: 'Todos' },
+                                { id: 'new', label: 'Nuevo' },
+                                { id: 'used', label: 'Usado' }
+                            ].map((status) => (
+                                <div
+                                    key={status.id}
+                                    onClick={() => setSelectedStatus(status.id)}
+                                    className="flex items-center space-x-3 cursor-pointer group"
+                                >
+                                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${selectedStatus === status.id ? 'border-primary bg-primary' : 'border-zinc-600'}`}>
+                                        {selectedStatus === status.id && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
+                                    </div>
+                                    <span className={`text-sm ${selectedStatus === status.id ? 'text-white' : 'text-zinc-400 group-hover:text-zinc-200'}`}>
+                                        {status.label}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </SheetContent>
+        </Sheet>
+    );
+};
+
 export function FloatingNavbar({ title, onToggleSidebar }: FloatingNavbarProps) {
     const { user, wallet, logout, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Global Filters
-    const {
-        searchTerm, setSearchTerm,
-        priceRange, setPriceRange,
-        selectedStatus, setSelectedStatus,
-        selectedCategory, setSelectedCategory
-    } = useFilters();
+    // Global Filters (only search needed here, others in Sheet)
+    const { searchTerm, setSearchTerm } = useFilters();
 
     const handleLogoClick = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -80,86 +165,12 @@ export function FloatingNavbar({ title, onToggleSidebar }: FloatingNavbarProps) 
                             />
                         </div>
 
-                        {/* Advanced Filters Button */}
-                        <Sheet>
-                            <SheetTrigger asChild>
-                                <MinimalButton icon={<SlidersHorizontal className="w-4 h-4" />}>
-                                    Filtros
-                                </MinimalButton>
-                            </SheetTrigger>
-                            <SheetContent className="bg-zinc-950 border-zinc-800 text-white w-[400px] sm:w-[540px]">
-                                <SheetHeader className="mb-8">
-                                    <SheetTitle className="text-2xl font-bold text-white">Filtros Avanzados</SheetTitle>
-                                    <SheetDescription className="text-zinc-400">
-                                        Ajusta los parámetros de búsqueda.
-                                    </SheetDescription>
-                                </SheetHeader>
-
-                                <div className="space-y-8">
-                                    {/* Categories */}
-                                    <div className="space-y-4">
-                                        <Label className="text-sm font-bold uppercase tracking-wider text-zinc-500">Categorías</Label>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {['Todos', 'Tecnología', 'Ropa', 'Libros', 'Servicios', 'Comida', 'Otros'].map((cat) => {
-                                                const isSelected = selectedCategory === cat || (cat === 'Todos' && selectedCategory === null);
-                                                return (
-                                                    <div
-                                                        key={cat}
-                                                        onClick={() => setSelectedCategory(cat === 'Todos' ? null : cat)}
-                                                        className={`flex items-center space-x-2 p-3 rounded-xl border transition-colors cursor-pointer group ${isSelected ? 'bg-zinc-800 border-white/20' : 'bg-zinc-900/50 border-white/5 hover:border-white/10'}`}
-                                                    >
-                                                        <div className={`h-4 w-4 rounded-full border transition-colors ${isSelected ? 'border-primary bg-primary' : 'border-zinc-600'}`} />
-                                                        <span className={`text-sm ${isSelected ? 'text-white' : 'text-zinc-300 group-hover:text-white'}`}>{cat}</span>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-
-                                    {/* Price Range */}
-                                    <div className="space-y-4">
-                                        <div className="flex items-center justify-between">
-                                            <Label className="text-sm font-bold uppercase tracking-wider text-zinc-500">Precio Máximo</Label>
-                                            <span className="text-xs font-mono text-white bg-white/10 px-2 py-1 rounded">{priceRange} {BRANDING.currencySymbol}</span>
-                                        </div>
-                                        <input
-                                            type="range"
-                                            min="0"
-                                            max="5000"
-                                            step="100"
-                                            value={priceRange}
-                                            onChange={(e) => setPriceRange(Number(e.target.value))}
-                                            className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white"
-                                        />
-                                    </div>
-
-                                    {/* Status */}
-                                    <div className="space-y-4">
-                                        <Label className="text-sm font-bold uppercase tracking-wider text-zinc-500">Estado</Label>
-                                        <div className="space-y-2">
-                                            {[
-                                                { id: 'all', label: 'Todos' },
-                                                { id: 'new', label: 'Nuevo' },
-                                                { id: 'used', label: 'Usado' }
-                                            ].map((status) => (
-                                                <div
-                                                    key={status.id}
-                                                    onClick={() => setSelectedStatus(status.id)}
-                                                    className="flex items-center space-x-3 cursor-pointer group"
-                                                >
-                                                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${selectedStatus === status.id ? 'border-primary bg-primary' : 'border-zinc-600'}`}>
-                                                        {selectedStatus === status.id && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
-                                                    </div>
-                                                    <span className={`text-sm ${selectedStatus === status.id ? 'text-white' : 'text-zinc-400 group-hover:text-zinc-200'}`}>
-                                                        {status.label}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </SheetContent>
-                        </Sheet>
+                        {/* Advanced Filters Button (DESKTOP) */}
+                        <FeedFilterSheet>
+                            <MinimalButton icon={<SlidersHorizontal className="w-4 h-4" />}>
+                                Filtros
+                            </MinimalButton>
+                        </FeedFilterSheet>
                     </div>
                 )}
 
@@ -171,6 +182,21 @@ export function FloatingNavbar({ title, onToggleSidebar }: FloatingNavbarProps) 
                             {wallet?.balance?.toLocaleString() || 0} <span className="text-zinc-500">{wallet?.currency_symbol || BRANDING.currencySymbol}</span>
                         </span>
                     </div>
+
+                    {/* Mobile Filter Button (New Request) */}
+                    {isFeed && (
+                        <div className="md:hidden">
+                            <FeedFilterSheet>
+                                <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="rounded-full hover:bg-white/10 text-zinc-400 hover:text-white transition-colors w-8 h-8"
+                                >
+                                    <SlidersHorizontal className="w-5 h-5" />
+                                </Button>
+                            </FeedFilterSheet>
+                        </div>
+                    )}
 
                     {/* User Avatar - Clickable to Dashboard */}
                     <Link to="/dashboard">

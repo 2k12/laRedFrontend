@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -60,6 +61,9 @@ export default function StoreProductsPage() {
     const [draggedProductId, setDraggedProductId] = useState<string | null>(null);
     const [dropTargetId, setDropTargetId] = useState<string | null>(null);
     const [otherStores, setOtherStores] = useState<any[]>([]);
+
+    // Delete State
+    const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
     // Edit Product State
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -190,23 +194,25 @@ export default function StoreProductsPage() {
         }
     };
 
-    const handleDelete = async (productId: string) => {
-        if (!confirm("¿Estás seguro de eliminar este drop?")) return;
+    const confirmDelete = async () => {
+        if (!productToDelete) return;
 
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch(`${API_BASE_URL}/api/products/${productId}`, {
+            const res = await fetch(`${API_BASE_URL}/api/products/${productToDelete}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
                 toast.success("Drop eliminado correctamente");
-                setProducts(prev => prev.filter(p => p.id !== productId));
+                setProducts(prev => prev.filter(p => p.id !== productToDelete));
             } else {
                 toast.error("Error al eliminar");
             }
         } catch (e) {
             toast.error("Error de conexión");
+        } finally {
+            setProductToDelete(null);
         }
     };
 
@@ -303,13 +309,13 @@ export default function StoreProductsPage() {
                 description={`Inventario de ${BRANDING.storeName}`}
                 icon={<Store className="w-8 h-8" />}
             >
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mt-4 sm:mt-0">
+                <div className="flex flex-row items-center justify-between w-full sm:w-auto gap-4 mt-4 sm:mt-0">
                     <div className="flex items-center gap-3">
                         <button onClick={() => navigate('/dashboard/stores')} className="p-2 hover:bg-zinc-900 rounded-full transition-colors text-zinc-500 hover:text-white shrink-0">
                             <ArrowLeft className="w-5 h-5" />
                         </button>
 
-                        <div className="relative flex-1 sm:flex-none">
+                        <div className="relative flex-1 sm:flex-none hidden md:block">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-600" />
                             <input
                                 type="text"
@@ -324,13 +330,13 @@ export default function StoreProductsPage() {
                     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                         <DialogTrigger asChild>
                             <MinimalButton
-                                className="h-10 px-6 rounded-full bg-white text-black font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-transform"
+                                className="w-auto text-xs"
                                 icon={<Plus className="w-4 h-4" />}
                             >
                                 Nuevo Drop
                             </MinimalButton>
                         </DialogTrigger>
-                        <DialogContent className="bg-zinc-950 border-zinc-800 text-white sm:max-w-[500px] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+                        <DialogContent className="bg-zinc-950 border border-white/10 text-white w-[90%] sm:max-w-[500px] max-h-[90vh] overflow-y-auto rounded-[2rem] p-6">
                             <DialogHeader>
                                 <DialogTitle className="text-xl md:text-2xl font-black uppercase italic tracking-tighter">Publicar Nuevo Drop</DialogTitle>
                             </DialogHeader>
@@ -480,9 +486,9 @@ export default function StoreProductsPage() {
                                 <MinimalButton
                                     onClick={handleCreate}
                                     disabled={submitting || isOverLimit || !formData.name.trim() || !formData.store_id}
-                                    className="w-full justify-center h-12 bg-white text-black font-black uppercase text-[10px] tracking-[0.2em] rounded-xl"
+                                    className="w-full justify-center h-12 rounded-xl"
                                 >
-                                    {submitting ? "Publicando..." : "Confirmar y Publicar"}
+                                    {submitting ? "Publicando..." : "Lanzar Drop"}
                                 </MinimalButton>
                             </DialogFooter>
                         </DialogContent>
@@ -587,7 +593,7 @@ export default function StoreProductsPage() {
                                                 <Edit2 className="w-3.5 h-3.5" />
                                             </button>
                                             <button
-                                                onClick={() => handleDelete(product.id)}
+                                                onClick={() => setProductToDelete(product.id)}
                                                 className="p-2.5 md:p-3 bg-zinc-950 border border-white/5 rounded-full hover:bg-red-500/10 hover:text-red-500 text-zinc-600 transition-colors"
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" />
@@ -600,6 +606,23 @@ export default function StoreProductsPage() {
                     </div>
                 )}
             </main>
+
+            <AlertDialog open={!!productToDelete} onOpenChange={(open) => !open && setProductToDelete(null)}>
+                <AlertDialogContent className="bg-zinc-950 border-zinc-900 text-white">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-zinc-400">
+                            Esta acción no se puede deshacer. Esto eliminará permanentemente el {BRANDING.productName} y todas sus variantes y datos asociados.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel className="bg-zinc-900 border-zinc-800 text-white hover:bg-zinc-800 hover:text-white">Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 text-white hover:bg-red-700 border-none">
+                            Eliminar {BRANDING.productName}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
             {/* Drag Ghost (Hidden Container) */}
             <div id="drag-ghost" className="fixed top-[-100px] left-[-200px] pointer-events-none z-0"></div>
@@ -729,9 +752,9 @@ export default function StoreProductsPage() {
 
             {/* Edit Dialog */}
             <Dialog open={!!editingProduct} onOpenChange={(open) => !open && setEditingProduct(null)}>
-                <DialogContent className="bg-zinc-950 border-zinc-900 text-white sm:max-w-[425px]">
+                <DialogContent className="bg-zinc-950 border border-white/10 text-white w-[90%] sm:max-w-[425px] rounded-[2rem] p-6">
                     <DialogHeader>
-                        <DialogTitle className="uppercase italic">Editar Drop</DialogTitle>
+                        <DialogTitle className="uppercase italic font-black text-xl">Editar Drop</DialogTitle>
                     </DialogHeader>
                     {editingProduct && (
                         <div className="grid gap-4 py-4">
@@ -753,25 +776,18 @@ export default function StoreProductsPage() {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
-                                    <Label className="text-[9px] font-black uppercase text-zinc-500">Precio</Label>
-                                    <Input
-                                        type="number"
-                                        value={editingProduct.price}
-                                        onChange={e => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) })}
-                                        className="bg-zinc-900 border-zinc-800"
-                                    />
-                                    {(() => {
-                                        const cat = categories.find((c: any) => c.slug === editingProduct.category);
-                                        const maxPrice = cat ? cat.max_price : 0;
-                                        if (cat && editingProduct.price > maxPrice) {
-                                            return (
-                                                <p className="text-[9px] text-red-500 font-bold mt-1">
-                                                    Máximo permitido: {maxPrice} {BRANDING.currencySymbol}
-                                                </p>
-                                            );
-                                        }
-                                        return null;
-                                    })()}
+                                    <Label className="text-[9px] font-black uppercase text-zinc-500">Categoría</Label>
+                                    <Select
+                                        value={editingProduct.category}
+                                        onValueChange={(v) => setEditingProduct({ ...editingProduct, category: v })}
+                                    >
+                                        <SelectTrigger className="bg-zinc-900 border-zinc-800 h-10 rounded-xl text-xs">
+                                            <SelectValue placeholder="Categoría" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+                                            {categories.map((c: any) => <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                                 <div className="grid gap-2">
                                     <Label className="text-[9px] font-black uppercase text-zinc-500">Stock</Label>
@@ -779,9 +795,37 @@ export default function StoreProductsPage() {
                                         type="number"
                                         value={editingProduct.stock}
                                         onChange={e => setEditingProduct({ ...editingProduct, stock: parseInt(e.target.value) })}
-                                        className="bg-zinc-900 border-zinc-800"
+                                        className="bg-zinc-900 border-zinc-800 h-10 rounded-xl"
                                     />
                                 </div>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label className="text-[9px] font-black uppercase text-zinc-500">Precio ({BRANDING.currencySymbol})</Label>
+                                <Input
+                                    type="number"
+                                    value={editingProduct.price}
+                                    onChange={e => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) })}
+                                    className={`bg-zinc-900 border-zinc-800 h-10 rounded-xl ${categories.find((c: any) => c.slug === editingProduct.category && editingProduct.price > c.max_price)
+                                            ? 'border-red-500 text-red-500 focus:ring-red-500'
+                                            : 'focus:border-primary'
+                                        }`}
+                                />
+                                {(() => {
+                                    const cat = categories.find((c: any) => c.slug === editingProduct.category);
+                                    const maxPrice = cat ? cat.max_price : 0;
+                                    const isOverLimit = cat && editingProduct.price > maxPrice;
+
+                                    if (cat) {
+                                        return (
+                                            <div className={`text-[9px] flex items-center gap-2 p-3 rounded-lg ${isOverLimit ? 'bg-red-500/10 text-red-400' : 'bg-green-500/5 text-zinc-500'}`}>
+                                                {isOverLimit ? <AlertTriangle className="w-3 h-3 shrink-0" /> : <Info className="w-3 h-3 shrink-0" />}
+                                                <span className="font-medium tracking-tight">Límite para {cat.name}: <strong className="text-white">{maxPrice} {BRANDING.currencySymbol}</strong></span>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })()}
                             </div>
                         </div>
                     )}
@@ -789,7 +833,7 @@ export default function StoreProductsPage() {
                         <MinimalButton
                             onClick={handleUpdate}
                             disabled={submitting}
-                            className="w-full h-12 bg-white text-black font-black uppercase text-[10px] tracking-widest rounded-xl"
+                            className="w-full justify-center h-12 rounded-xl"
                         >
                             {submitting ? "Guardando..." : "Guardar Cambios"}
                         </MinimalButton>
@@ -800,10 +844,9 @@ export default function StoreProductsPage() {
             {/* Status Footer */}
             <div className="fixed bottom-0 left-0 right-0 h-8 md:h-10 bg-zinc-950 border-t border-white/5 flex items-center justify-between px-4 md:px-10 text-[7px] md:text-[9px] font-mono text-zinc-700 uppercase tracking-[0.1em] md:tracking-[0.3em] z-50">
                 <div className="flex gap-4 md:gap-8">
-                    <span>Inventory: {products.length}</span>
-                    <span className="hidden sm:inline">Last_Sync: {new Date().toLocaleTimeString()}</span>
+                    <span>Inventario: {products.length}</span>
                 </div>
-                <div className="truncate max-w-[150px] md:max-w-none">{BRANDING.appName} Supply Manager</div>
+                <div className="truncate max-w-[150px] md:max-w-none">{BRANDING.appName}</div>
             </div>
         </div >
     );

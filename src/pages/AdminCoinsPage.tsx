@@ -86,7 +86,7 @@ export default function AdminCoinsPage() {
                                 className="w-full sm:relative bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-black font-black border-none px-6 sm:px-8 py-5 sm:py-6 shadow-[0_10px_20px_rgba(245,158,11,0.3)] hover:shadow-[0_15px_30px_rgba(245,158,11,0.5)] transition-all duration-500 rounded-full overflow-hidden text-xs sm:text-sm"
                             >
                                 <span className="relative z-10 flex items-center justify-center gap-2">
-                                    MINT {BRANDING.currencySymbol}
+                                    AGREGAR {BRANDING.currencySymbol}
                                     <span className="w-1.5 h-1.5 rounded-full bg-black/20 animate-ping" />
                                 </span>
 
@@ -102,7 +102,7 @@ export default function AdminCoinsPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
 
                         {/* Liquid Fill Container */}
-                        <div className="relative group order-2 lg:order-1">
+                        <div className="relative group">
                             <div className="absolute inset-0 bg-gradient-to-b from-primary/20 to-transparent blur-3xl opacity-20 group-hover:opacity-40 transition-opacity" />
 
                             <div className="relative w-full aspect-[4/5] max-w-[280px] sm:max-w-sm mx-auto bg-zinc-900/50 backdrop-blur-xl rounded-[2rem] md:rounded-[2.5rem] border border-white/10 overflow-hidden shadow-2xl">
@@ -153,7 +153,7 @@ export default function AdminCoinsPage() {
                         </div>
 
                         {/* Info Section */}
-                        <div className="space-y-8 md:space-y-12 order-1 lg:order-2">
+                        <div className="space-y-8 md:space-y-12">
                             <div className="space-y-4">
                                 <h3 className="text-3xl md:text-4xl font-black text-white leading-tight">
                                     Reserva<br />Monetaria

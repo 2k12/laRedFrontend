@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/PageHeader";
 import { API_BASE_URL } from "@/config/api";
+import { BRANDING } from "@/config/branding";
 
 export default function DashboardPage() {
     const { user, wallet, refreshProfile } = useAuth();
@@ -155,7 +156,7 @@ export default function DashboardPage() {
                             <div className="mb-3 w-9 h-9 md:w-10 md:h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
                                 <Store className="w-4 h-4 md:w-5 md:h-5" />
                             </div>
-                            <h3 className="text-xs md:text-sm font-bold text-white mb-0.5 md:mb-1">{user?.roles.includes('ADMIN') ? "Directorio" : "Mis Tiendas"}</h3>
+                            <h3 className="text-xs md:text-sm font-bold text-white mb-0.5 md:mb-1">{user?.roles.includes('ADMIN') ? "Directorio" : `Mis ${BRANDING.storeNamePlural}`}</h3>
                             <div className="flex items-center justify-between">
                                 <span className="text-[8px] md:text-[10px] text-zinc-500 uppercase tracking-wider truncate">{user?.roles.includes('ADMIN') ? "Red" : "Gestor"}</span>
                                 <ArrowRight className="w-3 h-3 text-zinc-600 group-hover:text-white transition-colors" />

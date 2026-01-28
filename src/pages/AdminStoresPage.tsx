@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Store, Plus, Edit2, Trash2, Package, ArrowRight, ShoppingCart, Clock } from "lucide-react";
@@ -36,6 +37,7 @@ export default function AdminStoresPage() {
   const [formData, setFormData] = useState({ name: "", description: "", owner_id: "" });
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [storeToDelete, setStoreToDelete] = useState<string | null>(null);
 
   const viewMode = searchParams.get('view') || (user?.roles.includes('ADMIN') ? 'all' : 'mine');
 
@@ -150,12 +152,12 @@ export default function AdminStoresPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm(`¿Estás seguro de eliminar esta ${BRANDING.storeName.toLowerCase()}?`)) return;
+  const confirmDelete = async () => {
+    if (!storeToDelete) return;
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${API_BASE_URL}/api/stores/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/stores/${storeToDelete}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -169,6 +171,8 @@ export default function AdminStoresPage() {
     } catch (e) {
       console.error(e);
       toast.error("Error de conexión");
+    } finally {
+      setStoreToDelete(null);
     }
   };
 
@@ -208,7 +212,7 @@ export default function AdminStoresPage() {
                 Nueva {BRANDING.storeName}
               </MinimalButton>
             </DialogTrigger>
-            <DialogContent className="bg-zinc-950 border-zinc-900 text-white sm:max-w-[425px]">
+            <DialogContent className="bg-zinc-950 border border-white/10 text-white w-[90%] sm:max-w-[425px] rounded-[2rem] p-6">
               <DialogHeader>
                 <DialogTitle>Crear Nueva {BRANDING.storeName}</DialogTitle>
                 <DialogDescription className="text-zinc-400">
@@ -286,8 +290,8 @@ export default function AdminStoresPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {stores.map((store) => (
-            <div key={store.id} className="group relative bg-zinc-900/50 border border-white/5 backdrop-blur-sm rounded-2xl md:rounded-3xl p-5 md:p-6 hover:border-white/10 transition-all duration-300">
-              <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-primary to-secondary opacity-0 group-hover:opacity-100 transition-opacity rounded-b-3xl" />
+            <div key={store.id} className="group relative bg-zinc-900/50 border border-white/5 backdrop-blur-sm rounded-2xl md:rounded-3xl p-5 md:p-6 hover:border-white/20 hover:bg-zinc-900/80 hover:brightness-110 transition-all duration-300 shadow-lg hover:shadow-xl">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl md:rounded-3xl pointer-events-none" />
 
               <div className="flex items-start justify-between mb-4 md:mb-6">
                 <div className="flex items-center gap-3 md:gap-4">
@@ -385,7 +389,7 @@ export default function AdminStoresPage() {
 
                   <MinimalButton
                     size="icon"
-                    onClick={() => handleDelete(store.id)}
+                    onClick={() => setStoreToDelete(store.id)}
                     className="h-8 w-8 md:h-10 md:w-10 text-zinc-500 hover:text-red-500 hover:border-red-500/50"
                     icon={<Trash2 className="w-3.5 h-3.5" />}
                   >
@@ -396,6 +400,24 @@ export default function AdminStoresPage() {
           ))}
         </div>
       )}
+
+
+      <AlertDialog open={!!storeToDelete} onOpenChange={(open) => !open && setStoreToDelete(null)}>
+        <AlertDialogContent className="bg-zinc-950 border-zinc-900 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400">
+              Esta acción no se puede deshacer. Esto eliminará permanentemente la {BRANDING.storeName.toLowerCase()} y todos sus datos asociados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-zinc-900 border-zinc-800 text-white hover:bg-zinc-800 hover:text-white">Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 text-white hover:bg-red-700 border-none">
+              Eliminar {BRANDING.storeName}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }

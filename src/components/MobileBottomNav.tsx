@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, Coins, QrCode, Settings, TrendingUp } from "lucide-react";
+import { LayoutGrid, Coins, QrCode, Settings, Store, Ticket } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export function MobileBottomNav() {
@@ -8,22 +8,19 @@ export function MobileBottomNav() {
     const { user } = useAuth();
 
     const primaryLinks = [
-        { href: "/feed", label: "Feed", icon: LayoutGrid },
+        { href: "/feed", label: "Red", icon: LayoutGrid },
         { href: "/dashboard/coins", label: "Bóveda", icon: Coins },
-        { href: "/dashboard/scan", label: "Escanear", icon: QrCode, isScanner: true },
+        { href: "/dashboard/scan", label: "Scanner", icon: QrCode, isScanner: true },
+        { href: "/dashboard/rewards", label: "Eventos", icon: Ticket },
         { href: "/dashboard", label: "Perfil", icon: Settings },
     ];
-
-    // For Admin extra links, we might want a "More" button or just show them if they aren't many
-    // But to keep it "ultra-minimalist", we'll stick to 4-5 main ones.
-    // We can add a "Tiendas" if admin and shift things.
 
     const isAdmin = user?.roles?.includes('ADMIN');
     const isSystem = user?.roles?.includes('SYSTEM');
 
     return (
-        <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[400px]">
-            <div className="bg-black/40 backdrop-blur-2xl border border-white/10 rounded-[2rem] px-2 py-2 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-[450px]">
+            <div className="bg-black/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] px-4 py-3 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
                 {primaryLinks.map((link) => {
                     const Icon = link.icon;
                     const isActive = pathname === link.href;
@@ -34,14 +31,13 @@ export function MobileBottomNav() {
                                 key={link.href}
                                 to={link.href}
                                 className={cn(
-                                    "relative -top-8 w-16 h-16 rounded-full flex items-center justify-center transition-all duration-500",
+                                    "relative -top-10 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500",
                                     "bg-white text-black shadow-[0_10px_30px_rgba(255,255,255,0.3)]",
                                     "hover:scale-110 active:scale-95",
                                     isActive ? "ring-4 ring-primary/20" : ""
                                 )}
                             >
-                                <Icon className="w-7 h-7" />
-                                {/* Notification pulse if needed */}
+                                <Icon className="w-6 h-6" />
                                 <span className="absolute inset-0 rounded-full bg-white opacity-20 animate-ping pointer-events-none" />
                             </Link>
                         );
@@ -52,9 +48,9 @@ export function MobileBottomNav() {
                             key={link.href}
                             to={link.href}
                             className={cn(
-                                "flex flex-col items-center gap-1 flex-1 py-2 rounded-2xl transition-all duration-300",
+                                "flex flex-col items-center gap-1 flex-1 py-1 rounded-2xl transition-all duration-300",
                                 isActive
-                                    ? "text-white scale-110"
+                                    ? "text-white scale-105"
                                     : "text-zinc-500 hover:text-zinc-300"
                             )}
                         >
@@ -71,20 +67,19 @@ export function MobileBottomNav() {
                     );
                 })}
 
-                {/* If Admin/System, maybe a tiny indicator or we can add a "More" link if needed */}
                 {(isAdmin || isSystem) && (
                     <Link
-                        to="/dashboard/stores" // Or a generic admin page
+                        to="/dashboard/stores"
                         className={cn(
-                            "flex flex-col items-center gap-1 flex-1 py-2 rounded-2xl transition-all duration-300",
-                            pathname.includes('/stores') || pathname.includes('/economy') ? "text-primary scale-110" : "text-zinc-500"
+                            "flex flex-col items-center gap-1 flex-1 py-1 rounded-2xl transition-all duration-300",
+                            pathname.includes('/stores') || pathname.includes('/economy') ? "text-primary scale-105" : "text-zinc-500"
                         )}
                     >
                         <div className={cn(
                             "p-1.5 rounded-xl transition-colors",
                             pathname.includes('/stores') || pathname.includes('/economy') ? "bg-primary/10" : "bg-transparent"
                         )}>
-                            <TrendingUp className="w-5 h-5" />
+                            <Store className="w-5 h-5" />
                         </div>
                         <span className="text-[9px] font-black uppercase tracking-tighter opacity-80">
                             Admin

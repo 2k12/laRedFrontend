@@ -295,73 +295,75 @@ export default function AdminRewardsPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 mt-6 md:mt-8">
                 {/* Events List */}
-                <div className="lg:col-span-1 space-y-4">
-                    <h3 className="text-[10px] md:text-sm font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 md:mb-6">Eventos Activos</h3>
-                    {loading ? (
-                        <div className="p-8 text-center text-zinc-600 animate-pulse text-xs">Cargando eventos...</div>
-                    ) : events.length === 0 ? (
-                        <div className="p-8 text-center border border-dashed border-zinc-800 rounded-3xl text-zinc-600 text-xs">
-                            No hay eventos configurados.
-                        </div>
-                    ) : events.map(event => (
-                        <div
-                            key={event.id}
-                            onClick={() => setSelectedEvent(event)}
-                            className={cn(
-                                "p-4 md:p-5 rounded-2xl md:rounded-3xl border transition-all duration-300 cursor-pointer group relative overflow-hidden",
-                                !event.is_active && "opacity-50 grayscale",
-                                selectedEvent?.id === event.id
-                                    ? "bg-emerald-500/5 border-emerald-500/30 shadow-xl"
-                                    : "bg-zinc-900/20 border-white/5 hover:bg-white/5 hover:border-white/10"
-                            )}
-                        >
-                            {/* Accent Glow on Selection */}
-                            {selectedEvent?.id === event.id && (
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-                            )}
-                            <div className="flex justify-between items-start mb-2">
-                                <h4 className={cn(
-                                    "font-bold text-sm md:text-base transition-all duration-300",
-                                    selectedEvent?.id === event.id ? "text-emerald-400" : "text-zinc-300 group-hover:text-white"
-                                )}>
-                                    {event.name} {!event.is_active && <span className="text-[7px] bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded-full ml-1 md:ml-2 border border-white/5">FINALIZADO</span>}
-                                </h4>
-                                <div className="flex items-center gap-1 relative z-10">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <button
-                                                onClick={(e) => e.stopPropagation()}
-                                                className="opacity-100 lg:opacity-0 group-hover:opacity-100 p-1.5 md:p-2 hover:bg-white/5 rounded-xl transition-all text-zinc-500 hover:text-white border border-transparent hover:border-white/10"
-                                            >
-                                                <MoreHorizontal className="w-4 h-4" />
-                                            </button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="bg-zinc-950 border-white/10 text-white min-w-[180px] rounded-2xl shadow-2xl">
-                                            <DropdownMenuItem
-                                                onClick={(e) => { e.stopPropagation(); setConfirmToggleData({ id: event.id, status: event.is_active }); }}
-                                                className="flex items-center gap-3 p-3 focus:bg-white/5 focus:text-white cursor-pointer rounded-xl transition-colors"
-                                            >
-                                                <RefreshCw className={cn("w-4 h-4", event.is_active ? "text-emerald-500" : "text-amber-500")} />
-                                                <span className="text-xs font-medium">{event.is_active ? "Finalizar Evento" : "Reactivar Evento"}</span>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator className="bg-white/5 mx-1" />
-                                            <DropdownMenuItem
-                                                onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(event.id); }}
-                                                className="flex items-center gap-3 p-3 focus:bg-red-500/10 focus:text-red-500 cursor-pointer text-red-400 rounded-xl transition-colors"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                                <span className="text-xs font-medium">Eliminar Registro</span>
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                <div className="lg:col-span-1 flex flex-col gap-4">
+                    <h3 className="text-[10px] md:text-sm font-black uppercase tracking-[0.2em] text-zinc-500">Eventos Activos</h3>
+                    <div className="flex lg:flex-col gap-3 lg:gap-4 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0 snap-x -mx-4 px-4 lg:mx-0 lg:px-0">
+                        {loading ? (
+                            <div className="p-8 text-center text-zinc-600 animate-pulse text-xs">Cargando eventos...</div>
+                        ) : events.length === 0 ? (
+                            <div className="p-8 text-center border border-dashed border-zinc-800 rounded-3xl text-zinc-600 text-xs">
+                                No hay eventos configurados.
+                            </div>
+                        ) : events.map(event => (
+                            <div
+                                key={event.id}
+                                onClick={() => setSelectedEvent(event)}
+                                className={cn(
+                                    "min-w-[300px] lg:min-w-0 bg-zinc-900/50 p-4 md:p-5 rounded-2xl md:rounded-3xl border transition-all duration-300 cursor-pointer group relative overflow-hidden snap-center",
+                                    !event.is_active && "opacity-50 grayscale",
+                                    selectedEvent?.id === event.id
+                                        ? "bg-emerald-500/5 border-emerald-500/30 shadow-xl ring-1 ring-emerald-500/20"
+                                        : "border-white/5 hover:bg-white/5 hover:border-white/10"
+                                )}
+                            >
+                                {/* Accent Glow on Selection */}
+                                {selectedEvent?.id === event.id && (
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                                )}
+                                <div className="flex justify-between items-start mb-2">
+                                    <h4 className={cn(
+                                        "font-bold text-sm md:text-base transition-all duration-300",
+                                        selectedEvent?.id === event.id ? "text-emerald-400" : "text-zinc-300 group-hover:text-white"
+                                    )}>
+                                        {event.name} {!event.is_active && <span className="text-[7px] bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded-full ml-1 md:ml-2 border border-white/5">FINALIZADO</span>}
+                                    </h4>
+                                    <div className="flex items-center gap-1 relative z-10">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <button
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="opacity-100 lg:opacity-0 group-hover:opacity-100 p-1.5 md:p-2 hover:bg-white/5 rounded-xl transition-all text-zinc-500 hover:text-white border border-transparent hover:border-white/10"
+                                                >
+                                                    <MoreHorizontal className="w-4 h-4" />
+                                                </button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="bg-zinc-950 border-white/10 text-white min-w-[180px] rounded-2xl shadow-2xl">
+                                                <DropdownMenuItem
+                                                    onClick={(e) => { e.stopPropagation(); setConfirmToggleData({ id: event.id, status: event.is_active }); }}
+                                                    className="flex items-center gap-3 p-3 focus:bg-white/5 focus:text-white cursor-pointer rounded-xl transition-colors"
+                                                >
+                                                    <RefreshCw className={cn("w-4 h-4", event.is_active ? "text-emerald-500" : "text-amber-500")} />
+                                                    <span className="text-xs font-medium">{event.is_active ? "Finalizar Evento" : "Reactivar Evento"}</span>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator className="bg-white/5 mx-1" />
+                                                <DropdownMenuItem
+                                                    onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(event.id); }}
+                                                    className="flex items-center gap-3 p-3 focus:bg-red-500/10 focus:text-red-500 cursor-pointer text-red-400 rounded-xl transition-colors"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                    <span className="text-xs font-medium">Eliminar Registro</span>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </div>
+                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[9px] md:text-[10px] font-mono text-zinc-500 uppercase">
+                                    <span className="flex items-center gap-1"><Wallet className="w-3 h-3 text-emerald-500/50" /> {event.remaining_budget}/{event.total_budget} {BRANDING.currencySymbol}</span>
+                                    <span className="flex items-center gap-1"><RefreshCw className="w-3 h-3 text-emerald-500/50" /> {event.reward_amount} {BRANDING.currencySymbol}/SCAN</span>
                                 </div>
                             </div>
-                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[9px] md:text-[10px] font-mono text-zinc-500 uppercase">
-                                <span className="flex items-center gap-1"><Wallet className="w-3 h-3 text-emerald-500/50" /> {event.remaining_budget}/{event.total_budget} {BRANDING.currencySymbol}</span>
-                                <span className="flex items-center gap-1"><RefreshCw className="w-3 h-3 text-emerald-500/50" /> {event.reward_amount} {BRANDING.currencySymbol}/SCAN</span>
-                            </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
 
                 {/* QR Display Area */}

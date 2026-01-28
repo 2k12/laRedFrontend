@@ -15,7 +15,7 @@ export function AppSidebar({ collapsed, toggleSidebar }: AppSidebarProps) {
   const { user } = useAuth();
 
   const links = [
-    { href: "/feed", label: "Feed Principal", icon: LayoutGrid },
+    { href: "/feed", label: "Red", icon: LayoutGrid },
     ...(user?.roles?.includes('ADMIN') ? [
       { href: "/dashboard/stores?view=all", label: BRANDING.storeNamePlural, icon: Store }
     ] : []),
