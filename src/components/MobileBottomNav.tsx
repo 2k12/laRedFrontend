@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, Coins, QrCode, Settings, Store, ShoppingBag } from "lucide-react";
+import { LayoutGrid, Coins, QrCode, Settings, Store, ShoppingBag, Users } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export function MobileBottomNav() {
@@ -69,20 +69,24 @@ export function MobileBottomNav() {
 
                 {(isAdmin || isSystem) && (
                     <Link
-                        to="/dashboard/stores"
+                        to={isSystem ? "/dashboard/users" : "/dashboard/stores"}
                         className={cn(
                             "flex flex-col items-center gap-1 flex-1 py-1 rounded-2xl transition-all duration-300",
-                            pathname.includes('/stores') || pathname.includes('/economy') ? "text-primary scale-105" : "text-zinc-500"
+                            (isSystem && pathname.includes('/users')) || (!isSystem && pathname.includes('/stores'))
+                                ? "text-primary scale-105"
+                                : "text-zinc-500"
                         )}
                     >
                         <div className={cn(
                             "p-1.5 rounded-xl transition-colors",
-                            pathname.includes('/stores') || pathname.includes('/economy') ? "bg-primary/10" : "bg-transparent"
+                            (isSystem && pathname.includes('/users')) || (!isSystem && pathname.includes('/stores'))
+                                ? "bg-primary/10"
+                                : "bg-transparent"
                         )}>
-                            <Store className="w-5 h-5" />
+                            {isSystem ? <Users className="w-5 h-5" /> : <Store className="w-5 h-5" />}
                         </div>
                         <span className="text-[9px] font-black uppercase tracking-tighter opacity-80">
-                            Admin
+                            {isSystem ? "Usuarios" : "Admin"}
                         </span>
                     </Link>
                 )}

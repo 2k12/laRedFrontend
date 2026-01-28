@@ -41,7 +41,7 @@ const FeedFilterSheet = ({ children }: { children: ReactNode }) => {
             <SheetTrigger asChild>
                 {children}
             </SheetTrigger>
-            <SheetContent className="bg-zinc-950 border-zinc-800 text-white w-[400px] sm:w-[540px]">
+            <SheetContent className="bg-zinc-950 border-zinc-800 text-white w-[400px] sm:w-[540px] overflow-y-auto max-h-screen">
                 <SheetHeader className="mb-8">
                     <SheetTitle className="text-2xl font-bold text-white">Filtros Avanzados</SheetTitle>
                     <SheetDescription className="text-zinc-400">
