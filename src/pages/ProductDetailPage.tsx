@@ -5,6 +5,7 @@ import { MinimalButton } from "@/components/MinimalButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { API_BASE_URL } from "@/config/api";
 import { AnimatePresence, motion } from "framer-motion";
+import { PurchaseQuantumOverlay } from "@/components/PurchaseQuantumOverlay";
 
 export default function ProductDetailPage() {
     const { id } = useParams();
@@ -12,6 +13,7 @@ export default function ProductDetailPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [product, setProduct] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [showPurchase, setShowPurchase] = useState(false);
 
     const handleClose = () => {
         navigate('/feed');
@@ -46,6 +48,15 @@ export default function ProductDetailPage() {
 
     return (
         <div className="w-full min-h-screen bg-zinc-950 relative overflow-hidden">
+            <AnimatePresence>
+                {showPurchase && product && (
+                    <PurchaseQuantumOverlay
+                        product={product}
+                        onClose={() => setShowPurchase(false)}
+                    />
+                )}
+            </AnimatePresence>
+
             {/* Contextual Navigation Arrows - Restricted to large screens for cleaner mobile UI */}
             <div className="hidden xl:flex fixed right-8 top-1/2 -translate-y-1/2 z-50 flex-col gap-3">
                 <AnimatePresence>
@@ -244,7 +255,11 @@ export default function ProductDetailPage() {
                                         transition={{ delay: 0.5 }}
                                         className="gsap-actions flex flex-wrap gap-3"
                                     >
-                                        <MinimalButton className="flex-1 sm:flex-none h-14 px-8 text-[11px] font-bold tracking-widest uppercase bg-zinc-800 text-white hover:bg-zinc-700 border-zinc-700 shadow-lg transition-all" icon={<ShoppingCart className="w-4 h-4" />}>
+                                        <MinimalButton
+                                            onClick={() => setShowPurchase(true)}
+                                            className="flex-1 sm:flex-none h-14 px-8 text-[11px] font-bold tracking-widest uppercase bg-zinc-800 text-white hover:bg-zinc-700 border-zinc-700 shadow-lg transition-all"
+                                            icon={<ShoppingCart className="w-4 h-4" />}
+                                        >
                                             Comprar
                                         </MinimalButton>
                                         <MinimalButton size="icon" className="h-14 w-14 hover:text-pink-500 hover:border-pink-500/50 transition-all" icon={<Heart className="w-5 h-5" />} />

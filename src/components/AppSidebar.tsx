@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, Store, Coins, Settings, TrendingUp, QrCode } from "lucide-react";
+import { LayoutGrid, Store, Coins, Settings, TrendingUp, QrCode, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { BRANDING } from "@/config/branding";
 
@@ -27,6 +27,7 @@ export function AppSidebar({ collapsed, toggleSidebar }: AppSidebarProps) {
       { href: "/economy", label: "Gestión Económica", icon: TrendingUp }
     ] : []),
     { href: "/dashboard/scan", label: "Escanear Premio", icon: QrCode },
+    { href: "/dashboard/orders", label: "Mis Pedidos", icon: ShoppingBag },
     { href: "/dashboard", label: "Configuración", icon: Settings },
   ];
 

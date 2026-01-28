@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingLayout from "@/layouts/LandingLayout";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import LandingPage from "@/pages/LandingPage";
@@ -17,6 +17,7 @@ import EconomyManagementPage from "@/pages/EconomyManagementPage";
 import AdminRewardsPage from "@/pages/AdminRewardsPage";
 import ClaimRewardPage from "@/pages/ClaimRewardPage";
 import QRScannerPage from "@/pages/QRScannerPage";
+import OrdersPage from "@/pages/OrdersPage";
 
 import { AuthProvider } from "@/context/AuthContext";
 
@@ -40,18 +41,27 @@ function App() {
           <Route element={<DashboardLayout />}>
             <Route path="/feed" element={<MarketplaceFeed />} />
             <Route path="/feed/product/:id" element={<ProductDetailPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/dashboard/coins" element={<AdminCoinsPage />} />
-            <Route path="/dashboard/stores" element={<AdminStoresPage />} />
-            <Route path="/dashboard/products" element={<DashboardProductsPage />} />
-            <Route path="/dashboard/mint" element={<MintConfirmPage />} />
-            <Route path="/dashboard/stores/:id/products" element={<StoreProductsPage />} />
-            <Route path="/dashboard/products/transfer/:productId" element={<ProductTransferPage />} />
+
+            {/* Dashboard Sub-routes */}
+            <Route path="/dashboard">
+              <Route index element={<DashboardPage />} />
+              <Route path="orders" element={<OrdersPage />} />
+              <Route path="coins" element={<AdminCoinsPage />} />
+              <Route path="stores" element={<AdminStoresPage />} />
+              <Route path="products" element={<DashboardProductsPage />} />
+              <Route path="mint" element={<MintConfirmPage />} />
+              <Route path="stores/:id/products" element={<StoreProductsPage />} />
+              <Route path="products/transfer/:productId" element={<ProductTransferPage />} />
+              <Route path="rewards" element={<AdminRewardsPage />} />
+              <Route path="rewards/claim" element={<ClaimRewardPage />} />
+              <Route path="scan" element={<QRScannerPage />} />
+            </Route>
+
             <Route path="/economy" element={<EconomyManagementPage />} />
-            <Route path="/dashboard/rewards" element={<AdminRewardsPage />} />
-            <Route path="/dashboard/rewards/claim" element={<ClaimRewardPage />} />
-            <Route path="/dashboard/scan" element={<QRScannerPage />} />
           </Route>
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
       <Toaster />
