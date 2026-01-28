@@ -152,6 +152,7 @@ export default function AdminRewardsPage() {
                 toast.success("Evento de recompensa creado exitosamente");
                 setIsCreateOpen(false);
                 fetchEvents();
+                fetchVaultBalance();
                 setFormData({ name: '', description: '', reward_amount: '5', total_budget: '100' });
             } else {
                 const err = await res.json();

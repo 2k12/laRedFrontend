@@ -117,8 +117,8 @@ export default function MintConfirmPage() {
                         <ShieldCheck className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
                     </div>
                     <div className="space-y-0.5">
-                        <h2 className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-white">Security Suite</h2>
-                        <p className="text-[8px] md:text-[9px] font-mono text-zinc-600 tracking-wider">MINTING_MODULE_V2.0</p>
+                        <h2 className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-white">Seguridad</h2>
+                        <p className="text-[8px] md:text-[9px] font-mono text-zinc-600 tracking-wider">{BRANDING.appName}</p>
                     </div>
                 </div>
                 <button
@@ -273,11 +273,8 @@ export default function MintConfirmPage() {
 
             {/* Status Bar */}
             <div className="fixed bottom-0 left-0 right-0 h-8 md:h-10 bg-zinc-950 border-t border-white/5 flex items-center justify-between px-4 md:px-10 text-[7px] md:text-[9px] font-mono text-zinc-700 uppercase tracking-[0.1em] md:tracking-[0.3em] z-50">
-                <div className="flex gap-4 md:gap-8">
-                    <span>Authorized: TRUE</span>
-                    <span className="hidden sm:inline">Enc_Channel: ACTIVE</span>
-                </div>
-                <div>{BRANDING.appName} Economy Suite</div>
+
+                <div>{BRANDING.appName} SEGURIDAD</div>
             </div>
         </div>
     );

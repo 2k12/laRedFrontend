@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useSpring, useTransform } from "framer-motion";
-import { Fingerprint, X, Smartphone, ShieldCheck } from "lucide-react";
+import { Fingerprint, X, Smartphone, ShieldCheck, AlertCircle } from "lucide-react";
 import { API_BASE_URL } from "@/config/api";
 import { useAuth } from "@/context/AuthContext";
 import { BRANDING } from "@/config/branding";
+import { cn } from "@/lib/utils";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import confetti from "canvas-confetti";
 
 interface PurchaseQuantumOverlayProps {
@@ -12,16 +14,19 @@ interface PurchaseQuantumOverlayProps {
         name: string;
         price: number;
         image?: string;
+        owner_id?: string;
     };
     onClose: () => void;
 }
 
 export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOverlayProps) {
-    const { token } = useAuth();
+    const { token, user } = useAuth();
     const [status, setStatus] = useState<'IDLE' | 'HOLDING' | 'PROCESSING' | 'SUCCESS' | 'ERROR'>('IDLE');
     const [progress, setProgress] = useState(0);
     const [resultData, setResultData] = useState<any>(null);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    const isOwner = user?.id === product.owner_id;
 
     const springConfig = { damping: 20, stiffness: 300 };
     const progressSpring = useSpring(0, springConfig);
@@ -175,32 +180,37 @@ export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOver
 
                             <div className="relative group">
                                 <motion.div
-                                    style={{ opacity: useTransform(progressSpring, [0, 100], [0, 0.6]) }}
-                                    className="absolute inset-0 bg-primary/30 blur-[60px] rounded-full"
+                                    style={{ opacity: useTransform(progressSpring, [0, 100], [0, 0.4]) }}
+                                    className="absolute inset-[-10px] bg-primary/20 blur-[40px] rounded-full"
                                 />
 
                                 <button
-                                    onPointerDown={handleStart}
+                                    onPointerDown={!isOwner ? handleStart : undefined}
                                     onPointerUp={handleEnd}
                                     onPointerLeave={handleEnd}
-                                    className={`relative w-40 h-40 rounded-full border border-white/10 bg-zinc-900 flex items-center justify-center overflow-hidden transition-all duration-200 select-none touch-none shadow-2xl ${status === 'PROCESSING' ? 'pointer-events-none scale-95 opacity-50' : 'active:scale-95'
-                                        }`}
+                                    disabled={isOwner}
+                                    className={cn(
+                                        "relative w-44 h-44 rounded-full border border-white/5 bg-zinc-950 flex items-center justify-center overflow-hidden transition-all duration-300 select-none touch-none shadow-2xl",
+                                        status === 'PROCESSING' || isOwner ? 'pointer-events-none opacity-50' : 'hover:border-white/10 active:scale-95'
+                                    )}
                                     style={{ WebkitTapHighlightColor: 'transparent' }}
                                 >
+                                    {/* Liquid Fill Effect - Growing from center */}
                                     <motion.div
-                                        className="absolute inset-0 bg-primary opacity-30"
+                                        className="absolute inset-0 bg-primary/20"
                                         style={{
-                                            clipPath: "circle(0% at 50% 100%)",
-                                            height: useTransform(progressSpring, [0, 100], ["0%", "100%"]),
-                                            bottom: 0
+                                            scale: useTransform(progressSpring, [0, 100], [0, 1.2]),
+                                            borderRadius: "100%"
                                         }}
                                     />
 
-                                    <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none p-1">
-                                        <circle cx="80" cy="80" r="76" stroke="rgba(255,255,255,0.05)" strokeWidth="2" fill="none" />
+                                    {/* Progress Ring - Flush with edges */}
+                                    <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
+                                        <circle cx="88" cy="88" r="84" stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none" />
                                         <motion.circle
-                                            cx="80" cy="80" r="76"
-                                            stroke="#10b981"
+                                            cx="88" cy="88" r="84"
+                                            stroke="currentColor"
+                                            className="text-primary"
                                             strokeWidth="6"
                                             fill="none"
                                             pathLength="1"
@@ -210,37 +220,57 @@ export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOver
                                         />
                                     </svg>
 
-                                    <Fingerprint className={`w-16 h-16 transition-all duration-500 ${progress > 20 ? 'text-primary scale-110' : 'text-zinc-700 scale-100'}`} />
+                                    {/* Fingerprint Icon Container */}
+                                    <div className="relative z-10 flex flex-col items-center">
+                                        <Fingerprint
+                                            className={cn(
+                                                "w-20 h-20 transition-all duration-500",
+                                                progress > 0 ? "text-primary drop-shadow-[0_0_15px_rgba(16,185,129,0.5)] scale-110" : "text-zinc-800"
+                                            )}
+                                        />
+                                    </div>
                                 </button>
                             </div>
 
-                            <div className="text-center space-y-4">
-                                <AnimatePresence>
-                                    {status === 'ERROR' && (
-                                        <motion.p
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0 }}
-                                            className="text-red-400 font-black text-[10px] uppercase tracking-widest bg-red-400/10 py-2 px-4 rounded-full border border-red-400/20"
-                                        >
-                                            Fondos insuficientes o error de red
-                                        </motion.p>
-                                    )}
-                                </AnimatePresence>
+                            <div className="text-center space-y-4 w-full px-6">
+                                {isOwner ? (
+                                    <Alert variant="premium" className="animate-in slide-in-from-bottom-2 duration-500 border-amber-500/20 bg-amber-500/5">
+                                        <AlertCircle className="h-4 w-4 text-amber-500" />
+                                        <AlertTitle className="text-amber-500 text-[10px] font-black uppercase tracking-[0.2em] mb-0">Protección Activa</AlertTitle>
+                                        <AlertDescription className="text-zinc-400 text-[10px] font-medium leading-relaxed">
+                                            No puedes adquirir tus propios activos. Registra este producto desde otra cuenta para pruebas.
+                                        </AlertDescription>
+                                    </Alert>
+                                ) : (
+                                    <>
+                                        <AnimatePresence>
+                                            {status === 'ERROR' && (
+                                                <motion.p
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0 }}
+                                                    className="text-red-400 font-black text-[10px] uppercase tracking-widest bg-red-400/10 py-2 px-4 rounded-full border border-red-400/20"
+                                                >
+                                                    Fondos insuficientes o error de red
+                                                </motion.p>
+                                            )}
+                                        </AnimatePresence>
 
-                                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">
-                                    {status === 'PROCESSING' ? (
-                                        <span className="flex items-center gap-2 text-primary">
-                                            <motion.span
-                                                animate={{ rotate: 360 }}
-                                                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                                            >
-                                                <Smartphone className="w-3 h-3" />
-                                            </motion.span>
-                                            PROCESANDO TRANSACCIÓN...
-                                        </span>
-                                    ) : 'MANTÉN PRESIONADO PARA ASEGURAR'}
-                                </p>
+                                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">
+                                            {status === 'PROCESSING' ? (
+                                                <span className="flex items-center gap-2 text-primary justify-center">
+                                                    <motion.span
+                                                        animate={{ rotate: 360 }}
+                                                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                                    >
+                                                        <Smartphone className="w-3 h-3" />
+                                                    </motion.span>
+                                                    PROCESANDO TRANSACCIÓN...
+                                                </span>
+                                            ) : 'MANTÉN PRESIONADO PARA ASEGURAR'}
+                                        </p>
+                                    </>
+                                )}
                             </div>
                         </motion.div>
                     )}
