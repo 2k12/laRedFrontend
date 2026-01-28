@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, Coins, QrCode, Settings, Store, Ticket } from "lucide-react";
+import { LayoutGrid, Coins, QrCode, Settings, Store, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export function MobileBottomNav() {
@@ -11,7 +11,7 @@ export function MobileBottomNav() {
         { href: "/feed", label: "Red", icon: LayoutGrid },
         { href: "/dashboard/coins", label: "Bóveda", icon: Coins },
         { href: "/dashboard/scan", label: "Scanner", icon: QrCode, isScanner: true },
-        { href: "/dashboard/rewards", label: "Eventos", icon: Ticket },
+        { href: "/dashboard/orders", label: "Pedidos", icon: ShoppingBag },
         { href: "/dashboard", label: "Perfil", icon: Settings },
     ];
 

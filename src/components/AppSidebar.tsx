@@ -16,18 +16,16 @@ export function AppSidebar({ collapsed, toggleSidebar }: AppSidebarProps) {
 
   const links = [
     { href: "/feed", label: "Red", icon: LayoutGrid },
-    ...(user?.roles?.includes('ADMIN') ? [
-      { href: "/dashboard/stores?view=all", label: BRANDING.storeNamePlural, icon: Store }
-    ] : []),
+    { href: "/dashboard/orders", label: "Mis Pedidos", icon: ShoppingBag },
     { href: "/dashboard/coins", label: "Bóveda", icon: Coins },
     ...(user?.roles?.includes('ADMIN') ? [
+      { href: "/dashboard/stores?view=all", label: BRANDING.storeNamePlural, icon: Store },
       { href: "/dashboard/rewards", label: BRANDING.rewardSystemName, icon: TrendingUp }
     ] : []),
     ...(user?.roles?.includes('SYSTEM') ? [
       { href: "/economy", label: "Gestión Económica", icon: TrendingUp }
     ] : []),
     { href: "/dashboard/scan", label: "Escanear Premio", icon: QrCode },
-    { href: "/dashboard/orders", label: "Mis Pedidos", icon: ShoppingBag },
     { href: "/dashboard", label: "Configuración", icon: Settings },
   ];
 
@@ -44,8 +42,6 @@ export function AppSidebar({ collapsed, toggleSidebar }: AppSidebarProps) {
       <aside
         className={cn(
           "fixed left-0 top-0 h-full z-50 flex flex-col justify-between pt-24 pb-8 transition-all duration-500 ease-out border-r border-white/5 bg-black lg:bg-transparent backdrop-blur-xl lg:backdrop-blur-sm",
-          // Mobile: Hidden by default (collapsed on mobile means off-screen)
-          // lg: On screen, either narrow (20) or wide (width)
           collapsed
             ? "-translate-x-full lg:translate-x-0 lg:w-20"
             : "translate-x-0 w-[280px] lg:w-72"
@@ -61,7 +57,6 @@ export function AppSidebar({ collapsed, toggleSidebar }: AppSidebarProps) {
                 key={link.href}
                 to={link.href}
                 onClick={() => {
-                  // Close sidebar on mobile when navigating
                   if (window.innerWidth < 1024) toggleSidebar?.();
                 }}
                 className={cn(
@@ -85,7 +80,6 @@ export function AppSidebar({ collapsed, toggleSidebar }: AppSidebarProps) {
                   {link.label}
                 </span>
 
-                {/* Tooltip for collapsed state (Desktop only) */}
                 {collapsed && (
                   <div className="hidden lg:block absolute left-full top-1/2 -translate-y-1/2 ml-4 px-3 py-1.5 bg-zinc-900 border border-white/10 rounded-lg text-xs font-medium text-white opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
                     {link.label}
