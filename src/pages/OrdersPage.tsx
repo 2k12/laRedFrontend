@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { MinimalButton } from "@/components/MinimalButton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { BRANDING } from "@/config/branding";
 
 export default function OrdersPage() {
     const { token } = useAuth();
@@ -178,9 +179,10 @@ function OrderCard({ order, type, onConfirm }: { order: any, type: 'purchase' | 
                                 <p className="text-3xl font-mono font-black text-white tracking-widest">{order.delivery_code}</p>
                             </div>
                             <MinimalButton
+                                aria-label="Contactar Vendedor"
                                 onClick={() => {
                                     // Generate dynamic WhatsApp link
-                                    const text = encodeURIComponent(`Hola, compré tu producto "${order.product_name}" en UniversityStore. Mi código es ${order.delivery_code}. ¿Dónde coordinamos?`);
+                                    const text = encodeURIComponent(`Hola, compré tu producto "${order.product_name}" en ${BRANDING.appName}. ¿Dónde coordinamos?`);
                                     window.open(`https://wa.me/?text=${text}`, '_blank');
                                 }}
                                 className="bg-[#25D366] text-black hover:bg-[#20bd5a] hover:scale-105"
