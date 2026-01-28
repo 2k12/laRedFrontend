@@ -8,6 +8,15 @@ import { BRANDING } from "@/config/branding";
 import { AnimatePresence, motion } from "framer-motion";
 import { PurchaseQuantumOverlay } from "@/components/PurchaseQuantumOverlay";
 import { cn } from "@/lib/utils";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function ProductDetailPage() {
     const { id } = useParams();
@@ -16,6 +25,7 @@ export default function ProductDetailPage() {
     const [product, setProduct] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [showPurchase, setShowPurchase] = useState(false);
+    const [purchaseSuccessData, setPurchaseSuccessData] = useState<any>(null);
 
     const handleClose = () => {
         navigate('/feed');
@@ -54,10 +64,50 @@ export default function ProductDetailPage() {
                 {showPurchase && product && (
                     <PurchaseQuantumOverlay
                         product={product}
+                        onSuccess={(data) => {
+                            setPurchaseSuccessData(data);
+                            setShowPurchase(false);
+                        }}
                         onClose={() => setShowPurchase(false)}
                     />
                 )}
             </AnimatePresence>
+
+            <AlertDialog open={!!purchaseSuccessData} onOpenChange={() => setPurchaseSuccessData(null)}>
+                <AlertDialogContent className="bg-zinc-950 border-white/10 text-white rounded-3xl p-8 max-w-md">
+                    <AlertDialogHeader className="items-center text-center">
+                        <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/50 mb-4">
+                            <ShieldCheck className="w-10 h-10 text-emerald-400" />
+                        </div>
+                        <AlertDialogTitle className="text-3xl font-black uppercase italic tracking-tighter">¡Compra Exitosa!</AlertDialogTitle>
+                        <AlertDialogDescription className="text-zinc-400 text-sm">
+                            Tu activo ha sido asegurado. Puedes revisar los detalles y el código de entrega en el apartado de tus pedidos.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    {purchaseSuccessData && (
+                        <div className="my-6 p-6 rounded-2xl bg-white/5 border border-white/10 text-center space-y-2">
+                            <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Código de Entrega</p>
+                            <p className="text-4xl font-mono font-black text-emerald-400 tracking-[0.2em]">{purchaseSuccessData.delivery_code}</p>
+                        </div>
+                    )}
+
+                    <AlertDialogFooter className="flex-col sm:flex-col gap-3">
+                        <AlertDialogAction
+                            onClick={() => navigate('/dashboard/orders')}
+                            className="bg-white text-black hover:bg-zinc-200 h-12 rounded-xl font-bold uppercase tracking-widest text-[11px]"
+                        >
+                            Ver mis pedidos
+                        </AlertDialogAction>
+                        <button
+                            onClick={() => setPurchaseSuccessData(null)}
+                            className="text-zinc-500 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors py-2"
+                        >
+                            Seguir navegando
+                        </button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
             {/* Contextual Navigation Arrows - Restricted to large screens for cleaner mobile UI */}
             <div className="hidden xl:flex fixed right-8 top-1/2 -translate-y-1/2 z-50 flex-col gap-3">

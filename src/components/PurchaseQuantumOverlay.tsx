@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useSpring, useTransform } from "framer-motion";
-import { Fingerprint, X, Smartphone, ShieldCheck, AlertCircle } from "lucide-react";
+import { Fingerprint, X, Smartphone, AlertCircle } from "lucide-react";
 import { API_BASE_URL } from "@/config/api";
 import { useAuth } from "@/context/AuthContext";
 import { BRANDING } from "@/config/branding";
@@ -16,14 +16,14 @@ interface PurchaseQuantumOverlayProps {
         image?: string;
         owner_id?: string;
     };
+    onSuccess: (data: any) => void;
     onClose: () => void;
 }
 
-export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOverlayProps) {
+export function PurchaseQuantumOverlay({ product, onSuccess, onClose }: PurchaseQuantumOverlayProps) {
     const { token, user } = useAuth();
     const [status, setStatus] = useState<'IDLE' | 'HOLDING' | 'PROCESSING' | 'SUCCESS' | 'ERROR'>('IDLE');
     const [progress, setProgress] = useState(0);
-    const [resultData, setResultData] = useState<any>(null);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const isOwner = user?.id === product.owner_id;
@@ -72,15 +72,18 @@ export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOver
             const data = await res.json();
 
             if (res.ok) {
-                setResultData(data);
                 setStatus('SUCCESS');
                 confetti({
                     particleCount: 150,
                     spread: 80,
                     origin: { y: 0.7 },
                     colors: ['#10b981', '#ffffff', '#3b82f6'],
-                    zIndex: 100
+                    zIndex: 1000
                 });
+                // Small delay to let confetti start before closing overlay
+                setTimeout(() => {
+                    onSuccess(data);
+                }, 500);
             } else {
                 setStatus('ERROR');
                 setTimeout(() => {
@@ -99,7 +102,7 @@ export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOver
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[999] flex items-center justify-center bg-black/98 md:bg-black/95 backdrop-blur-3xl px-4 overflow-y-auto overscroll-none"
+            className="fixed inset-0 z-[999] flex items-center justify-center bg-black/95 backdrop-blur-3xl px-4 overflow-y-auto overscroll-none"
         >
             {/* Close Button - Visible except when processing */}
             {status !== 'PROCESSING' && (
@@ -113,167 +116,114 @@ export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOver
 
             <div className="relative w-full max-w-md py-12 flex flex-col items-center">
                 <AnimatePresence mode="popLayout">
-                    {status === 'SUCCESS' ? (
-                        <motion.div
-                            key="success"
-                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            className="space-y-8 w-full text-center"
-                        >
-                            <div className="w-24 h-24 mx-auto rounded-full bg-green-500/20 flex items-center justify-center border border-green-500/50 shadow-[0_0_50px_rgba(16,185,129,0.4)]">
-                                <ShieldCheck className="w-12 h-12 text-green-400" />
-                            </div>
+                    <motion.div
+                        key="hold"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="flex flex-col items-center space-y-10 w-full"
+                    >
+                        <div className="space-y-3 text-center">
+                            <h3 className="text-zinc-500 font-black uppercase tracking-[0.3em] text-[10px]">Verificación de Pago</h3>
+                            <h2 className="text-6xl font-black text-white tracking-tighter">{product.price} {BRANDING.currencySymbol}</h2>
+                            <p className="text-zinc-400 font-medium text-sm">{product.name}</p>
+                        </div>
 
-                            <div className="space-y-2">
-                                <h2 className="text-4xl font-black text-white tracking-tighter uppercase italic">Activo Asegurado</h2>
-                                <p className="text-zinc-400">Tu compra ha sido procesada correctamente.</p>
-                            </div>
-
-                            {resultData ? (
-                                <div className="p-8 rounded-3xl bg-zinc-900/50 border border-white/5 space-y-4 backdrop-blur-sm">
-                                    <div className="space-y-1">
-                                        <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Código Maestro de Entrega</p>
-                                        <p className="text-5xl font-mono font-black text-white tracking-[0.2em]">{resultData.delivery_code}</p>
-                                    </div>
-                                    <div className="text-[10px] text-zinc-500 bg-black/40 p-3 rounded-xl uppercase tracking-tighter leading-relaxed">
-                                        Presenta este código al vendedor para validar la recepción de tu producto.
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="p-8 rounded-3xl bg-zinc-900/50 border border-white/5 h-40 flex items-center justify-center">
-                                    <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-                                </div>
-                            )}
-
-                            {resultData?.whatsapp_url && (
-                                <a
-                                    href={resultData.whatsapp_url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="flex items-center justify-center gap-3 w-full py-5 bg-[#25D366] hover:bg-[#20bd5a] text-black font-black rounded-2xl transition-all shadow-[0_10px_30px_rgba(37,211,102,0.4)] transform hover:scale-[1.02] active:scale-95 uppercase tracking-tighter text-xs"
-                                >
-                                    <Smartphone className="w-5 h-5" />
-                                    Coordinar Entrega
-                                </a>
-                            )}
+                        <div className="relative group">
+                            <motion.div
+                                style={{ opacity: useTransform(progressSpring, [0, 100], [0, 0.4]) }}
+                                className="absolute inset-[-10px] bg-primary/20 blur-[40px] rounded-full"
+                            />
 
                             <button
-                                onClick={onClose}
-                                className="text-zinc-500 hover:text-white text-xs font-bold uppercase tracking-widest pt-4"
+                                onPointerDown={!isOwner ? handleStart : undefined}
+                                onPointerUp={handleEnd}
+                                onPointerLeave={handleEnd}
+                                disabled={isOwner}
+                                className={cn(
+                                    "relative w-44 h-44 rounded-full border border-white/5 bg-zinc-950 flex items-center justify-center overflow-hidden transition-all duration-300 select-none touch-none shadow-2xl",
+                                    status === 'PROCESSING' || isOwner ? 'pointer-events-none opacity-50' : 'hover:border-white/10 active:scale-95'
+                                )}
+                                style={{ WebkitTapHighlightColor: 'transparent' }}
                             >
-                                Finalizar y volver
-                            </button>
-                        </motion.div>
-                    ) : (
-                        <motion.div
-                            key="hold"
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="flex flex-col items-center space-y-10 w-full"
-                        >
-                            <div className="space-y-3 text-center">
-                                <h3 className="text-zinc-500 font-black uppercase tracking-[0.3em] text-[10px]">Verificación de Pago</h3>
-                                <h2 className="text-6xl font-black text-white tracking-tighter">{product.price} {BRANDING.currencySymbol}</h2>
-                                <p className="text-zinc-400 font-medium text-sm">{product.name}</p>
-                            </div>
-
-                            <div className="relative group">
+                                {/* Liquid Fill Effect - Growing from center */}
                                 <motion.div
-                                    style={{ opacity: useTransform(progressSpring, [0, 100], [0, 0.4]) }}
-                                    className="absolute inset-[-10px] bg-primary/20 blur-[40px] rounded-full"
+                                    className="absolute inset-0 bg-primary/20"
+                                    style={{
+                                        scale: useTransform(progressSpring, [0, 100], [0, 1.2]),
+                                        borderRadius: "100%"
+                                    }}
                                 />
 
-                                <button
-                                    onPointerDown={!isOwner ? handleStart : undefined}
-                                    onPointerUp={handleEnd}
-                                    onPointerLeave={handleEnd}
-                                    disabled={isOwner}
-                                    className={cn(
-                                        "relative w-44 h-44 rounded-full border border-white/5 bg-zinc-950 flex items-center justify-center overflow-hidden transition-all duration-300 select-none touch-none shadow-2xl",
-                                        status === 'PROCESSING' || isOwner ? 'pointer-events-none opacity-50' : 'hover:border-white/10 active:scale-95'
-                                    )}
-                                    style={{ WebkitTapHighlightColor: 'transparent' }}
-                                >
-                                    {/* Liquid Fill Effect - Growing from center */}
-                                    <motion.div
-                                        className="absolute inset-0 bg-primary/20"
-                                        style={{
-                                            scale: useTransform(progressSpring, [0, 100], [0, 1.2]),
-                                            borderRadius: "100%"
-                                        }}
+                                {/* Progress Ring - Flush with edges */}
+                                <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
+                                    <circle cx="88" cy="88" r="84" stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none" />
+                                    <motion.circle
+                                        cx="88" cy="88" r="84"
+                                        stroke="currentColor"
+                                        className="text-primary"
+                                        strokeWidth="6"
+                                        fill="none"
+                                        pathLength="1"
+                                        strokeDasharray="1"
+                                        strokeDashoffset={useTransform(progressSpring, [0, 100], [1, 0])}
+                                        strokeLinecap="round"
                                     />
+                                </svg>
 
-                                    {/* Progress Ring - Flush with edges */}
-                                    <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
-                                        <circle cx="88" cy="88" r="84" stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none" />
-                                        <motion.circle
-                                            cx="88" cy="88" r="84"
-                                            stroke="currentColor"
-                                            className="text-primary"
-                                            strokeWidth="6"
-                                            fill="none"
-                                            pathLength="1"
-                                            strokeDasharray="1"
-                                            strokeDashoffset={useTransform(progressSpring, [0, 100], [1, 0])}
-                                            strokeLinecap="round"
-                                        />
-                                    </svg>
+                                {/* Fingerprint Icon Container */}
+                                <div className="relative z-10 flex flex-col items-center">
+                                    <Fingerprint
+                                        className={cn(
+                                            "w-20 h-20 transition-all duration-500",
+                                            progress > 0 ? "text-primary drop-shadow-[0_0_15px_rgba(16,185,129,0.5)] scale-110" : "text-zinc-800"
+                                        )}
+                                    />
+                                </div>
+                            </button>
+                        </div>
 
-                                    {/* Fingerprint Icon Container */}
-                                    <div className="relative z-10 flex flex-col items-center">
-                                        <Fingerprint
-                                            className={cn(
-                                                "w-20 h-20 transition-all duration-500",
-                                                progress > 0 ? "text-primary drop-shadow-[0_0_15px_rgba(16,185,129,0.5)] scale-110" : "text-zinc-800"
-                                            )}
-                                        />
-                                    </div>
-                                </button>
-                            </div>
+                        <div className="text-center space-y-4 w-full px-6">
+                            {isOwner ? (
+                                <Alert variant="premium" className="animate-in slide-in-from-bottom-2 duration-500 border-amber-500/20 bg-amber-500/5">
+                                    <AlertCircle className="h-4 w-4 text-amber-500" />
+                                    <AlertTitle className="text-amber-500 text-[10px] font-black uppercase tracking-[0.2em] mb-0">Protección Activa</AlertTitle>
+                                    <AlertDescription className="text-zinc-400 text-[10px] font-medium leading-relaxed">
+                                        No puedes adquirir tus propios activos. Registra este producto desde otra cuenta para pruebas.
+                                    </AlertDescription>
+                                </Alert>
+                            ) : (
+                                <>
+                                    <AnimatePresence>
+                                        {status === 'ERROR' && (
+                                            <motion.p
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0 }}
+                                                className="text-red-400 font-black text-[10px] uppercase tracking-widest bg-red-400/10 py-2 px-4 rounded-full border border-red-400/20"
+                                            >
+                                                Fondos insuficientes o error de red
+                                            </motion.p>
+                                        )}
+                                    </AnimatePresence>
 
-                            <div className="text-center space-y-4 w-full px-6">
-                                {isOwner ? (
-                                    <Alert variant="premium" className="animate-in slide-in-from-bottom-2 duration-500 border-amber-500/20 bg-amber-500/5">
-                                        <AlertCircle className="h-4 w-4 text-amber-500" />
-                                        <AlertTitle className="text-amber-500 text-[10px] font-black uppercase tracking-[0.2em] mb-0">Protección Activa</AlertTitle>
-                                        <AlertDescription className="text-zinc-400 text-[10px] font-medium leading-relaxed">
-                                            No puedes adquirir tus propios activos. Registra este producto desde otra cuenta para pruebas.
-                                        </AlertDescription>
-                                    </Alert>
-                                ) : (
-                                    <>
-                                        <AnimatePresence>
-                                            {status === 'ERROR' && (
-                                                <motion.p
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    exit={{ opacity: 0 }}
-                                                    className="text-red-400 font-black text-[10px] uppercase tracking-widest bg-red-400/10 py-2 px-4 rounded-full border border-red-400/20"
+                                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">
+                                        {status === 'PROCESSING' ? (
+                                            <span className="flex items-center gap-2 text-primary justify-center">
+                                                <motion.span
+                                                    animate={{ rotate: 360 }}
+                                                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                                                 >
-                                                    Fondos insuficientes o error de red
-                                                </motion.p>
-                                            )}
-                                        </AnimatePresence>
-
-                                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">
-                                            {status === 'PROCESSING' ? (
-                                                <span className="flex items-center gap-2 text-primary justify-center">
-                                                    <motion.span
-                                                        animate={{ rotate: 360 }}
-                                                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                                                    >
-                                                        <Smartphone className="w-3 h-3" />
-                                                    </motion.span>
-                                                    PROCESANDO TRANSACCIÓN...
-                                                </span>
-                                            ) : 'MANTÉN PRESIONADO PARA ASEGURAR'}
-                                        </p>
-                                    </>
-                                )}
-                            </div>
-                        </motion.div>
-                    )}
+                                                    <Smartphone className="w-3 h-3" />
+                                                </motion.span>
+                                                PROCESANDO TRANSACCIÓN...
+                                            </span>
+                                        ) : 'MANTÉN PRESIONADO PARA ASEGURAR'}
+                                    </p>
+                                </>
+                            )}
+                        </div>
+                    </motion.div>
                 </AnimatePresence>
             </div>
         </motion.div>
