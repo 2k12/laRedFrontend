@@ -6,12 +6,13 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Package, ArrowLeft, Edit2, Trash2, ArrowRightLeft, Search, Plus, Store, AlertTriangle, Info, X } from "lucide-react";
+import { Package, ArrowLeft, Edit2, Trash2, ArrowRightLeft, Search, Plus, Store, AlertTriangle, Info, X, ShieldAlert } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { MinimalButton } from "@/components/MinimalButton";
 import { PageHeader } from "@/components/PageHeader";
 import { BRANDING } from "@/config/branding";
 import { API_BASE_URL } from "@/config/api";
+import { cn } from "@/lib/utils";
 
 interface Category {
     slug: string;
@@ -538,8 +539,13 @@ export default function StoreProductsPage() {
                                 className={`group relative bg-zinc-900/30 border border-white/5 rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-8 hover:bg-zinc-900/50 transition-all duration-500 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 md:gap-8 ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''} ${draggedProductId === product.id ? 'border-primary opacity-40 grayscale scale-[0.98]' : ''}`}
                             >
                                 <div className="flex flex-row lg:flex-row items-center gap-4 md:gap-8 w-full lg:w-auto pointer-events-none">
-                                    <div className="w-14 h-14 md:w-20 md:h-20 bg-zinc-950 rounded-xl md:rounded-2xl border border-white/5 flex items-center justify-center text-zinc-800 group-hover:text-primary transition-colors shrink-0">
+                                    <div className="relative w-14 h-14 md:w-20 md:h-20 bg-zinc-950 rounded-xl md:rounded-2xl border border-white/5 flex items-center justify-center text-zinc-800 group-hover:text-primary transition-colors shrink-0">
                                         <Package className="w-7 h-7 md:w-10 md:h-10" />
+                                        {product.stock === 0 && (
+                                            <div className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-bounce">
+                                                <ShieldAlert className="w-3 h-3 md:w-4 md:h-4" />
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="space-y-0.5 md:space-y-1 overflow-hidden flex-1">
                                         <div className="flex items-center gap-2 md:gap-3">
@@ -566,7 +572,10 @@ export default function StoreProductsPage() {
                                 <div className="flex items-center justify-between lg:justify-end gap-3 md:gap-12 w-full lg:w-auto mt-2 lg:mt-0 pt-4 lg:pt-0 border-t lg:border-t-0 border-white/5">
                                     <div className="hidden lg:block text-center uppercase tracking-widest text-[9px] font-black text-zinc-600">
                                         <p className="mb-0.5">Stock</p>
-                                        <p className="text-xl md:text-2xl text-white font-black tabular-nums">{product.stock}</p>
+                                        <p className={cn(
+                                            "text-xl md:text-2xl font-black tabular-nums",
+                                            product.stock === 0 ? "text-red-500" : "text-white"
+                                        )}>{product.stock}</p>
                                     </div>
                                     <div className="hidden lg:block text-center uppercase tracking-widest text-[9px] font-black text-zinc-600">
                                         <p className="mb-0.5">Precio</p>
@@ -807,8 +816,8 @@ export default function StoreProductsPage() {
                                     value={editingProduct.price}
                                     onChange={e => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) })}
                                     className={`bg-zinc-900 border-zinc-800 h-10 rounded-xl ${categories.find((c: any) => c.slug === editingProduct.category && editingProduct.price > c.max_price)
-                                            ? 'border-red-500 text-red-500 focus:ring-red-500'
-                                            : 'focus:border-primary'
+                                        ? 'border-red-500 text-red-500 focus:ring-red-500'
+                                        : 'focus:border-primary'
                                         }`}
                                 />
                                 {(() => {

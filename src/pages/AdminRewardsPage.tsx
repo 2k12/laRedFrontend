@@ -374,22 +374,37 @@ export default function AdminRewardsPage() {
                             <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent pointer-events-none" />
 
                             <div className="z-10 bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl border-4 md:border-8 border-white mb-6 md:mb-8 group relative">
-                                <QRCodeSVG value={qrUrl} size={180} className="md:w-[300px] md:h-[300px]" level="H" />
-                                <div className="absolute inset-0 flex items-center justify-center bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <div className="bg-black text-white px-3 md:px-4 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                                        <RefreshCw className="w-3 h-3 animate-spin" /> Escanear
+                                {selectedEvent.is_active ? (
+                                    <>
+                                        <QRCodeSVG value={qrUrl} size={180} className="md:w-[300px] md:h-[300px]" level="H" />
+                                        <div className="absolute inset-0 flex items-center justify-center bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="bg-black text-white px-3 md:px-4 py-1.5 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                                                <RefreshCw className="w-3 h-3 animate-spin" /> Escanear
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="w-[180px] h-[180px] md:w-[300px] md:h-[300px] flex flex-col items-center justify-center bg-zinc-100 rounded-xl space-y-4">
+                                        <Clock className="w-12 h-12 text-zinc-300" />
+                                        <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Evento Finalizado</p>
                                     </div>
-                                </div>
+                                )}
                             </div>
 
                             <div className="z-10 space-y-3 md:space-y-4">
                                 <h2 className="text-2xl md:text-3xl font-black text-white italic tracking-tighter uppercase">{selectedEvent.name}</h2>
                                 <p className="text-zinc-500 text-sm max-w-xs md:max-w-md mx-auto">{selectedEvent.description || 'Escanea el código para recibir tu recompensa instantánea.'}</p>
 
-                                <div className="inline-flex items-center gap-3 md:gap-4 px-5 md:px-6 py-2 md:py-3 bg-black/40 border border-white/5 rounded-full text-[10px] md:text-xs font-mono uppercase tracking-widest text-emerald-400">
-                                    <Clock className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                                    Actualización en: <span className="text-white font-black w-3 md:w-4">{countdown}s</span>
-                                </div>
+                                {selectedEvent.is_active ? (
+                                    <div className="inline-flex items-center gap-3 md:gap-4 px-5 md:px-6 py-2 md:py-3 bg-black/40 border border-white/5 rounded-full text-[10px] md:text-xs font-mono uppercase tracking-widest text-emerald-400">
+                                        <Clock className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                                        Actualización en: <span className="text-white font-black w-3 md:w-4">{countdown}s</span>
+                                    </div>
+                                ) : (
+                                    <div className="inline-flex items-center gap-3 px-5 py-2 bg-zinc-800/40 border border-white/5 rounded-full text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+                                        Estado: <span className="text-zinc-400 font-black">Cerrado</span>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="mt-8 md:mt-12 grid grid-cols-2 gap-4 md:gap-8 z-10 w-full max-w-lg">

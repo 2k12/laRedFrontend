@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { API_BASE_URL } from "@/config/api";
 import { AnimatePresence, motion } from "framer-motion";
 import { PurchaseQuantumOverlay } from "@/components/PurchaseQuantumOverlay";
+import { cn } from "@/lib/utils";
 
 export default function ProductDetailPage() {
     const { id } = useParams();
@@ -246,7 +247,15 @@ export default function ProductDetailPage() {
                                         className="gsap-price flex items-baseline gap-4"
                                     >
                                         <span className="text-3xl md:text-4xl font-bold text-white tracking-tight">{product.price} UC</span>
-                                        <span className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-widest font-medium">Precio Final</span>
+                                        <div className="flex flex-col gap-0.5">
+                                            <span className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-widest font-medium">Precio Final</span>
+                                            {product.stock <= 5 && product.stock > 0 && (
+                                                <span className="text-[9px] font-black text-amber-500 uppercase animate-pulse">¡Solo {product.stock} restantes!</span>
+                                            )}
+                                            {product.stock === 0 && (
+                                                <span className="text-[9px] font-black text-red-500 uppercase">Agotado temporalmente</span>
+                                            )}
+                                        </div>
                                     </motion.div>
 
                                     <motion.div
@@ -257,10 +266,16 @@ export default function ProductDetailPage() {
                                     >
                                         <MinimalButton
                                             onClick={() => setShowPurchase(true)}
-                                            className="flex-1 sm:flex-none h-14 px-8 text-[11px] font-bold tracking-widest uppercase bg-zinc-800 text-white hover:bg-zinc-700 border-zinc-700 shadow-lg transition-all"
+                                            disabled={product.stock <= 0}
+                                            className={cn(
+                                                "flex-1 sm:flex-none h-14 px-8 text-[11px] font-bold tracking-widest uppercase transition-all",
+                                                product.stock <= 0
+                                                    ? "bg-zinc-900 text-zinc-600 border-zinc-800 cursor-not-allowed opacity-50"
+                                                    : "bg-zinc-800 text-white hover:bg-zinc-700 border-zinc-700 shadow-lg"
+                                            )}
                                             icon={<ShoppingCart className="w-4 h-4" />}
                                         >
-                                            Comprar
+                                            {product.stock <= 0 ? "Agotado" : "Comprar"}
                                         </MinimalButton>
                                         <MinimalButton size="icon" className="h-14 w-14 hover:text-pink-500 hover:border-pink-500/50 transition-all" icon={<Heart className="w-5 h-5" />} />
                                         <MinimalButton size="icon" className="h-14 w-14" icon={<Share2 className="w-5 h-5" />} />
