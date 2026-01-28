@@ -93,7 +93,7 @@ export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOver
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 md:bg-black/80 backdrop-blur-2xl px-4 overflow-y-auto"
+            className="fixed inset-0 z-[999] flex items-center justify-center bg-black/98 md:bg-black/95 backdrop-blur-3xl px-4 overflow-y-auto overscroll-none"
         >
             {/* Close Button - Visible except when processing */}
             {status !== 'PROCESSING' && (
@@ -138,10 +138,10 @@ export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOver
                                     href={resultData.whatsapp_url}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="flex items-center justify-center gap-3 w-full py-5 bg-[#25D366] hover:bg-[#20bd5a] text-black font-black rounded-2xl transition-all shadow-[0_10px_30px_rgba(37,211,102,0.4)] transform hover:scale-[1.02] active:scale-95 uppercase tracking-tight"
+                                    className="flex items-center justify-center gap-3 w-full py-5 bg-[#25D366] hover:bg-[#20bd5a] text-black font-black rounded-2xl transition-all shadow-[0_10px_30px_rgba(37,211,102,0.4)] transform hover:scale-[1.02] active:scale-95 uppercase tracking-tighter text-xs"
                                 >
-                                    <Smartphone className="w-5 h-5 font-bold" />
-                                    Coordinar en WhatsApp
+                                    <Smartphone className="w-5 h-5" />
+                                    Coordinar Entrega
                                 </a>
                             ) : (
                                 <div className="p-4 bg-amber-500/10 border border-amber-500/20 text-amber-500 rounded-2xl text-xs font-bold">
@@ -180,7 +180,8 @@ export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOver
                                     onPointerDown={handleStart}
                                     onPointerUp={handleEnd}
                                     onPointerLeave={handleEnd}
-                                    className="relative w-40 h-40 rounded-full border border-white/10 bg-zinc-900 flex items-center justify-center overflow-hidden active:scale-95 transition-transform duration-100 select-none touch-none shadow-2xl"
+                                    className={`relative w-40 h-40 rounded-full border border-white/10 bg-zinc-900 flex items-center justify-center overflow-hidden transition-all duration-200 select-none touch-none shadow-2xl ${status === 'PROCESSING' || status === 'SUCCESS' ? 'pointer-events-none scale-95 opacity-50' : 'active:scale-95'
+                                        }`}
                                     style={{ WebkitTapHighlightColor: 'transparent' }}
                                 >
                                     <motion.div
@@ -224,8 +225,18 @@ export function PurchaseQuantumOverlay({ product, onClose }: PurchaseQuantumOver
                                     )}
                                 </AnimatePresence>
 
-                                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em] animate-pulse">
-                                    {status === 'PROCESSING' ? 'PROCESANDO TRANSACCIÓN...' : 'MANTÉN PRESIONADO PARA ASEGURAR'}
+                                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">
+                                    {status === 'PROCESSING' ? (
+                                        <span className="flex items-center gap-2 text-primary">
+                                            <motion.span
+                                                animate={{ rotate: 360 }}
+                                                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                            >
+                                                <Smartphone className="w-3 h-3" />
+                                            </motion.span>
+                                            PROCESANDO TRANSACCIÓN...
+                                        </span>
+                                    ) : 'MANTÉN PRESIONADO PARA ASEGURAR'}
                                 </p>
                             </div>
                         </motion.div>
