@@ -53,10 +53,13 @@ export default function LandingLayout() {
 
           {/* Center Nav Links (Hidden on mobile) */}
           <nav className="hidden lg:flex items-center gap-1 bg-black/20 rounded-full px-2 py-1 border border-white/5">
-            {['Mercado', 'Funciones', 'Comunidad'].map((item) => (
-              <a key={item} href="#" className="nav-link px-6 py-2 rounded-full text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-300 no-underline">
-                {item}
-              </a>
+            {[
+              { name: 'Mercado', path: '/marketplace' },
+              { name: 'Funciones', path: '/features' }
+            ].map((item) => (
+              <Link key={item.name} to={item.path} className="nav-link px-6 py-2 rounded-full text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-300 no-underline">
+                {item.name}
+              </Link>
             ))}
           </nav>
 
@@ -67,7 +70,7 @@ export default function LandingLayout() {
                 Entrar
               </Button>
             </Link>
-            <Link to="/login">
+            <Link to="/register">
               <Button className="nav-link rounded-full bg-white text-black hover:bg-zinc-200 px-4 md:px-6 py-1 h-9 md:h-10 text-xs md:text-sm font-bold shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all">
                 Registrarse
               </Button>

@@ -157,8 +157,8 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start">
 
                 {/* Left Column: Minimalist ID Card */}
-                <div className="relative group overflow-hidden sm:overflow-visible">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-[2rem] md:rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-50 transition-all duration-700" />
+                <div className="relative overflow-hidden sm:overflow-visible">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-[2rem] md:rounded-[2.5rem] blur-xl opacity-20" />
                     <div className="relative bg-zinc-900/80 backdrop-blur-md border border-white/10 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10">
                         {/* Background Pattern */}
                         <div className="absolute top-0 right-0 w-48 md:w-64 h-48 md:h-64 bg-gradient-to-bl from-white/5 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />

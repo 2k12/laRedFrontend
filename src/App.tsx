@@ -4,6 +4,8 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import LandingPage from "@/pages/generic/LandingPage";
 import LoginPage from "@/pages/auth/LoginPage";
 import RegisterPage from "@/pages/auth/RegisterPage";
+import FeaturesPage from "@/pages/generic/FeaturesPage";
+import MarketplaceShowcase from "@/pages/generic/MarketplaceShowcase";
 import MarketplaceFeed from "@/pages/marketplace/MarketplaceFeed";
 import DashboardPage from "@/pages/dashboard/DashboardPage";
 
@@ -35,6 +37,8 @@ function App() {
         <Routes>
           <Route element={<LandingLayout />}>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/marketplace" element={<MarketplaceShowcase />} />
+            <Route path="/features" element={<FeaturesPage />} />
           </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
