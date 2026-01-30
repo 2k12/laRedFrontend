@@ -41,7 +41,7 @@ export default function LandingLayout() {
         <header className="flex items-center justify-between w-full max-w-5xl h-14 md:h-16 px-2 pr-2 bg-zinc-900/40 backdrop-blur-xl border border-white/5 rounded-full shadow-2xl shadow-black/50">
           {/* Logo Area */}
           <div className="pl-4 md:pl-6">
-            <Link to="/" className="flex items-center gap-2 group">
+            <Link to="/" className="flex items-center gap-2 group no-underline">
               <div className="w-7 h-7 md:w-8 md:h-8 bg-white text-black rounded-lg flex items-center justify-center font-bold text-lg md:text-xl group-hover:scale-110 transition-transform duration-300">
                 {BRANDING.appName.charAt(0)}
               </div>
@@ -54,7 +54,7 @@ export default function LandingLayout() {
           {/* Center Nav Links (Hidden on mobile) */}
           <nav className="hidden lg:flex items-center gap-1 bg-black/20 rounded-full px-2 py-1 border border-white/5">
             {['Mercado', 'Funciones', 'Comunidad'].map((item) => (
-              <a key={item} href="#" className="nav-link px-6 py-2 rounded-full text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-300">
+              <a key={item} href="#" className="nav-link px-6 py-2 rounded-full text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-300 no-underline">
                 {item}
               </a>
             ))}

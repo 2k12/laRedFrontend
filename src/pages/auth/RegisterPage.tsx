@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { API_BASE_URL } from "@/config/api";
 import PulseCoin from "@/components/PulseCoin";
 
 export default function RegisterPage() {
+    const location = useLocation();
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
 
@@ -83,7 +84,7 @@ export default function RegisterPage() {
                         asChild
                         className="w-full h-12 bg-white text-black hover:bg-zinc-200 rounded-none font-bold tracking-wide uppercase text-xs"
                     >
-                        <Link to="/login">Volver al Inicio</Link>
+                        <Link to="/login" state={{ from: (location.state as any)?.from }}>Iniciar Sesión</Link>
                     </Button>
                 </div>
             </div>
@@ -163,7 +164,7 @@ export default function RegisterPage() {
 
                 <div className="register-element text-center border-t border-white/5 pt-6">
                     <p className="text-[10px] text-zinc-600 uppercase tracking-widest">
-                        ¿Ya tienes cuenta? <Link to="/login" className="text-white hover:underline ml-1">Inicia Sesión</Link>
+                        ¿Ya tienes cuenta? <Link to="/login" state={{ from: (location.state as any)?.from }} className="text-white hover:underline ml-1">Inicia Sesión</Link>
                     </p>
                 </div>
             </div>

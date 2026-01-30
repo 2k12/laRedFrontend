@@ -6,10 +6,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Package, ArrowLeft, Edit2, Trash2, ArrowRightLeft, Search, Plus, Store, AlertTriangle, Info, X, ShieldAlert, Share2 } from "lucide-react";
+import { Package, ArrowLeft, Edit2, Trash2, ArrowRightLeft, Search, Plus, Store, AlertTriangle, Info, X, ShieldAlert, Zap } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { MinimalButton } from "@/components/MinimalButton";
 import { PageHeader } from "@/components/PageHeader";
+import AdPurchaseModal from "@/components/AdPurchaseModal";
 import { BRANDING } from "@/config/branding";
 import { API_BASE_URL } from "@/config/api";
 import { cn } from "@/lib/utils";
@@ -40,6 +41,7 @@ export default function StoreProductsPage() {
     const [storeName, setStoreName] = useState("");
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
+    const [adProduct, setAdProduct] = useState<any>(null);
 
     // Create Form State
     const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -88,14 +90,6 @@ export default function StoreProductsPage() {
         fetchOtherStores();
     }, [id, isCreateOpen, user?.id]);
 
-    const handleShareStore = () => {
-        const url = `${window.location.origin}/feed?storeId=${id}`;
-        navigator.clipboard.writeText(url);
-        toast.success("Link de tienda generado", {
-            description: "El enlace público de la tienda ha sido copiado al portapapeles.",
-            icon: <Share2 className="w-4 h-4 text-emerald-400" />
-        });
-    };
 
     const fetchOtherStores = async () => {
         const token = localStorage.getItem('token');
@@ -526,13 +520,6 @@ export default function StoreProductsPage() {
                         </DialogContent>
                     </Dialog>
 
-                    <MinimalButton
-                        onClick={handleShareStore}
-                        icon={<Share2 className="w-4 h-4" />}
-                        className="text-xs"
-                    >
-                        Compartir Tienda
-                    </MinimalButton>
                 </div>
             </PageHeader >
 
@@ -635,6 +622,13 @@ export default function StoreProductsPage() {
                                         </MinimalButton>
 
                                         <div className="flex gap-2">
+                                            <button
+                                                onClick={() => setAdProduct(product)}
+                                                className="p-2.5 md:p-3 bg-zinc-950 border border-amber-400/20 rounded-full hover:bg-amber-400/10 text-amber-500 transition-colors"
+                                                title="Promocionar Producto"
+                                            >
+                                                <Zap className="w-3.5 h-3.5 fill-amber-500" />
+                                            </button>
                                             <button
                                                 onClick={() => setEditingProduct(product)}
                                                 className="p-2.5 md:p-3 bg-zinc-950 border border-white/5 rounded-full hover:bg-zinc-900 text-zinc-600 hover:text-white transition-colors"
@@ -904,6 +898,17 @@ export default function StoreProductsPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* Ad Purchase Modal */}
+            {adProduct && (
+                <AdPurchaseModal
+                    productId={adProduct.id}
+                    productName={adProduct.name}
+                    isOpen={!!adProduct}
+                    onClose={() => setAdProduct(null)}
+                    onSuccess={() => fetchProducts()}
+                />
+            )}
 
             {/* Status Footer */}
             <div className="fixed bottom-0 left-0 right-0 h-8 md:h-10 bg-zinc-950 border-t border-white/5 flex items-center justify-between px-4 md:px-10 text-[7px] md:text-[9px] font-mono text-zinc-700 uppercase tracking-[0.1em] md:tracking-[0.3em] z-50">

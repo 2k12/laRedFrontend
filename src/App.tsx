@@ -1,32 +1,32 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingLayout from "@/layouts/LandingLayout";
 import DashboardLayout from "@/layouts/DashboardLayout";
-import LandingPage from "@/pages/LandingPage";
-import LoginPage from "@/pages/LoginPage";
-import RegisterPage from "@/pages/RegisterPage";
-import MarketplaceFeed from "@/pages/MarketplaceFeed";
-import DashboardPage from "@/pages/DashboardPage";
+import LandingPage from "@/pages/generic/LandingPage";
+import LoginPage from "@/pages/auth/LoginPage";
+import RegisterPage from "@/pages/auth/RegisterPage";
+import MarketplaceFeed from "@/pages/marketplace/MarketplaceFeed";
+import DashboardPage from "@/pages/dashboard/DashboardPage";
 
-import AdminCoinsPage from "@/pages/AdminCoinsPage";
-import AdminStoresPage from "@/pages/AdminStoresPage";
-import DashboardProductsPage from "@/pages/DashboardProductsPage";
-import MintConfirmPage from "@/pages/MintConfirmPage";
-import ProductDetailPage from "@/pages/ProductDetailPage";
-import StoreProductsPage from "@/pages/StoreProductsPage";
-import ProductTransferPage from "@/pages/ProductTransferPage";
-import EconomyManagementPage from "@/pages/EconomyManagementPage";
-import AdminRewardsPage from "@/pages/AdminRewardsPage";
-import ClaimRewardPage from "@/pages/ClaimRewardPage";
-import QRScannerPage from "@/pages/QRScannerPage";
-import OrdersPage from "@/pages/OrdersPage";
-import AdminUsersPage from "@/pages/AdminUsersPage";
+import AdminCoinsPage from "@/pages/admin/AdminCoinsPage";
+import AdminStoresPage from "@/pages/admin/AdminStoresPage";
+import DashboardProductsPage from "@/pages/dashboard/DashboardProductsPage";
+import MintConfirmPage from "@/pages/marketplace/MintConfirmPage";
+import ProductDetailPage from "@/pages/marketplace/ProductDetailPage";
+import StoreProductsPage from "@/pages/dashboard/StoreProductsPage";
+import ProductTransferPage from "@/pages/dashboard/ProductTransferPage";
+import EconomyManagementPage from "@/pages/admin/EconomyManagementPage";
+import AdminRewardsPage from "@/pages/admin/AdminRewardsPage";
+import ClaimRewardPage from "@/pages/marketplace/ClaimRewardPage";
+import QRScannerPage from "@/pages/generic/QRScannerPage";
+import OrdersPage from "@/pages/dashboard/OrdersPage";
+import AdminUsersPage from "@/pages/admin/AdminUsersPage";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 import { AuthProvider } from "@/context/AuthContext";
 
 import { Toaster } from "@/components/ui/sonner";
-import PrivacyPolicyPage from "@/pages/PrivacyPolicyPage";
-import TermsPage from "@/pages/TermsPage";
+import PrivacyPolicyPage from "@/pages/info/PrivacyPolicyPage";
+import TermsPage from "@/pages/info/TermsPage";
 
 function App() {
   return (

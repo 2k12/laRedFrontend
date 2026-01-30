@@ -20,7 +20,7 @@ export function VerticalPagination() {
                     </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="right" className="bg-zinc-950 border-zinc-800 text-zinc-300 min-w-[60px]">
-                    {[5, 12, 24, 50, 100].map((l) => (
+                    {[6, 12, 24, 50, 100].map((l) => (
                         <DropdownMenuItem
                             key={l}
                             onClick={() => { setLimit(l); setPage(1); }}

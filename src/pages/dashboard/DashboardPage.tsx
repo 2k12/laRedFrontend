@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Wallet, Mail, Smartphone, Edit2, ShieldCheck, Store, Coins, ArrowRight, Loader2 } from "lucide-react";
+import { User, Wallet, Mail, Smartphone, Edit2, ShieldCheck, Store, Coins, ArrowRight, Loader2, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -13,6 +13,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { API_BASE_URL } from "@/config/api";
 import { BRANDING } from "@/config/branding";
 import { HistoryModal } from "@/components/HistoryModal";
+import BadgeDisplay from "@/components/BadgeDisplay";
 
 export default function DashboardPage() {
     const { user, wallet, refreshProfile } = useAuth();
@@ -189,6 +190,17 @@ export default function DashboardPage() {
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Badge System Section */}
+                    <div className="mt-8">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 rounded-lg bg-white/5 text-zinc-300">
+                                <Award className="w-4 h-4 md:w-5 md:h-5" />
+                            </div>
+                            <h3 className="text-base md:text-lg font-bold text-white uppercase tracking-tight">Mis Insignias</h3>
+                        </div>
+                        <BadgeDisplay />
                     </div>
                 </div>
 

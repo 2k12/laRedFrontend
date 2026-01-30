@@ -5,6 +5,7 @@ import { useFilters } from "@/context/FilterContext";
 import { VerticalPagination } from "@/components/VerticalPagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/PageHeader";
+import FeaturedSlide from "@/components/FeaturedSlide";
 import { BRANDING } from "@/config/branding";
 import { API_BASE_URL } from "@/config/api";
 import { motion, AnimatePresence, Variants } from "framer-motion";
@@ -22,14 +23,14 @@ export default function MarketplaceFeed() {
         page, setPage, setTotalPages, limit
     } = useFilters();
 
-    // Sync storeId from URL to global filter state on mount
+    // Sync storeId from URL to global filter state on mount and URL changes
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const storeIdFromUrl = urlParams.get('storeId');
-        if (storeIdFromUrl && storeIdFromUrl !== selectedStore) {
+        if (storeIdFromUrl) {
             setSelectedStore(storeIdFromUrl);
         }
-    }, []);
+    }, [setSelectedStore]);
 
     // Reset page when filters change (except page itself)
     useEffect(() => {
@@ -48,7 +49,8 @@ export default function MarketplaceFeed() {
         if (priceRange < 5000) params.append('maxPrice', priceRange.toString());
         if (selectedStatus !== 'all') params.append('status', selectedStatus);
         if (selectedCategory) params.append('category', selectedCategory);
-        if (selectedStore) params.append('storeId', selectedStore);
+        const currentStoreId = new URLSearchParams(window.location.search).get('storeId') || selectedStore;
+        if (currentStoreId) params.append('storeId', currentStoreId);
 
         fetch(`${API_BASE_URL}/api/store/products/public?${params.toString()}`)
             .then(res => res.json())
@@ -110,6 +112,9 @@ export default function MarketplaceFeed() {
 
                         {/* Product Grid Area */}
                         <div className="flex-1 w-full overflow-hidden">
+                            {/* Featured Slide Section */}
+                            {!searchTerm && <FeaturedSlide />}
+
                             <PageHeader
                                 title={BRANDING.productNamePlural}
                                 description={`Explora ${BRANDING.productNamePlural.toLowerCase()} de la comunidad universitaria.`}

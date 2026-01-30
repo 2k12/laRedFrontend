@@ -21,10 +21,10 @@ export default function PulseCoin({
 }: PulseCoinProps) {
     const coinRef = useRef<HTMLDivElement>(null);
     const ringRef = useRef<HTMLDivElement>(null);
-    const coreRef = useRef<HTMLDivElement>(null);
+    const shineRef = useRef<SVGLinearGradientElement>(null);
 
     useGSAP(() => {
-        // 1. Floating Path (The 60deg incline flow)
+        // 1. Floating Path
         gsap.to(coinRef.current, {
             x: xMove,
             y: yMove,
@@ -35,24 +35,22 @@ export default function PulseCoin({
             delay: delay
         });
 
-        // 2. Gyroscopic Tumble (3D Rotation)
+        // 2. 3D Tumble
         gsap.to(ringRef.current, {
             rotationX: 360,
             rotationY: 360,
-            rotationZ: 90,
-            duration: duration * 2.5,
+            duration: duration * 2,
             repeat: -1,
             ease: "none",
         });
 
-        // 3. Core Pulse (Breathing)
-        gsap.to(coreRef.current, {
-            scale: 1.2,
-            opacity: 0.8,
-            duration: 2,
+        // 3. Shimmer Animation
+        gsap.to(shineRef.current, {
+            attr: { x1: "150%", x2: "250%" },
+            duration: 3,
             repeat: -1,
-            yoyo: true,
-            ease: "power1.inOut"
+            ease: "power2.inOut",
+            delay: delay
         });
 
     }, { scope: coinRef });
@@ -60,38 +58,71 @@ export default function PulseCoin({
     return (
         <div
             ref={coinRef}
-            className={`absolute z-0 pointer-events-none mix-blend-screen ${className}`}
-            style={{ width: size, height: size, perspective: "800px" }}
+            className={`absolute z-0 pointer-events-none ${className}`}
+            style={{ width: size, height: size, perspective: "1000px" }}
         >
-            {/* 3D Container */}
             <div
                 ref={ringRef}
-                className="w-full h-full relative preserve-3d"
+                className="w-full h-full relative"
                 style={{ transformStyle: "preserve-3d" }}
             >
-                {/* Outer Rim - Gold Structure */}
-                <div
-                    className="absolute inset-0 rounded-full border-[1px] border-amber-400/40"
-                    style={{
-                        boxShadow: "0 0 15px rgba(251, 191, 36, 0.2), inset 0 0 10px rgba(251, 191, 36, 0.2)",
-                        background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%)"
-                    }}
-                />
+                <svg
+                    viewBox="0 0 100 100"
+                    className="w-full h-full drop-shadow-[0_0_15px_rgba(251,191,36,0.4)]"
+                >
+                    <defs>
+                        <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#FBDF8C" />
+                            <stop offset="50%" stopColor="#FBBF24" />
+                            <stop offset="100%" stopColor="#B45309" />
+                        </linearGradient>
 
-                {/* Tech Ring (Dashed) - Gold */}
-                <div
-                    className="absolute inset-[15%] rounded-full border border-dashed border-amber-400/30"
-                    style={{ transform: "rotateX(45deg)" }}
-                />
+                        <linearGradient id="shineGradient" x1="-150%" y1="0%" x2="-50%" y2="0%" ref={shineRef}>
+                            <stop offset="0%" stopColor="white" stopOpacity="0" />
+                            <stop offset="50%" stopColor="white" stopOpacity="0.6" />
+                            <stop offset="100%" stopColor="white" stopOpacity="0" />
+                        </linearGradient>
 
-                {/* Inner Core - Gold Energy */}
-                <div
-                    ref={coreRef}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[15%] h-[15%] rounded-full bg-amber-400"
-                    style={{
-                        boxShadow: "0 0 20px 5px rgba(251, 191, 36, 0.6)"
-                    }}
-                />
+                        <filter id="innerShadow">
+                            <feOffset dx="0" dy="1" />
+                            <feGaussianBlur stdDeviation="1" result="offset-blur" />
+                            <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse" />
+                            <feFlood floodColor="black" floodOpacity="0.5" result="color" />
+                            <feComposite operator="in" in="color" in2="inverse" result="shadow" />
+                            <feComposite operator="over" in="shadow" in2="SourceGraphic" />
+                        </filter>
+                    </defs>
+
+                    {/* Outer Rim */}
+                    <circle cx="50" cy="50" r="48" fill="url(#goldGradient)" stroke="#F59E0B" strokeWidth="0.5" />
+                    <circle cx="50" cy="50" r="44" fill="none" stroke="#B45309" strokeWidth="1" strokeDasharray="1,2" opacity="0.3" />
+
+                    {/* Coin Face */}
+                    <circle cx="50" cy="50" r="42" fill="url(#goldGradient)" filter="url(#innerShadow)" />
+
+                    {/* Minting Details */}
+                    <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.5" />
+                    <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(0,0,0,0.1)" strokeWidth="0.5" />
+
+                    {/* Central Symbol 'L' (LaRed) */}
+                    <text
+                        x="50"
+                        y="62"
+                        textAnchor="middle"
+                        fill="#78350F"
+                        style={{
+                            fontSize: '35px',
+                            fontWeight: 'bold',
+                            fontFamily: 'serif',
+                            filter: 'drop-shadow(0px 1px 1px rgba(255,255,255,0.3))'
+                        }}
+                    >
+                        PL
+                    </text>
+
+                    {/* Animated Shine Overlay */}
+                    <circle cx="50" cy="50" r="48" fill="url(#shineGradient)" pointerEvents="none" />
+                </svg>
             </div>
         </div>
     );

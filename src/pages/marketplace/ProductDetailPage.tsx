@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { ShoppingCart, Heart, Share2, ShieldCheck, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { MinimalButton } from "@/components/MinimalButton";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,6 +27,8 @@ export default function ProductDetailPage() {
     const [loading, setLoading] = useState(true);
     const [showPurchase, setShowPurchase] = useState(false);
     const [purchaseSuccessData, setPurchaseSuccessData] = useState<any>(null);
+    const [searchParams] = useSearchParams();
+    const context = searchParams.get('context');
 
     const handleClose = () => {
         navigate('/feed');
@@ -35,8 +37,11 @@ export default function ProductDetailPage() {
     useEffect(() => {
         if (!id) return;
         setLoading(true);
-        // Mock fetch or real endpoint
-        fetch(`${API_BASE_URL}/api/store/products/${id}`)
+
+        const url = new URL(`${API_BASE_URL}/api/store/products/${id}`);
+        if (context) url.searchParams.append('context', context);
+
+        fetch(url.toString())
             .then(res => res.json())
             .then(data => {
                 setProduct(data);
@@ -44,20 +49,9 @@ export default function ProductDetailPage() {
             })
             .catch(err => {
                 console.error(err);
-                // Mock data for demo if fetch fails
-                setTimeout(() => {
-                    setProduct({
-                        id: id,
-                        name: "Curso Python Pro (Mock)",
-                        description: "Domina Python desde cero hasta experto. Incluye estructura de datos, algoritmos y proyectos reales.",
-                        price: 150,
-                        store: "DevAcademy",
-                        owner_id: 1
-                    });
-                    setLoading(false);
-                }, 800);
+                setLoading(false);
             });
-    }, [id]);
+    }, [id, context]);
 
     const handleShare = () => {
         const url = `${window.location.origin}/feed/product/${id}`;
@@ -193,15 +187,15 @@ export default function ProductDetailPage() {
                     </motion.div>
                 ) : (
                     <motion.div
-                        key={product.id} // Key Change triggers animation
+                        key={product.id}
                         initial={{ opacity: 0, filter: "blur(10px)", scale: 0.98 }}
                         animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
                         exit={{ opacity: 0, filter: "blur(10px)", scale: 1.02 }}
                         transition={{ duration: 0.4, ease: "easeInOut" }}
-                        className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 min-h-screen"
+                        className="grid grid-cols-1 lg:grid-cols-2 gap-0 min-h-screen"
                     >
-                        {/* Image Section (Icon Based) - Mobile: Card / Desktop: Full Split */}
-                        <div className="gsap-image-container lg:h-screen relative lg:sticky lg:top-0 aspect-square lg:aspect-auto overflow-hidden bg-zinc-900/50 lg:bg-zinc-950/50 rounded-[2.5rem] lg:rounded-none border border-white/5 lg:border-none lg:border-r flex items-center justify-center group shadow-2xl lg:shadow-none mx-4 mt-4 lg:mx-0 lg:mt-0">
+                        {/* Image Section - Mobile: Immersive Edge-to-Edge / Desktop: Split Screen */}
+                        <div className="gsap-image-container lg:h-screen relative lg:sticky lg:top-0 h-[60vh] overflow-hidden bg-zinc-900/50 lg:bg-zinc-950/50 border-b lg:border-none lg:border-r border-white/5 flex items-center justify-center group">
                             <motion.div
                                 initial={{ scale: 1.1, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
@@ -209,45 +203,99 @@ export default function ProductDetailPage() {
                                 className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-50"
                             />
 
-                            {/* Hero Icon with Glow */}
-                            <motion.div
-                                initial={{ scale: 0.8, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                transition={{ delay: 0.2, duration: 0.5 }}
-                                className="relative z-10 p-8 md:p-12 rounded-full bg-zinc-900 border border-zinc-800 shadow-2xl group-hover:shadow-[0_0_50px_-10px_rgba(var(--primary-rgb),0.3)] group-hover:scale-110 transition-transform duration-500"
-                            >
-                                <ShoppingCart className="w-12 h-12 md:w-32 md:h-32 text-zinc-500 group-hover:text-primary transition-colors duration-500" />
-                            </motion.div>
+                            {/* Product Image or Icon */}
+                            {product.image_url || product.image ? (
+                                <motion.img
+                                    src={product.image_url || product.image}
+                                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
+                                    alt={product.name}
+                                />
+                            ) : (
+                                <motion.div
+                                    initial={{ scale: 0.8, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    transition={{ delay: 0.2, duration: 0.5 }}
+                                    className="relative z-10 p-8 md:p-12 rounded-full bg-zinc-900 border border-zinc-800 shadow-2xl group-hover:shadow-[0_0_50px_-10px_rgba(var(--primary-rgb),0.3)] group-hover:scale-110 transition-transform duration-500"
+                                >
+                                    <ShoppingCart className="w-12 h-12 md:w-32 md:h-32 text-zinc-500 group-hover:text-primary transition-colors duration-500" />
+                                </motion.div>
+                            )}
 
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black/0 to-black/40" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-black/40" />
 
-                            {/* Mobile Back Button (Top Left of Card) - Now with 'X' Close Functionality */}
-                            <div className="absolute top-4 left-4 lg:hidden z-50">
-                                <MinimalButton size="icon" onClick={handleClose} className="rounded-full bg-black/40 backdrop-blur border-white/10 w-10 h-10">
+                            {/* Mobile Back Button */}
+                            <div className="absolute top-6 left-6 lg:hidden z-50">
+                                <button
+                                    onClick={handleClose}
+                                    className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white shadow-2xl"
+                                >
                                     <X className="w-5 h-5" />
-                                </MinimalButton>
+                                </button>
                             </div>
 
-                            {/* Mobile Prev/Next Arrows (Overlay on Image) */}
-                            <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-2 lg:hidden z-40 pointer-events-none">
-                                {/* Previous */}
+                            {/* Mobile Action Dock - Top Centered */}
+                            <div className="absolute top-6 left-1/2 -translate-x-1/2 lg:hidden z-50">
+                                <motion.div
+                                    initial={{ opacity: 0, y: -20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.5, type: "spring", stiffness: 300, damping: 30 }}
+                                    className="px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-2xl border border-white/10 shadow-2xl flex items-center gap-2"
+                                >
+                                    <MinimalButton
+                                        onClick={() => setShowPurchase(true)}
+                                        disabled={product.stock <= 0}
+                                        className={cn(
+                                            "h-9 px-4 text-[8px] font-black tracking-[0.2em] uppercase transition-all rounded-full",
+                                            product.stock <= 0
+                                                ? "bg-zinc-800/50 text-zinc-600 border-zinc-700/50 cursor-not-allowed"
+                                                : "bg-white text-black hover:bg-zinc-100 border-none active:scale-95"
+                                        )}
+                                    >
+                                        {product.stock <= 0 ? "Agotado" : "Adquirir"}
+                                    </MinimalButton>
+
+                                    <div className="flex gap-1.5 ml-0.5">
+                                        <button
+                                            className="w-8 h-8 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white/70 hover:text-pink-500 transition-all active:scale-90"
+                                            title="Me gusta"
+                                        >
+                                            <Heart className="w-3.5 h-3.5" />
+                                        </button>
+                                        <button
+                                            onClick={handleShare}
+                                            className="w-8 h-8 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white/70 hover:text-primary transition-all active:scale-90"
+                                            title="Compartir"
+                                        >
+                                            <Share2 className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            </div>
+
+                            {/* Mobile Navigation Arrows */}
+                            <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4 lg:hidden z-40 pointer-events-none">
                                 <div className="pointer-events-auto">
                                     {!loading && product && product.prev_id && (
                                         <button
-                                            onClick={(e) => { e.stopPropagation(); navigate(`/feed/product/${product.prev_id}`) }}
-                                            className="w-10 h-10 rounded-full bg-black/20 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/70 hover:bg-black/40 transition-colors"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigate(`/feed/product/${product.prev_id}${context ? `?context=${context}` : ''}`);
+                                            }}
+                                            className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/70 hover:bg-black/60 transition-all"
                                         >
                                             <ChevronLeft className="w-6 h-6" />
                                         </button>
                                     )}
                                 </div>
 
-                                {/* Next */}
                                 <div className="pointer-events-auto">
                                     {!loading && product && product.next_id && (
                                         <button
-                                            onClick={(e) => { e.stopPropagation(); navigate(`/feed/product/${product.next_id}`) }}
-                                            className="w-10 h-10 rounded-full bg-black/20 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/70 hover:bg-black/40 transition-colors"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigate(`/feed/product/${product.next_id}${context ? `?context=${context}` : ''}`);
+                                            }}
+                                            className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/70 hover:bg-black/60 transition-all"
                                         >
                                             <ChevronRight className="w-6 h-6" />
                                         </button>
@@ -257,7 +305,7 @@ export default function ProductDetailPage() {
                         </div>
 
                         {/* Content Section */}
-                        <div className="p-4 lg:p-24 flex flex-col justify-center relative z-10 min-h-[50vh] lg:min-h-screen">
+                        <div className="p-8 lg:p-24 flex flex-col justify-center relative z-10 min-h-[50vh] lg:min-h-screen pb-32 lg:pb-24">
 
                             {/* Close Button (Hidden on Mobile, Desktop Only) */}
                             <div className="hidden lg:block absolute -top-2 -right-2 md:top-4 md:right-4 z-50">
@@ -319,27 +367,29 @@ export default function ProductDetailPage() {
                                         </div>
                                     </motion.div>
 
+                                    {/* Desktop Action Dock */}
                                     <motion.div
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.5 }}
-                                        className="gsap-actions flex flex-wrap gap-3"
+                                        className="hidden lg:flex items-center gap-3 pt-4"
                                     >
                                         <MinimalButton
                                             onClick={() => setShowPurchase(true)}
                                             disabled={product.stock <= 0}
                                             className={cn(
-                                                "flex-1 sm:flex-none h-14 px-8 text-[11px] font-bold tracking-widest uppercase transition-all",
+                                                "flex-[2] h-14 px-10 text-[11px] font-black tracking-[0.2em] uppercase transition-all rounded-2xl",
                                                 product.stock <= 0
-                                                    ? "bg-zinc-900 text-zinc-600 border-zinc-800 cursor-not-allowed opacity-50"
-                                                    : "bg-zinc-800 text-white hover:bg-zinc-700 border-zinc-700 shadow-lg"
+                                                    ? "bg-zinc-800 text-zinc-600 border-zinc-700 cursor-not-allowed"
+                                                    : "bg-white text-black hover:bg-zinc-200 border-none shadow-2xl active:scale-95"
                                             )}
-                                            icon={<ShoppingCart className="w-4 h-4" />}
                                         >
-                                            {product.stock <= 0 ? "Agotado" : "Comprar"}
+                                            {product.stock <= 0 ? "Agotado" : "Adquirir Ahora"}
                                         </MinimalButton>
-                                        <MinimalButton size="icon" className="h-14 w-14 hover:text-pink-500 hover:border-pink-500/50 transition-all" icon={<Heart className="w-5 h-5" />} />
-                                        <MinimalButton size="icon" className="h-14 w-14" onClick={handleShare} icon={<Share2 className="w-5 h-5" />} />
+                                        <div className="flex gap-3">
+                                            <MinimalButton size="icon" className="h-14 w-14 hover:text-pink-500 hover:border-pink-500/50 transition-all border-white/10 bg-zinc-900/50" icon={<Heart className="w-5 h-5" />} />
+                                            <MinimalButton size="icon" className="h-14 w-14 border-white/10 bg-zinc-900/50" onClick={handleShare} icon={<Share2 className="w-5 h-5" />} />
+                                        </div>
                                     </motion.div>
                                 </div>
 
