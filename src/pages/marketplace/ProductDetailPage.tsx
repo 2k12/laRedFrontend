@@ -183,7 +183,7 @@ export default function ProductDetailPage() {
                         exit={{ opacity: 0 }}
                         className="min-h-[60vh] flex items-center justify-center text-red-500 font-mono text-sm tracking-widest"
                     >
-                        PRODUCTO NO ENCONTRADO
+                        PRODPLTO NO ENCONTRADO
                     </motion.div>
                 ) : (
                     <motion.div

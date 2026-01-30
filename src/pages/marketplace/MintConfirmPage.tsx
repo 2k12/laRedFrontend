@@ -78,7 +78,7 @@ export default function MintConfirmPage() {
                     </div>
                     <div className="space-y-3 md:space-y-4">
                         <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-tight">Protocolo<br className="md:hidden" /> Finalizado</h1>
-                        <p className="text-zinc-500 font-mono text-[10px] md:text-sm tracking-[0.2em] md:tracking-widest">TRANSACTION_HASH: SUCCESS_EMISSION</p>
+                        <p className="text-zinc-500 font-mono text-[10px] md:text-sm tracking-[0.2em] md:tracking-widest">TRANSACTION_HASH: SPLCESS_EMISSION</p>
                     </div>
                     <div className="text-5xl md:text-7xl font-black text-white tabular-nums tracking-tighter">
                         +{parseInt(amount).toLocaleString()} <span className="text-xl md:text-2xl text-zinc-600 font-normal">{BRANDING.currencySymbol}</span>

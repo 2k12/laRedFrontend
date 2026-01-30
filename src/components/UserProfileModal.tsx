@@ -170,7 +170,7 @@ export default function UserProfileModal({ userId, isOpen, onClose }: UserProfil
                                                 <span className="text-5xl font-black italic text-white tracking-tighter">
                                                     {profile.wallet?.balance || 0}
                                                 </span>
-                                                <span className="text-xs font-black text-primary uppercase italic">UC</span>
+                                                <span className="text-xs font-black text-primary uppercase italic">PL</span>
                                             </div>
                                             <div className="mt-6 flex gap-2">
                                                 {profile.user.roles.map(role => (

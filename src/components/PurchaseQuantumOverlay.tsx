@@ -22,7 +22,7 @@ interface PurchaseQuantumOverlayProps {
 
 export function PurchaseQuantumOverlay({ product, onSuccess, onClose }: PurchaseQuantumOverlayProps) {
     const { token, user } = useAuth();
-    const [status, setStatus] = useState<'IDLE' | 'HOLDING' | 'PROCESSING' | 'SUCCESS' | 'ERROR'>('IDLE');
+    const [status, setStatus] = useState<'IDLE' | 'HOLDING' | 'PROCESSING' | 'SPLCESS' | 'ERROR'>('IDLE');
     const [progress, setProgress] = useState(0);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -36,7 +36,7 @@ export function PurchaseQuantumOverlay({ product, onSuccess, onClose }: Purchase
     }, [progress, progressSpring]);
 
     const handleStart = () => {
-        if (status === 'SUCCESS' || status === 'PROCESSING') return;
+        if (status === 'SPLCESS' || status === 'PROCESSING') return;
         setStatus('HOLDING');
         let p = 0;
         intervalRef.current = setInterval(() => {
@@ -51,7 +51,7 @@ export function PurchaseQuantumOverlay({ product, onSuccess, onClose }: Purchase
     };
 
     const handleEnd = () => {
-        if (status === 'SUCCESS' || status === 'PROCESSING') return;
+        if (status === 'SPLCESS' || status === 'PROCESSING') return;
         if (intervalRef.current) clearInterval(intervalRef.current);
         setStatus('IDLE');
         setProgress(0);
@@ -72,7 +72,7 @@ export function PurchaseQuantumOverlay({ product, onSuccess, onClose }: Purchase
             const data = await res.json();
 
             if (res.ok) {
-                setStatus('SUCCESS');
+                setStatus('SPLCESS');
                 confetti({
                     particleCount: 150,
                     spread: 80,
