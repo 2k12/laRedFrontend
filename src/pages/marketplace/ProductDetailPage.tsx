@@ -263,18 +263,18 @@ export default function ProductDetailPage() {
                                     transition={{ delay: 0.5, type: "spring", stiffness: 300, damping: 30 }}
                                     className="px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-2xl border border-white/10 shadow-2xl flex items-center gap-2"
                                 >
-                                    <MinimalButton
+                                    <button
                                         onClick={() => setShowPurchase(true)}
                                         disabled={product.stock <= 0}
                                         className={cn(
-                                            "h-9 px-4 text-[8px] font-black tracking-[0.2em] uppercase transition-all rounded-full",
+                                            "h-9 px-6 text-[9px] font-black tracking-[0.2em] uppercase transition-all duration-300 rounded-full border",
                                             product.stock <= 0
-                                                ? "bg-zinc-800/50 text-zinc-600 border-zinc-700/50 cursor-not-allowed"
-                                                : "bg-white text-black hover:bg-zinc-100 border-none active:scale-95"
+                                                ? "bg-zinc-900/50 text-zinc-600 border-white/5 cursor-not-allowed"
+                                                : "bg-white text-black border-white active:scale-95 shadow-[0_10px_20px_-10px_rgba(255,255,255,0.3)]"
                                         )}
                                     >
                                         {product.stock <= 0 ? "Agotado" : "Adquirir"}
-                                    </MinimalButton>
+                                    </button>
 
                                     <div className="flex gap-1.5 ml-0.5">
                                         <button
@@ -400,18 +400,18 @@ export default function ProductDetailPage() {
                                         transition={{ delay: 0.5 }}
                                         className="hidden lg:flex items-center gap-3 pt-4"
                                     >
-                                        <MinimalButton
+                                        <button
                                             onClick={() => setShowPurchase(true)}
                                             disabled={product.stock <= 0}
                                             className={cn(
-                                                "flex-[2] h-14 px-10 text-[11px] font-black tracking-[0.2em] uppercase transition-all rounded-2xl",
+                                                "flex-[2] h-14 px-10 text-[11px] font-black tracking-[0.3em] uppercase transition-all duration-500 rounded-2xl border relative overflow-hidden group/btn",
                                                 product.stock <= 0
-                                                    ? "bg-zinc-800 text-zinc-600 border-zinc-700 cursor-not-allowed"
-                                                    : "bg-white text-black hover:bg-zinc-200 border-none shadow-2xl active:scale-95"
+                                                    ? "bg-zinc-950 text-zinc-700 border-white/5 cursor-not-allowed"
+                                                    : "bg-transparent border-white/20 text-white hover:border-white hover:bg-white hover:text-black active:scale-[0.98]"
                                             )}
                                         >
-                                            {product.stock <= 0 ? "Agotado" : "Adquirir Ahora"}
-                                        </MinimalButton>
+                                            <span className="relative z-10">{product.stock <= 0 ? "Agotado" : "Adquirir Ahora"}</span>
+                                        </button>
                                         <div className="flex gap-3">
                                             <MinimalButton size="icon" className="h-14 w-14 hover:text-pink-500 hover:border-pink-500/50 transition-all border-white/10 bg-zinc-900/50" icon={<Heart className="w-5 h-5" />} />
                                             <MinimalButton size="icon" className="h-14 w-14 border-white/10 bg-zinc-900/50" onClick={handleShare} icon={<Share2 className="w-5 h-5" />} />
