@@ -163,7 +163,7 @@ export default function AdminStoresPage() {
     }
   };
 
-  const onScanFailure = (error: any) => {
+  const onScanFailure = (_error: any) => {
     // console.warn(`Code scan error = ${error}`);
   };
 
