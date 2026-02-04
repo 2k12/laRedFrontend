@@ -24,6 +24,7 @@ export default function ProductDetailPage() {
     const navigate = useNavigate();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [product, setProduct] = useState<any>(null);
+    const [activeImage, setActiveImage] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [showPurchase, setShowPurchase] = useState(false);
     const [purchaseSuccessData, setPurchaseSuccessData] = useState<any>(null);
@@ -45,6 +46,8 @@ export default function ProductDetailPage() {
             .then(res => res.json())
             .then(data => {
                 setProduct(data);
+                const firstImg = (data.images && data.images.length > 0) ? data.images[0] : (data.image_url || data.image);
+                setActiveImage(firstImg);
                 setLoading(false);
             })
             .catch(err => {
@@ -204,9 +207,12 @@ export default function ProductDetailPage() {
                             />
 
                             {/* Product Image or Icon */}
-                            {product.image_url || product.image ? (
+                            {activeImage ? (
                                 <motion.img
-                                    src={product.image_url || product.image}
+                                    key={activeImage}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    src={activeImage}
                                     className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
                                     alt={product.name}
                                 />
@@ -219,6 +225,22 @@ export default function ProductDetailPage() {
                                 >
                                     <ShoppingCart className="w-12 h-12 md:w-32 md:h-32 text-zinc-500 group-hover:text-primary transition-colors duration-500" />
                                 </motion.div>
+                            )}
+
+                            {/* Image Selection Thumbnails (if multiple) */}
+                            {product.images && product.images.length > 1 && (
+                                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-50">
+                                    {product.images.map((img: string, idx: number) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => setActiveImage(img)}
+                                            className={cn(
+                                                "w-2 h-2 rounded-full transition-all duration-300",
+                                                activeImage === img ? "bg-white w-6" : "bg-white/30 hover:bg-white/60"
+                                            )}
+                                        />
+                                    ))}
+                                </div>
                             )}
 
                             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-black/40" />

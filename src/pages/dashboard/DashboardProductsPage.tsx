@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/PageHeader";
 import { BRANDING } from "@/config/branding";
 import { API_BASE_URL } from "@/config/api";
+import { ImageUpload } from "@/components/ImageUpload";
 
 interface Category {
     slug: string;
@@ -34,7 +35,8 @@ export default function DashboardProductsPage() {
         price: "",
         stock: "",
         category: "",
-        store_id: ""
+        store_id: "",
+        images: [] as string[]
     });
     const [variants, setVariants] = useState<{ name: string, sku: string, price_modifier: string, stock: string }[]>([]);
     const [newVariant, setNewVariant] = useState({ name: "", sku: "", price_modifier: "0", stock: "0" });
@@ -78,6 +80,7 @@ export default function DashboardProductsPage() {
                     ...formData,
                     price: parseFloat(formData.price),
                     stock: parseInt(formData.stock),
+                    images: formData.images,
                     variants: variants
                 })
             });
@@ -86,7 +89,7 @@ export default function DashboardProductsPage() {
             if (res.ok) {
                 toast.success("Drop creado exitosamente");
                 setIsOpen(false);
-                setFormData({ name: "", description: "", price: "", stock: "", category: "", store_id: "" });
+                setFormData({ name: "", description: "", price: "", stock: "", category: "", store_id: "", images: [] });
             } else {
                 toast.error(data.error || "Error al crear drop");
             }
@@ -146,94 +149,94 @@ export default function DashboardProductsPage() {
                                 </div>
                             </div>
 
-                            <div className="grid gap-1.5 lg:gap-2">
-                                <Label className="text-zinc-500 text-[9px] font-black uppercase tracking-wider">Precio ({BRANDING.currencySymbol})</Label>
+                            {selectedCat && (
+                                <div className={`text-[9px] flex items-center gap-2 p-2 rounded-lg ${isOverLimit ? 'bg-red-500/10 text-red-400' : 'bg-green-500/5 text-zinc-500'}`}>
+                                    {isOverLimit ? <AlertTriangle className="w-3 h-3 shrink-0" /> : <Info className="w-3 h-3 shrink-0" />}
+                                    <span className="font-medium">Tope legal para {selectedCat.name}: <strong className="text-white">{priceLimit} {BRANDING.currencySymbol}</strong></span>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label className="text-zinc-500 text-[9px] font-black uppercase tracking-wider">Imágenes del Drop</Label>
+                            <ImageUpload
+                                value={formData.images}
+                                onChange={(urls) => setFormData({ ...formData, images: urls })}
+                                maxFiles={3}
+                            />
+                        </div>
+
+                        {/* Variants Manager */}
+                        <div className="grid gap-3 pt-3 lg:pt-4 border-t border-white/5 mt-2">
+                            <Label className="text-zinc-500 text-[9px] font-black uppercase tracking-wider">Variantes Complejas</Label>
+                            <div className="grid grid-cols-2 gap-2">
+                                <Input
+                                    placeholder="Nombre (ej. XL)"
+                                    className="bg-zinc-900 border-zinc-800 h-10 text-[10px] rounded-lg"
+                                    value={newVariant.name}
+                                    onChange={e => setNewVariant({ ...newVariant, name: e.target.value })}
+                                />
+                                <Input
+                                    placeholder="SKU"
+                                    className="bg-zinc-900 border-zinc-800 h-10 text-[10px] rounded-lg"
+                                    value={newVariant.sku}
+                                    onChange={e => setNewVariant({ ...newVariant, sku: e.target.value })}
+                                />
                                 <Input
                                     type="number"
-                                    className={`bg-zinc-900 border-zinc-800 h-10 lg:h-12 rounded-xl text-xs ${isOverLimit ? 'border-red-500 text-red-500 focus:ring-red-500' : ''}`}
-                                    value={formData.price}
-                                    onChange={e => setFormData({ ...formData, price: e.target.value })}
+                                    placeholder="Modif. $"
+                                    className="bg-zinc-900 border-zinc-800 h-10 text-[10px] rounded-lg"
+                                    value={newVariant.price_modifier}
+                                    onChange={e => setNewVariant({ ...newVariant, price_modifier: e.target.value })}
                                 />
-                                {selectedCat && (
-                                    <div className={`text-[9px] flex items-center gap-2 p-2 rounded-lg ${isOverLimit ? 'bg-red-500/10 text-red-400' : 'bg-green-500/5 text-zinc-500'}`}>
-                                        {isOverLimit ? <AlertTriangle className="w-3 h-3 shrink-0" /> : <Info className="w-3 h-3 shrink-0" />}
-                                        <span className="font-medium">Tope legal para {selectedCat.name}: <strong className="text-white">{priceLimit} {BRANDING.currencySymbol}</strong></span>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Variants Manager */}
-                            <div className="grid gap-3 pt-3 lg:pt-4 border-t border-white/5 mt-2">
-                                <Label className="text-zinc-500 text-[9px] font-black uppercase tracking-wider">Variantes Complejas</Label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <Input
-                                        placeholder="Nombre (ej. XL)"
-                                        className="bg-zinc-900 border-zinc-800 h-10 text-[10px] rounded-lg"
-                                        value={newVariant.name}
-                                        onChange={e => setNewVariant({ ...newVariant, name: e.target.value })}
-                                    />
-                                    <Input
-                                        placeholder="SKU"
-                                        className="bg-zinc-900 border-zinc-800 h-10 text-[10px] rounded-lg"
-                                        value={newVariant.sku}
-                                        onChange={e => setNewVariant({ ...newVariant, sku: e.target.value })}
-                                    />
+                                <div className="flex gap-2">
                                     <Input
                                         type="number"
-                                        placeholder="Modif. $"
-                                        className="bg-zinc-900 border-zinc-800 h-10 text-[10px] rounded-lg"
-                                        value={newVariant.price_modifier}
-                                        onChange={e => setNewVariant({ ...newVariant, price_modifier: e.target.value })}
+                                        placeholder="Stock"
+                                        className="bg-zinc-900 border-zinc-800 h-10 text-[10px] rounded-lg shrink-0 w-2/3"
+                                        value={newVariant.stock}
+                                        onChange={e => setNewVariant({ ...newVariant, stock: e.target.value })}
                                     />
-                                    <div className="flex gap-2">
-                                        <Input
-                                            type="number"
-                                            placeholder="Stock"
-                                            className="bg-zinc-900 border-zinc-800 h-10 text-[10px] rounded-lg shrink-0 w-2/3"
-                                            value={newVariant.stock}
-                                            onChange={e => setNewVariant({ ...newVariant, stock: e.target.value })}
-                                        />
-                                        <button
-                                            onClick={(e: any) => {
-                                                e.preventDefault();
-                                                if (newVariant.name) {
-                                                    setVariants([...variants, newVariant]);
-                                                    setNewVariant({ name: "", sku: "", price_modifier: "0", stock: "0" });
-                                                }
-                                            }}
-                                            className="flex-1 bg-white text-black rounded-lg hover:scale-105 transition-transform flex items-center justify-center"
-                                        >
-                                            <Plus className="w-4 h-4" />
-                                        </button>
-                                    </div>
+                                    <button
+                                        onClick={(e: any) => {
+                                            e.preventDefault();
+                                            if (newVariant.name) {
+                                                setVariants([...variants, newVariant]);
+                                                setNewVariant({ name: "", sku: "", price_modifier: "0", stock: "0" });
+                                            }
+                                        }}
+                                        className="flex-1 bg-white text-black rounded-lg hover:scale-105 transition-transform flex items-center justify-center"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                    </button>
                                 </div>
-
-                                {variants.length > 0 && (
-                                    <div className="space-y-2 mt-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar">
-                                        {variants.map((v, i) => (
-                                            <div key={i} className="flex items-center justify-between p-2 lg:p-3 bg-zinc-900/50 border border-white/5 rounded-xl text-[9px]">
-                                                <div className="flex flex-col gap-0.5">
-                                                    <span className="font-bold text-white uppercase tracking-wider">{v.name}</span>
-                                                    <span className="text-zinc-600 font-mono italic">{v.sku || 'SIN-SKU'}</span>
-                                                </div>
-                                                <div className="flex items-center gap-3 lg:gap-4 text-zinc-400">
-                                                    <span className="text-zinc-500">+{v.price_modifier} {BRANDING.currencySymbol}</span>
-                                                    <span className="font-bold text-white bg-zinc-800 px-1.5 py-0.5 rounded">{v.stock} UN</span>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            setVariants(variants.filter((_, idx) => idx !== i));
-                                                        }}
-                                                        className="text-zinc-700 hover:text-red-500 transition-colors"
-                                                    >
-                                                        ×
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
                             </div>
+
+                            {variants.length > 0 && (
+                                <div className="space-y-2 mt-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar">
+                                    {variants.map((v, i) => (
+                                        <div key={i} className="flex items-center justify-between p-2 lg:p-3 bg-zinc-900/50 border border-white/5 rounded-xl text-[9px]">
+                                            <div className="flex flex-col gap-0.5">
+                                                <span className="font-bold text-white uppercase tracking-wider">{v.name}</span>
+                                                <span className="text-zinc-600 font-mono italic">{v.sku || 'SIN-SKU'}</span>
+                                            </div>
+                                            <div className="flex items-center gap-3 lg:gap-4 text-zinc-400">
+                                                <span className="text-zinc-500">+{v.price_modifier} {BRANDING.currencySymbol}</span>
+                                                <span className="font-bold text-white bg-zinc-800 px-1.5 py-0.5 rounded">{v.stock} UN</span>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setVariants(variants.filter((_, idx) => idx !== i));
+                                                    }}
+                                                    className="text-zinc-700 hover:text-red-500 transition-colors"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         <DialogFooter className="pt-4 border-t border-white/5">
