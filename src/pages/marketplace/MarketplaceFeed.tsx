@@ -161,9 +161,9 @@ export default function MarketplaceFeed() {
                                         >
                                             {/* Full Cover Background Image */}
                                             <div className="absolute inset-0 z-0">
-                                                {product.image || product.imageUrl ? (
+                                                {(product.images && product.images.length > 0) || product.image || product.imageUrl ? (
                                                     <img
-                                                        src={product.image || product.imageUrl}
+                                                        src={(product.images && product.images.length > 0) ? product.images[0] : (product.image || product.imageUrl)}
                                                         alt={product.name}
                                                         className="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100"
                                                         onError={(e) => {
@@ -182,54 +182,64 @@ export default function MarketplaceFeed() {
                                             </div>
 
                                             {/* Top Content: Price Banner (Futuristic & Kinetic) */}
-                                            <div className="absolute top-4 right-0 z-20 w-[70%] flex justify-end overflow-visible pointer-events-none">
-                                                {/* Mobile: Always visible (translate-x-0). Desktop: Hidden (translate-x-[85%]) until hover. */}
-                                                <div className="relative transform translate-x-0 lg:translate-x-[85%] lg:group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform bg-zinc-900/90 backdrop-blur-md border-l border-y border-white/10 pl-6 pr-4 py-1.5 shadow-2xl flex items-center gap-1.5"
-                                                    style={{ clipPath: "polygon(15% 0, 100% 0, 100% 100%, 0% 100%)" }}>
+                                            <div className="absolute top-4 right-0 z-20 flex justify-end overflow-visible pointer-events-none"
+                                                style={{ filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.5))" }}>
+                                                {/* Mobile: Always visible (translate-x-0). Desktop: Hidden (translate-x-[90%]) until hover. */}
+                                                <div className="relative transform translate-x-0 lg:translate-x-[90%] lg:group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform flex items-center overflow-hidden"
+                                                    style={{
+                                                        clipPath: "polygon(12px 0, 100% 0, 100% 100%, 0% 100%)",
+                                                        WebkitClipPath: "polygon(12px 0, 100% 0, 100% 100%, 0% 100%)"
+                                                    }}>
 
-                                                    {/* Hint Indicator (Desktop Only) */}
-                                                    <div className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 lg:opacity-100 lg:group-hover:opacity-0 transition-opacity duration-300">
-                                                        <div className="w-0.5 h-3 bg-amber-400/50 rounded-full animate-pulse blur-[1px]" />
-                                                    </div>
+                                                    {/* Background Layer: Premium Gradient Theme */}
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-700 backdrop-blur-xl border-l border-y border-white/20 shadow-[0_0_20px_rgba(139,92,246,0.3)]" />
 
-                                                    {/* Price & Currency (Dynamic Logic) */}
-                                                    <div className="flex items-center">
-                                                        {/* Case MONEY: Green $ Prefix */}
-                                                        {product.currency === 'MONEY' && (
-                                                            <div className="overflow-hidden mr-1">
-                                                                <span className="text-sm font-black tracking-tight text-emerald-500 inline-block transform translate-y-0 lg:translate-y-full lg:group-hover:translate-y-0 transition-transform duration-500 backface-hidden">
-                                                                    $
-                                                                </span>
-                                                            </div>
-                                                        )}
-
-                                                        {/* Price Digits (Always White) */}
-                                                        <div className="flex items-baseline overflow-hidden">
-                                                            {product.price.toString().split('').map((char: string, i: number) => (
-                                                                <span
-                                                                    key={i}
-                                                                    className="text-sm font-black tracking-tight text-white inline-block transform translate-y-0 lg:translate-y-full lg:group-hover:translate-y-0 transition-transform duration-500 backface-hidden"
-                                                                    style={{ transitionDelay: `${50 + (i * 30)}ms` }}
-                                                                >
-                                                                    {char}
-                                                                </span>
-                                                            ))}
+                                                    {/* Content Layer */}
+                                                    <div className="relative pl-7 pr-4 py-1.5 flex items-center gap-1.5">
+                                                        {/* Hint Indicator (Desktop Only) */}
+                                                        <div className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 lg:opacity-100 lg:group-hover:opacity-0 transition-opacity duration-300">
+                                                            <div className="w-0.5 h-3 bg-amber-400/50 rounded-full animate-pulse blur-[1px]" />
                                                         </div>
 
-                                                        {/* Case COINS: Amber Suffix */}
-                                                        {product.currency !== 'MONEY' && (
-                                                            <div className="flex items-baseline overflow-hidden pl-1">
-                                                                {BRANDING.currencySymbol.split('').map((char: string, i: number) => (
+                                                        {/* Price & Currency (Dynamic Logic) */}
+                                                        <div className="flex items-center">
+                                                            {/* Case MONEY: Green $ Prefix */}
+                                                            {product.currency === 'MONEY' && (
+                                                                <div className="overflow-hidden mr-1">
+                                                                    <span className="text-sm font-black tracking-tight text-emerald-500 inline-block transform translate-y-0 lg:translate-y-full lg:group-hover:translate-y-0 transition-transform duration-500 backface-hidden">
+                                                                        $
+                                                                    </span>
+                                                                </div>
+                                                            )}
+
+                                                            {/* Price Digits (Always White) */}
+                                                            <div className="flex items-baseline overflow-hidden">
+                                                                {product.price.toString().split('').map((char: string, i: number) => (
                                                                     <span
                                                                         key={i}
-                                                                        className="text-[8px] font-bold uppercase tracking-widest text-amber-500 inline-block transform translate-y-0 lg:translate-y-full lg:group-hover:translate-y-0 transition-transform duration-500 backface-hidden"
-                                                                        style={{ transitionDelay: `${200 + (i * 30)}ms` }}
+                                                                        className="text-sm font-black tracking-tight text-white inline-block transform translate-y-0 lg:translate-y-full lg:group-hover:translate-y-0 transition-transform duration-500 backface-hidden"
+                                                                        style={{ transitionDelay: `${50 + (i * 30)}ms` }}
                                                                     >
                                                                         {char}
                                                                     </span>
                                                                 ))}
                                                             </div>
-                                                        )}
+
+                                                            {/* Case COINS: Violet Suffix (Matched to Marketplace theme) */}
+                                                            {product.currency !== 'MONEY' && (
+                                                                <div className="flex items-baseline overflow-hidden pl-1">
+                                                                    {BRANDING.currencySymbol.split('').map((char: string, i: number) => (
+                                                                        <span
+                                                                            key={i}
+                                                                            className="text-[8px] font-bold uppercase tracking-widest text-amber-400 inline-block transform translate-y-0 lg:translate-y-full lg:group-hover:translate-y-0 transition-transform duration-500 backface-hidden"
+                                                                            style={{ transitionDelay: `${200 + (i * 30)}ms` }}
+                                                                        >
+                                                                            {char}
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

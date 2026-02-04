@@ -13,6 +13,7 @@ interface PurchaseQuantumOverlayProps {
         id: string;
         name: string;
         price: number;
+        currency: 'MONEY' | 'COINS';
         image?: string;
         owner_id?: string;
     };
@@ -125,7 +126,11 @@ export function PurchaseQuantumOverlay({ product, onSuccess, onClose }: Purchase
                     >
                         <div className="space-y-3 text-center">
                             <h3 className="text-zinc-500 font-black uppercase tracking-[0.3em] text-[10px]">Verificación de Pago</h3>
-                            <h2 className="text-6xl font-black text-white tracking-tighter">{product.price} {BRANDING.currencySymbol}</h2>
+                            <h2 className="text-6xl font-black text-white tracking-tighter">
+                                {product.currency === 'MONEY' && <span className="text-emerald-500 mr-2 text-4xl">$</span>}
+                                {product.price}
+                                {product.currency !== 'MONEY' && <span className="text-amber-400 ml-4 text-4xl">{BRANDING.currencySymbol}</span>}
+                            </h2>
                             <p className="text-zinc-400 font-medium text-sm">{product.name}</p>
                         </div>
 

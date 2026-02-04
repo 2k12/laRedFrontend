@@ -40,7 +40,7 @@ export default function FeaturedSlide() {
                         {/* Background Image with Parallax-esque scale */}
                         <div className="absolute inset-0 overflow-hidden">
                             <img
-                                src={current.image_url || current.image}
+                                src={(current.images && current.images.length > 0) ? current.images[0] : (current.image_url || current.image)}
                                 alt={current.name}
                                 className="w-full h-full object-cover opacity-50 sm:opacity-60 transition-transform duration-[10s] ease-linear hover:scale-110"
                             />

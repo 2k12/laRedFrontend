@@ -602,10 +602,18 @@ export default function StoreProductsPage() {
                                 className={`group relative bg-zinc-900/30 border border-white/5 rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-8 hover:bg-zinc-900/50 transition-all duration-500 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 md:gap-8 ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''} ${draggedProductId === product.id ? 'border-primary opacity-40 grayscale scale-[0.98]' : ''}`}
                             >
                                 <div className="flex flex-row lg:flex-row items-center gap-4 md:gap-8 w-full lg:w-auto pointer-events-none">
-                                    <div className="relative w-14 h-14 md:w-20 md:h-20 bg-zinc-950 rounded-xl md:rounded-2xl border border-white/5 flex items-center justify-center text-zinc-800 group-hover:text-primary transition-colors shrink-0">
-                                        <Package className="w-7 h-7 md:w-10 md:h-10" />
+                                    <div className="relative w-14 h-14 md:w-20 md:h-20 bg-zinc-950 rounded-xl md:rounded-2xl border border-white/5 flex items-center justify-center text-zinc-800 group-hover:text-primary transition-colors shrink-0 overflow-hidden">
+                                        {product.images && product.images.length > 0 ? (
+                                            <img
+                                                src={product.images[0]}
+                                                alt={product.name}
+                                                className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity"
+                                            />
+                                        ) : (
+                                            <Package className="w-7 h-7 md:w-10 md:h-10" />
+                                        )}
                                         {product.stock === 0 && (
-                                            <div className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-bounce">
+                                            <div className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-bounce z-10">
                                                 <ShieldAlert className="w-3 h-3 md:w-4 md:h-4" />
                                             </div>
                                         )}
