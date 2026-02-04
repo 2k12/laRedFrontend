@@ -95,7 +95,7 @@ export default function AdminStoresPage() {
 
   // QR Scanner Logic with robust initialization
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+    let timeoutId: NodeJS.Timeout | undefined;
     let attempts = 0;
     const MAX_ATTEMPTS = 50; // Try for 5 seconds
 
