@@ -4,7 +4,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Store, Plus, Edit2, Trash2, Package, ArrowRight, ShoppingCart, Clock, Share2, ScanLine, Loader2 } from "lucide-react";
+import { Store, Plus, Edit2, Trash2, Package, ArrowRight, ShoppingCart, Clock, Share2, ScanLine, Loader2, AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { MinimalButton } from "@/components/MinimalButton";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/PageHeader";
 import { BRANDING } from "@/config/branding";
 import { API_BASE_URL } from "@/config/api";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import QrScanner from 'qr-scanner';
 
 interface StoreData {
   id: string;
@@ -41,7 +41,11 @@ export default function AdminStoresPage() {
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [storeToDelete, setStoreToDelete] = useState<string | null>(null);
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+
+  // QR Scanner Refs
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const scannerRef = useRef<QrScanner | null>(null);
+  const [hasCamera, setHasCamera] = useState<boolean | null>(null);
 
   const viewMode = searchParams.get('view') || (user?.roles.includes('ADMIN') ? 'all' : 'mine');
 
@@ -89,44 +93,96 @@ export default function AdminStoresPage() {
     }
   }, [user]);
 
-  // QR Scanner Logic
+  // QR Scanner Logic with robust initialization
   useEffect(() => {
-    if (isQrOpen) {
-      // Small timeout to ensure DOM is ready
-      setTimeout(() => {
-        if (!scannerRef.current) {
-          scannerRef.current = new Html5QrcodeScanner(
-            "reader",
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            /* verbose= */ false
-          );
-          scannerRef.current.render(onScanSuccess, onScanFailure);
+    let timeoutId: NodeJS.Timeout;
+    let attempts = 0;
+    const MAX_ATTEMPTS = 50; // Try for 5 seconds
+
+    const tryStartScanner = () => {
+      // Check if video element is mounted and not null
+      if (videoRef.current) {
+        if (scannerRef.current) return; // Already running
+
+        console.log("Starting QR Scanner...");
+        const scanner = new QrScanner(
+          videoRef.current,
+          result => onScanSuccess(result.data),
+          {
+            highlightScanRegion: true,
+            highlightCodeOutline: true,
+            maxScansPerSecond: 5,
+            preferredCamera: 'environment'
+          }
+        );
+
+        scannerRef.current = scanner;
+        scanner.start()
+          .then(() => {
+            console.log("Scanner started successfully");
+            setHasCamera(true);
+          })
+          .catch((e) => {
+            console.error("Scanner failed to start:", e);
+            setHasCamera(false);
+          });
+      } else {
+        // Video ref not ready, retry
+        attempts++;
+        if (attempts < MAX_ATTEMPTS) {
+          // console.log(`Waiting for video element... (${attempts}/${MAX_ATTEMPTS})`);
+          timeoutId = setTimeout(tryStartScanner, 100);
+        } else {
+          console.error("Video element never mounted");
+          setHasCamera(false);
         }
-      }, 100);
+      }
+    };
+
+    if (isQrOpen) {
+      // Initial delay to allow Dialog to render
+      // Reset state
+      setHasCamera(null);
+      timeoutId = setTimeout(tryStartScanner, 300);
     } else {
       if (scannerRef.current) {
-        scannerRef.current.clear().catch(console.error);
+        scannerRef.current.stop();
+        scannerRef.current.destroy();
         scannerRef.current = null;
       }
+      clearTimeout(timeoutId);
     }
 
     return () => {
+      clearTimeout(timeoutId);
       if (scannerRef.current) {
-        scannerRef.current.clear().catch(console.error);
+        scannerRef.current.stop();
+        scannerRef.current.destroy();
         scannerRef.current = null;
       }
     };
   }, [isQrOpen]);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const onScanSuccess = async (decodedText: string, _decodedResult: any) => {
-    if (submitting) return; // Prevent double submit
+  // Clean up on unmount just in case
+  useEffect(() => {
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current.destroy();
+      }
+    }
+  }, []);
+
+  const onScanSuccess = async (decodedText: string) => {
+    if (submitting) return;
     setSubmitting(true);
 
-    // Stop scanning immediately
+    // Pause scanner
     if (scannerRef.current) {
-      scannerRef.current.pause();
+      scannerRef.current.stop();
     }
+
+    // Haptic Feedback
+    if ('vibrate' in navigator) navigator.vibrate(200);
 
     try {
       const token = localStorage.getItem('token');
@@ -147,24 +203,20 @@ export default function AdminStoresPage() {
         setIsQrOpen(false); // Close modal
       } else {
         toast.error("Error de Verificación", { description: data.error || "Código inválido o ya registrado." });
-        // Resume scanning if error
+        // Resume scanning if error (Restart)
         if (scannerRef.current) {
-          scannerRef.current.resume();
+          scannerRef.current.start();
         }
       }
     } catch (e) {
       console.error(e);
       toast.error("Error de Conexión");
       if (scannerRef.current) {
-        scannerRef.current.resume();
+        scannerRef.current.start();
       }
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const onScanFailure = (_error: any) => {
-    // console.warn(`Code scan error = ${error}`);
   };
 
   const handleCreate = async () => {
@@ -310,23 +362,67 @@ export default function AdminStoresPage() {
                     Vincular Carnet
                   </MinimalButton>
                 </DialogTrigger>
-                <DialogContent className="bg-zinc-950 border border-white/10 text-white w-[90%] sm:max-w-md rounded-[2rem] p-6">
-                  <DialogHeader>
-                    <DialogTitle className="text-center">Escanear Carnet</DialogTitle>
-                    <DialogDescription className="text-zinc-400 text-center">
-                      Escanea el código QR de tu carnet para verificar tu identidad y habilitar la creación de tiendas.
-                    </DialogDescription>
-                  </DialogHeader>
+                <DialogContent className="bg-zinc-950 border border-white/10 text-white w-[90%] md:w-[500px] border-none bg-transparent shadow-none p-0 flex items-center justify-center">
 
-                  <div className="flex flex-col items-center justify-center py-6 min-h-[300px]">
-                    <div id="reader" className="w-full h-full overflow-hidden rounded-xl border border-white/10 bg-black"></div>
-                    {submitting && (
-                      <div className="mt-4 flex items-center gap-2 text-emerald-400">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span className="text-xs font-bold uppercase tracking-wider">Verificando...</span>
+                  {/* Standardized QR Scanner UI */}
+                  <div className="relative w-full max-w-[350px] aspect-square group mx-auto">
+                    {/* Minimalist Scanner Frame */}
+                    <div className="absolute inset-0 z-10 pointer-events-none border-[12px] border-black/40 backdrop-blur-[2px] rounded-[2.5rem]">
+                      {/* Scanning Animation */}
+                      <div className="absolute inset-[2px] overflow-hidden rounded-[2rem]">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-primary/40 shadow-[0_0_15px_rgba(255,255,255,0.5)] animate-[scanline_3s_linear_infinite]" />
                       </div>
-                    )}
+
+                      {/* Corners */}
+                      <div className="absolute top-0 left-0 w-10 h-10 border-t-2 border-l-2 border-primary/60 rounded-tl-[2rem]" />
+                      <div className="absolute top-0 right-0 w-10 h-10 border-t-2 border-r-2 border-primary/60 rounded-tr-[2rem]" />
+                      <div className="absolute bottom-0 left-0 w-10 h-10 border-b-2 border-l-2 border-primary/60 rounded-bl-[2rem]" />
+                      <div className="absolute bottom-0 right-0 w-10 h-10 border-b-2 border-r-2 border-primary/60 rounded-br-[2rem]" />
+                    </div>
+
+                    <div className="w-full h-full bg-zinc-950 rounded-[2.5rem] overflow-hidden shadow-2xl relative border border-white/5">
+                      <video
+                        ref={videoRef}
+                        className="w-full h-full object-cover grayscale-[0.5] contrast-125"
+                      />
+
+                      {/* No Camera Access State */}
+                      {hasCamera === false && (
+                        <div className="absolute inset-0 bg-zinc-900 flex flex-col items-center justify-center text-center p-8 z-20">
+                          <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+                          <h3 className="text-lg font-bold uppercase mb-2">Error de Acceso</h3>
+                          <p className="text-xs text-zinc-500 max-w-[200px]">No pudimos acceder a tu cámara.</p>
+                        </div>
+                      )}
+
+                      {/* Submitting Overlay */}
+                      {submitting && (
+                        <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-30 backdrop-blur-sm">
+                          <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mb-4" />
+                          <span className="text-sm font-bold uppercase tracking-widest text-emerald-500">Verificando...</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Status Indicator */}
+                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3 px-5 py-2 bg-black border border-white/10 rounded-full shadow-2xl whitespace-nowrap overflow-hidden">
+                      <div className={`w-2 h-2 rounded-full ${submitting ? 'bg-emerald-500' : 'bg-primary'} animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.5)]`} />
+                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">
+                        {submitting ? 'VALIDANDO' : 'ESCANEA TU CARNET'}
+                      </span>
+                    </div>
                   </div>
+
+                  {/* CSS for scanline animation if not global */}
+                  <style dangerouslySetInnerHTML={{
+                    __html: `
+                    @keyframes scanline {
+                        0% { transform: translateY(0); opacity: 0; }
+                        10% { opacity: 1; }
+                        90% { opacity: 1; }
+                        100% { transform: translateY(300px); opacity: 0; }
+                    }
+                `}} />
 
                 </DialogContent>
               </Dialog>
@@ -545,7 +641,7 @@ export default function AdminStoresPage() {
         <AlertDialog open={!!storeToDelete} onOpenChange={(open) => !open && setStoreToDelete(null)}>
           <AlertDialogContent className="bg-zinc-950 border-zinc-900 text-white">
             <AlertDialogHeader>
-              <AlertDialogTitle>¿Está absolutamente seguro?</AlertDialogTitle>
+              <AlertDialogTitle>¿Está absolutely seguro?</AlertDialogTitle>
               <AlertDialogDescription className="text-zinc-400">
                 Esta acción no se puede deshacer. Esto eliminará permanentemente la {BRANDING.storeName.toLowerCase()} y todos sus datos asociados.
               </AlertDialogDescription>

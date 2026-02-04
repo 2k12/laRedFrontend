@@ -37,6 +37,7 @@ interface RewardEvent {
     remaining_budget: number;
     is_active: boolean;
     created_at: string;
+    qr_refresh_rate?: number;
 }
 
 export default function AdminRewardsPage() {
@@ -53,7 +54,8 @@ export default function AdminRewardsPage() {
         name: '',
         description: '',
         reward_amount: '5',
-        total_budget: '100'
+        total_budget: '100',
+        qr_refresh_rate: '60'
     });
 
     // AlertDialog States
@@ -118,12 +120,19 @@ export default function AdminRewardsPage() {
     useEffect(() => {
         let interval: NodeJS.Timeout;
         if (selectedEvent) {
-            fetchToken(selectedEvent.id);
+            const refreshRate = selectedEvent.qr_refresh_rate || 60;
+
+            // Only fetch initial token if we haven't already or if event changed
+            if (!currentToken) {
+                fetchToken(selectedEvent.id);
+                setCountdown(refreshRate);
+            }
+
             interval = setInterval(() => {
                 setCountdown((prev) => {
                     if (prev <= 1) {
                         fetchToken(selectedEvent.id);
-                        return 60;
+                        return refreshRate;
                     }
                     return prev - 1;
                 });
@@ -144,7 +153,8 @@ export default function AdminRewardsPage() {
                 body: JSON.stringify({
                     ...formData,
                     reward_amount: parseInt(formData.reward_amount),
-                    total_budget: parseInt(formData.total_budget)
+                    total_budget: parseInt(formData.total_budget),
+                    qr_refresh_rate: parseInt(formData.qr_refresh_rate)
                 })
             });
 
@@ -153,7 +163,7 @@ export default function AdminRewardsPage() {
                 setIsCreateOpen(false);
                 fetchEvents();
                 fetchVaultBalance();
-                setFormData({ name: '', description: '', reward_amount: '5', total_budget: '100' });
+                setFormData({ name: '', description: '', reward_amount: '5', total_budget: '100', qr_refresh_rate: '60' });
             } else {
                 const err = await res.json();
                 toast.error(err.error || "Error al crear evento");
@@ -282,6 +292,16 @@ export default function AdminRewardsPage() {
                                         onChange={e => setFormData({ ...formData, total_budget: e.target.value })}
                                     />
                                 </div>
+                            </div>
+                            <div className="grid gap-2">
+                                <Label>Tiempo de Refresco (segundos)</Label>
+                                <Input
+                                    type="number"
+                                    className="bg-zinc-900 border-zinc-800"
+                                    value={formData.qr_refresh_rate}
+                                    onChange={e => setFormData({ ...formData, qr_refresh_rate: e.target.value })}
+                                    placeholder="Defecto: 60"
+                                />
                             </div>
                             <MinimalButton
                                 className="w-full mt-4"
