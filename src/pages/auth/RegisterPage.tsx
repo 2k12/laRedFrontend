@@ -105,7 +105,7 @@ export default function RegisterPage() {
 
                 <div className="register-element space-y-2 text-center">
                     <h1 className="text-3xl font-bold tracking-tighter text-foreground">Registro</h1>
-                    <p className="text-muted-foreground text-sm uppercase text-[10px] font-black tracking-widest">Crea tu identidad digital</p>
+                    <p className="text-muted-foreground text-sm  text-[10px]  tracking-widest">Crea tu identidad digital</p>
                 </div>
 
                 <form onSubmit={handleRegister} className="register-element space-y-5">

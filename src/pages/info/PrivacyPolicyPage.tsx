@@ -82,8 +82,8 @@ export default function PrivacyPolicyPage() {
                         <Section number="01" title="Recopilación de Datos">
                             <p>
                                 {BRANDING.appName} opera bajo principios de minimización de datos. Recopilamos únicamente
-                                identificadores criptográficos institucionales y metadatos de transacciones necesarios para
-                                el consenso del ledger. Su identidad física está desacoplada de su identidad digital pública.
+                                identificadores institucionales y metadatos de transacciones necesarios para
+                                la trazabilidad de las transacciones. Su identidad física está desacoplada de su identidad digital pública.
                             </p>
                         </Section>
 

@@ -84,11 +84,11 @@ export default function DashboardProductsPage() {
 
             const data = await res.json();
             if (res.ok) {
-                toast.success("Producto creado exitosamente");
+                toast.success("Drop creado exitosamente");
                 setIsOpen(false);
                 setFormData({ name: "", description: "", price: "", stock: "", category: "", store_id: "" });
             } else {
-                toast.error(data.error || "Error al crear producto");
+                toast.error(data.error || "Error al crear drop");
             }
         } catch (e) {
             toast.error("Error de conexión");

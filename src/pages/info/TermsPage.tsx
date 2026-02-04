@@ -91,7 +91,7 @@ export default function TermsPage() {
                             <p>
                                 Los "{BRANDING.currencyNamePlural}" (PL) son créditos digitales de uso exclusivo dentro de la plataforma.
                                 No tienen valor monetario fuera del sistema {BRANDING.appName} y su uso está limitado al
-                                intercambio de productos y servicios autorizados en el campus.
+                                intercambio de drops y servicios autorizados en el campus.
                             </p>
                         </Section>
 
@@ -108,6 +108,18 @@ export default function TermsPage() {
                                 {BRANDING.appName} se esfuerza por mantener un tiempo de actividad (uptime) continuo,
                                 pero no se hace responsable por interrupciones temporales por mantenimiento o fallos de red.
                                 Opere con responsabilidad.
+                            </p>
+                        </Section>
+
+                        <Section number="05" title="Funciones de Mercado">
+                            <p>
+                                La plataforma habilita el comercio flexible: ahora puedes listar drops tanto en
+                                <strong className="text-white"> {BRANDING.currencyNamePlural} (PL)</strong> como en
+                                <strong className="text-white"> Dinero Real ($)</strong>.
+                                <br /><br />
+                                <span className="text-amber-500/80">REQUISITO DE SEGURIDAD:</span> Para salvaguardar la confianza del ecosistema,
+                                todo usuario que desee <strong>Crear Estaciones de Compra</strong> o <strong>Publicar Drops</strong> debe
+                                validar su identidad escaneando su <strong>Carnet Universitario</strong>.
                             </p>
                         </Section>
                     </div>

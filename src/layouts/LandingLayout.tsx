@@ -52,7 +52,7 @@ export default function LandingLayout() {
           </div>
 
           {/* Center Nav Links (Hidden on mobile) */}
-          <nav className="hidden lg:flex items-center gap-1 bg-black/20 rounded-full px-2 py-1 border border-white/5">
+          <nav className="hidden md:flex items-center gap-1 bg-black/20 rounded-full px-2 py-1 border border-white/5">
             {[
               { name: 'Mercado', path: '/marketplace' },
               { name: 'Funciones', path: '/features' }

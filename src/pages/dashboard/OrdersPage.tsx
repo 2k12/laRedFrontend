@@ -113,7 +113,7 @@ export default function OrdersPage() {
                         {loading ? (
                             <LoadingState />
                         ) : sales.length === 0 ? (
-                            <EmptyState message="Aún no has vendido nada. ¡Publica un producto!" />
+                            <EmptyState message="Aún no has vendido nada. ¡Publica un drop!" />
                         ) : (
                             <div className="grid gap-6">
                                 {sales.map((order) => (

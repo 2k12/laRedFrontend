@@ -41,7 +41,7 @@ export default function ProductTransferPage() {
             const data = await res.json();
             if (res.ok) setProduct(data);
         } catch (e) {
-            toast.error("Error al obtener información del producto");
+            toast.error("Error al obtener información del drop");
         }
     };
 

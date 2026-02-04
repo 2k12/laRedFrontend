@@ -20,6 +20,7 @@ export default function MarketplaceFeed() {
     // Use Global Filters
     const {
         searchTerm, priceRange, selectedStatus, selectedCategory, selectedStore, setSelectedStore,
+        selectedCurrency, // New filter
         page, setPage, setTotalPages, limit
     } = useFilters();
 
@@ -35,7 +36,7 @@ export default function MarketplaceFeed() {
     // Reset page when filters change (except page itself)
     useEffect(() => {
         setPage(1);
-    }, [searchTerm, priceRange, selectedStatus, selectedCategory, selectedStore, limit, setPage]);
+    }, [searchTerm, priceRange, selectedStatus, selectedCategory, selectedStore, selectedCurrency, limit, setPage]);
 
     // Fetch Products
     useEffect(() => {
@@ -49,6 +50,8 @@ export default function MarketplaceFeed() {
         if (priceRange < 5000) params.append('maxPrice', priceRange.toString());
         if (selectedStatus !== 'all') params.append('status', selectedStatus);
         if (selectedCategory) params.append('category', selectedCategory);
+        if (selectedCurrency !== 'all') params.append('currency', selectedCurrency);
+
         const currentStoreId = new URLSearchParams(window.location.search).get('storeId') || selectedStore;
         if (currentStoreId) params.append('storeId', currentStoreId);
 
@@ -69,7 +72,7 @@ export default function MarketplaceFeed() {
                 console.error("Error fetching products:", err);
                 setLoading(false);
             });
-    }, [page, limit, searchTerm, priceRange, selectedStatus, selectedCategory, selectedStore, setTotalPages]);
+    }, [page, limit, searchTerm, priceRange, selectedStatus, selectedCategory, selectedStore, selectedCurrency, setTotalPages]);
 
     const handleProductClick = async (productId: number) => {
         setIsExiting(true);

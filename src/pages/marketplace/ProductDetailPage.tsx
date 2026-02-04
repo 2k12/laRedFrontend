@@ -123,7 +123,7 @@ export default function ProductDetailPage() {
                             exit={{ opacity: 0, x: 20 }}
                             onClick={() => navigate(`/feed/product/${product.prev_id}`)}
                             className="w-12 h-12 rounded-full border border-white/10 bg-black/20 backdrop-blur-md flex items-center justify-center text-zinc-400 hover:text-white hover:bg-black/40 hover:scale-110 transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]"
-                            title="Producto Anterior"
+                            title="Drop Anterior"
                         >
                             <ChevronLeft className="w-6 h-6" />
                         </motion.button>
@@ -138,7 +138,7 @@ export default function ProductDetailPage() {
                             exit={{ opacity: 0, x: 20 }}
                             onClick={() => navigate(`/feed/product/${product.next_id}`)}
                             className="w-12 h-12 rounded-full border border-white/10 bg-black/20 backdrop-blur-md flex items-center justify-center text-zinc-400 hover:text-white hover:bg-black/40 hover:scale-110 transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]"
-                            title="Producto Siguiente"
+                            title="Drop Siguiente"
                         >
                             <ChevronRight className="w-6 h-6" />
                         </motion.button>

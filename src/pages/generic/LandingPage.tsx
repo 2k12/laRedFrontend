@@ -76,8 +76,14 @@ export default function LandingPage() {
 
                     <motion.div
                         variants={itemVariants}
-                        className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4 md:pt-8 w-full sm:w-auto px-6 sm:px-0"
+                        className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 md:pt-8 w-full sm:w-auto px-6 sm:px-0"
                     >
+                        <Link to="/marketplace" className="w-full sm:w-auto">
+                            <Button variant="outline" className="h-12 md:h-16 w-full sm:w-auto px-6 md:px-10 rounded-full border-white/10 text-white hover:bg-white/5 text-sm md:text-lg font-normal transition-all duration-300">
+                                Explorar Mercado
+                            </Button>
+                        </Link>
+
                         <Link to="/login" className="w-full sm:w-auto">
                             <Magnetic>
                                 <Button className="h-12 md:h-16 w-full sm:w-auto px-6 md:px-10 rounded-full bg-primary text-primary-foreground hover:bg-white hover:text-black text-sm md:text-lg font-normal transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary/20">
@@ -122,22 +128,22 @@ export default function LandingPage() {
                         <BankingCard
                             index={1}
                             icon={<Globe className="w-5 h-5" />}
-                            title="Ecosistema Digital"
-                            desc={`Conecta con todos los comercios del campus en tiempo real. Un mercado centralizado para la comunidad universitaria.`}
+                            title="Mercado Híbrido"
+                            desc={`Compra y vende libremente usando ${BRANDING.currencyNamePlural} (PL) o Dinero Real ($). Un ecosistema flexible adaptado a tus necesidades.`}
                             delay={0}
                         />
                         <BankingCard
                             index={2}
                             icon={<Zap className="w-5 h-5" />}
                             title="Pagos Instantáneos"
-                            desc="Transacciones sin fricción. Adquiere productos y servicios al instante mediante nuestra pasarela de pagos digital."
+                            desc="Transacciones sin fricción. Adquiere drops y servicios al instante."
                             delay={0.2}
                         />
                         <BankingCard
                             index={3}
                             icon={<Shield className="w-5 h-5" />}
-                            title="Activos Protegidos"
-                            desc="Seguridad robusta para tus fondos y datos. Garantizamos la integridad de cada intercambio en la plataforma."
+                            title="Verificación Biométrica"
+                            desc="Seguridad de grado institucional. Para crear estaciones de compra y vender, es obligatorio escanear tu Carnet Universitario."
                             delay={0.4}
                         />
                     </div>

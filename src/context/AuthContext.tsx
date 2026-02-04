@@ -7,6 +7,7 @@ interface User {
   email: string;
   roles: string[];
   utn_id?: string;
+  phone?: string;
 }
 
 interface Wallet {

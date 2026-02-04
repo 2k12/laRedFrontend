@@ -32,7 +32,11 @@ interface Product {
     condition: string;
     currency?: 'COINS' | 'MONEY';
     variants?: any[];
+    images?: string[];
 }
+
+import { ImageUpload } from "@/components/ImageUpload";
+
 
 export default function StoreProductsPage() {
     const { id } = useParams(); // Current Store ID
@@ -58,7 +62,8 @@ export default function StoreProductsPage() {
         category_slug: "",
         store_id: id || "",
         condition: "NEW",
-        currency: "COINS"
+        currency: "COINS",
+        images: [] as string[]
     });
     const [variants, setVariants] = useState<{ name: string, sku: string, price_modifier: string, stock: string }[]>([]);
     const [newVariant, setNewVariant] = useState({ name: "", sku: "", price_modifier: "0", stock: "0" });
@@ -135,7 +140,7 @@ export default function StoreProductsPage() {
                 setDraggedProductId(null);
                 setDropTargetId(null);
             } else {
-                toast.error("Error al transferir el producto");
+                toast.error("Error al transferir el drop");
                 // Reset states on error too
                 setIsDragging(false);
                 setDraggedProductId(null);
@@ -193,7 +198,7 @@ export default function StoreProductsPage() {
             if (res.ok) {
                 setProducts(data.products || []);
             } else {
-                toast.error(data.error || "Error al cargar productos");
+                toast.error(data.error || "Error al cargar drops");
             }
         } catch (e) {
             toast.error("Error de conexión");
@@ -252,7 +257,8 @@ export default function StoreProductsPage() {
                     stock: editingProduct.stock,
                     category: editingProduct.category,
                     condition: editingProduct.condition,
-                    currency: editingProduct.currency
+                    currency: editingProduct.currency,
+                    images: editingProduct.images
                 })
             });
             if (res.ok) {
@@ -303,6 +309,7 @@ export default function StoreProductsPage() {
                     stock: parseInt(formData.stock),
                     condition: formData.condition,
                     currency: formData.currency,
+                    images: formData.images,
                     variants: variants
                 })
             });
@@ -310,12 +317,12 @@ export default function StoreProductsPage() {
             if (res.ok) {
                 toast.success(`${BRANDING.productName} creado exitosamente`);
                 setIsCreateOpen(false);
-                setFormData({ name: "", description: "", price: "", stock: "", sku_part: "", category_slug: "", store_id: id || "", condition: "NEW", currency: "COINS" });
+                setFormData({ name: "", description: "", price: "", stock: "", sku_part: "", category_slug: "", store_id: id || "", condition: "NEW", currency: "COINS", images: [] });
                 setVariants([]);
                 fetchProducts();
             } else {
                 const data = await res.json();
-                toast.error(data.error || "Error al crear producto");
+                toast.error(data.error || "Error al crear drop");
             }
         } catch (e) {
             toast.error("Error de conexión");
@@ -454,6 +461,15 @@ export default function StoreProductsPage() {
                                         <span className="font-medium tracking-tight">Límite para {selectedCat.name}: <strong className="text-white">{priceLimit} {BRANDING.currencySymbol}</strong></span>
                                     </div>
                                 )}
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label className="text-zinc-500 text-[9px] font-black uppercase">Imágenes del Drop</Label>
+                                <ImageUpload
+                                    value={formData.images}
+                                    onChange={(urls) => setFormData({ ...formData, images: urls })}
+                                    maxFiles={3}
+                                />
                             </div>
 
                             {/* Variants Manager */}
@@ -654,7 +670,7 @@ export default function StoreProductsPage() {
                                             <button
                                                 onClick={() => setAdProduct(product)}
                                                 className="p-2.5 md:p-3 bg-zinc-950 border border-amber-400/20 rounded-full hover:bg-amber-400/10 text-amber-500 transition-colors"
-                                                title="Promocionar Producto"
+                                                title="Promocionar drop"
                                             >
                                                 <Zap className="w-3.5 h-3.5 fill-amber-500" />
                                             </button>
@@ -900,6 +916,15 @@ export default function StoreProductsPage() {
                                         className="bg-zinc-900 border-zinc-800 h-10 rounded-xl"
                                     />
                                 </div>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label className="text-[9px] font-black uppercase text-zinc-500">Imágenes</Label>
+                                <ImageUpload
+                                    value={editingProduct.images || []}
+                                    onChange={(urls) => setEditingProduct({ ...editingProduct!, images: urls })}
+                                    maxFiles={3}
+                                />
                             </div>
 
                             <div className="grid gap-2">

@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Coins, User, LogOut, Menu, Search, SlidersHorizontal } from "lucide-react";
+import { Coins, User, LogOut, Menu, Search, SlidersHorizontal, RotateCcw } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { MinimalButton } from "@/components/MinimalButton";
 import { useFilters } from "@/context/FilterContext";
@@ -24,7 +24,9 @@ const FeedFilterSheet = ({ children }: { children: ReactNode }) => {
         priceRange, setPriceRange,
         selectedStatus, setSelectedStatus,
         selectedCategory, setSelectedCategory,
-        selectedStore, setSelectedStore
+        selectedStore, setSelectedStore,
+        selectedCurrency, setSelectedCurrency,
+        setSearchTerm, setPage
     } = useFilters();
 
     const [stores, setStores] = useState<{ id: string, name: string }[]>([]);
@@ -36,17 +38,38 @@ const FeedFilterSheet = ({ children }: { children: ReactNode }) => {
             .catch(err => console.error("Error fetching stores:", err));
     }, []);
 
+    const handleReset = () => {
+        setPriceRange(5000);
+        setSelectedStatus("all");
+        setSelectedCategory(null);
+        setSelectedStore(null);
+        setSelectedCurrency("all");
+        setSearchTerm("");
+        setPage(1);
+    };
+
     return (
         <Sheet>
             <SheetTrigger asChild>
                 {children}
             </SheetTrigger>
             <SheetContent className="bg-zinc-950 border-zinc-800 text-white w-[400px] sm:w-[540px] overflow-y-auto max-h-screen">
-                <SheetHeader className="mb-8">
-                    <SheetTitle className="text-2xl font-bold text-white">Filtros Avanzados</SheetTitle>
-                    <SheetDescription className="text-zinc-400">
-                        Ajusta los parámetros de búsqueda.
-                    </SheetDescription>
+                <SheetHeader className="mb-8 flex flex-row items-center justify-between space-y-0">
+                    <div className="space-y-1">
+                        <SheetTitle className="text-2xl font-bold text-white">Filtros Avanzados</SheetTitle>
+                        <SheetDescription className="text-zinc-400">
+                            Ajusta los parámetros de búsqueda.
+                        </SheetDescription>
+                    </div>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleReset}
+                        className="text-zinc-500 hover:text-white hover:bg-white/10"
+                    >
+                        <RotateCcw className="w-4 h-4 mr-2" />
+                        Limpiar
+                    </Button>
                 </SheetHeader>
 
                 <div className="space-y-8">
@@ -74,7 +97,9 @@ const FeedFilterSheet = ({ children }: { children: ReactNode }) => {
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <Label className="text-sm font-bold uppercase tracking-wider text-zinc-500">Precio Máximo</Label>
-                            <span className="text-xs font-mono text-white bg-white/10 px-2 py-1 rounded">{priceRange} {BRANDING.currencySymbol}</span>
+                            <span className="text-xs font-mono text-white bg-white/10 px-2 py-1 rounded">
+                                {priceRange} {selectedCurrency === 'MONEY' ? '$' : BRANDING.currencySymbol}
+                            </span>
                         </div>
                         <input
                             type="range"
@@ -85,6 +110,31 @@ const FeedFilterSheet = ({ children }: { children: ReactNode }) => {
                             onChange={(e) => setPriceRange(Number(e.target.value))}
                             className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white"
                         />
+                    </div>
+
+                    {/* Currency Filter */}
+                    <div className="space-y-4 pt-4 border-t border-white/5">
+                        <Label className="text-sm font-bold uppercase tracking-wider text-zinc-500">Tipo de Moneda</Label>
+                        <div className="grid grid-cols-3 gap-2">
+                            {[
+                                { id: 'all', label: 'Todos' },
+                                { id: 'COINS', label: BRANDING.currencySymbol },
+                                { id: 'MONEY', label: '$' }
+                            ].map((curr) => {
+                                const isSelected = selectedCurrency === curr.id;
+                                return (
+                                    <div
+                                        key={curr.id}
+                                        onClick={() => setSelectedCurrency(curr.id)}
+                                        className={`flex items-center justify-center p-2.5 rounded-xl border transition-all cursor-pointer ${isSelected
+                                            ? 'bg-zinc-800 border-white/20 text-white font-bold'
+                                            : 'bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-white hover:border-white/10'}`}
+                                    >
+                                        <span className="text-xs">{curr.label}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
 
                     {/* Store Selector */}

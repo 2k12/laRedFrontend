@@ -38,7 +38,7 @@ export default function DashboardPage() {
             setFormData({
                 name: user.name,
                 email: user.email,
-                phone: ""
+                phone: user.phone || ""
             });
         }
     }, [user]);
@@ -243,7 +243,7 @@ export default function DashboardPage() {
 
                             <Dialog open={isEditing} onOpenChange={setIsEditing}>
                                 <DialogTrigger asChild>
-                                    <MinimalButton onClick={() => setFormData({ name: user?.name || "", email: user?.email || "", phone: "" })} icon={<Edit2 className="w-3 h-3" />}>
+                                    <MinimalButton onClick={() => setFormData({ name: user?.name || "", email: user?.email || "", phone: user?.phone || "" })} icon={<Edit2 className="w-3 h-3" />}>
                                         Editar
                                     </MinimalButton>
                                 </DialogTrigger>

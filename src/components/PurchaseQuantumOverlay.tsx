@@ -189,7 +189,7 @@ export function PurchaseQuantumOverlay({ product, onSuccess, onClose }: Purchase
                                     <AlertCircle className="h-4 w-4 text-amber-500" />
                                     <AlertTitle className="text-amber-500 text-[10px] font-black uppercase tracking-[0.2em] mb-0">Protección Activa</AlertTitle>
                                     <AlertDescription className="text-zinc-400 text-[10px] font-medium leading-relaxed">
-                                        No puedes adquirir tus propios activos. Registra este producto desde otra cuenta para pruebas.
+                                        No puedes adquirir tus propios activos.
                                     </AlertDescription>
                                 </Alert>
                             ) : (
