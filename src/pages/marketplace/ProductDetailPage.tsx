@@ -355,7 +355,11 @@ export default function ProductDetailPage() {
                                         transition={{ delay: 0.4 }}
                                         className="gsap-price flex items-baseline gap-4"
                                     >
-                                        <span className="text-3xl md:text-4xl font-bold text-white tracking-tight">{product.price} {BRANDING.currencySymbol}</span>
+                                        <span className="text-3xl md:text-4xl font-bold text-white tracking-tight">
+                                            {product.currency === 'MONEY' && <span className="text-emerald-500 mr-1">$</span>}
+                                            {product.price}
+                                            {product.currency !== 'MONEY' && <span className="text-amber-500 ml-2 font-black text-2xl">{BRANDING.currencySymbol}</span>}
+                                        </span>
                                         <div className="flex flex-col gap-0.5">
                                             <span className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-widest font-medium">Precio Final</span>
                                             {product.stock <= 5 && product.stock > 0 && (

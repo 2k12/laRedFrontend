@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Store, Plus, Edit2, Trash2, Package, ArrowRight, ShoppingCart, Clock, Share2 } from "lucide-react";
+import { Store, Plus, Edit2, Trash2, Package, ArrowRight, ShoppingCart, Clock, Share2, ScanLine, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { MinimalButton } from "@/components/MinimalButton";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/PageHeader";
 import { BRANDING } from "@/config/branding";
 import { API_BASE_URL } from "@/config/api";
+import { Html5QrcodeScanner } from "html5-qrcode";
 
 interface StoreData {
   id: string;
@@ -28,34 +29,31 @@ interface UserListItem {
 }
 
 export default function AdminStoresPage() {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [stores, setStores] = useState<StoreData[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isQrOpen, setIsQrOpen] = useState(false);
   const [editingStore, setEditingStore] = useState<StoreData | null>(null);
   const [formData, setFormData] = useState({ name: "", description: "", owner_id: "" });
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [storeToDelete, setStoreToDelete] = useState<string | null>(null);
+  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
 
   const viewMode = searchParams.get('view') || (user?.roles.includes('ADMIN') ? 'all' : 'mine');
 
   // Fetch stores based on role and view mode
   useEffect(() => {
     fetchStores();
-  }, [user, viewMode]); // Re-fetch when viewMode changes
+  }, [user, viewMode]);
 
   const fetchStores = async () => {
     if (!user) return;
     try {
       const token = localStorage.getItem('token');
-      // const isAdmin = user.roles.includes('ADMIN');
-
-      // Determine Endpoint based on View Mode
-      // 'all' -> All stores (Directory)
-      // 'mine' -> My stores (Management)
       const endpoint = viewMode === 'all'
         ? `${API_BASE_URL}/api/stores/all`
         : `${API_BASE_URL}/api/stores/me`;
@@ -90,6 +88,84 @@ export default function AdminStoresPage() {
       fetchUsers();
     }
   }, [user]);
+
+  // QR Scanner Logic
+  useEffect(() => {
+    if (isQrOpen) {
+      // Small timeout to ensure DOM is ready
+      setTimeout(() => {
+        if (!scannerRef.current) {
+          scannerRef.current = new Html5QrcodeScanner(
+            "reader",
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            /* verbose= */ false
+          );
+          scannerRef.current.render(onScanSuccess, onScanFailure);
+        }
+      }, 100);
+    } else {
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch(console.error);
+        scannerRef.current = null;
+      }
+    }
+
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch(console.error);
+        scannerRef.current = null;
+      }
+    };
+  }, [isQrOpen]);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const onScanSuccess = async (decodedText: string, _decodedResult: any) => {
+    if (submitting) return; // Prevent double submit
+    setSubmitting(true);
+
+    // Stop scanning immediately
+    if (scannerRef.current) {
+      scannerRef.current.pause();
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/api/users/link-utnid`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ utn_id: decodedText })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success("Carnet Vinculado", { description: "Tu identidad ha sido verificada exitosamente." });
+        await refreshProfile(); // Refresh user to get the new utn_id
+        setIsQrOpen(false); // Close modal
+      } else {
+        toast.error("Error de Verificación", { description: data.error || "Código inválido o ya registrado." });
+        // Resume scanning if error
+        if (scannerRef.current) {
+          scannerRef.current.resume();
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Error de Conexión");
+      if (scannerRef.current) {
+        scannerRef.current.resume();
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const onScanFailure = (error: any) => {
+    // console.warn(`Code scan error = ${error}`);
+  };
 
   const handleCreate = async () => {
     if (!formData.name.trim()) return;
@@ -191,6 +267,16 @@ export default function AdminStoresPage() {
     });
   };
 
+  // Determine if user can create store
+  // Requirements: ADMIN role OR (utn_id present)
+  // Logic: 
+  // If NOT ADMIN and NO utn_id -> Show "Vincular Carnet" -> Open QR Modal
+  // Else -> Show "Nueva Tienda" -> Open Create Modal
+
+  const isSystem = user?.roles.includes('SYSTEM') || user?.roles.includes('ADMIN'); // Assuming ADMIN can also bypass or just system? Requirement said "cualquier rol que no sea SYSTEM". Let's stick to user.roles.includes('SYSTEM') as the bypass.
+  const hasUtnId = !!user?.utn_id;
+  const canCreateStore = isSystem || hasUtnId;
+
   return (
     <TooltipProvider>
       <main className="container mx-auto max-w-7xl px-4 sm:px-6 pb-20 relative z-10">
@@ -217,68 +303,98 @@ export default function AdminStoresPage() {
               </div>
             )}
 
-            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-              <DialogTrigger asChild>
-                <MinimalButton className="w-full sm:w-auto text-xs" icon={<Plus className="w-4 h-4" />}>
-                  Nueva {BRANDING.storeName}
-                </MinimalButton>
-              </DialogTrigger>
-              <DialogContent className="bg-zinc-950 border border-white/10 text-white w-[90%] sm:max-w-[425px] rounded-[2rem] p-6">
-                <DialogHeader>
-                  <DialogTitle>Crear Nueva {BRANDING.storeName}</DialogTitle>
-                  <DialogDescription className="text-zinc-400">
-                    Define la identidad de tu nueva marca comercial.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="name" className="text-zinc-400">Nombre</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="bg-zinc-900 border-zinc-800 text-white focus:border-white h-12"
-                      placeholder="Ej. TechMasters"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="description" className="text-zinc-400">Descripción</Label>
-                    <Input
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="bg-zinc-900 border-zinc-800 text-white focus:border-white h-12"
-                      placeholder="Breve descripción..."
-                    />
+            {!canCreateStore ? (
+              <Dialog open={isQrOpen} onOpenChange={setIsQrOpen}>
+                <DialogTrigger asChild>
+                  <MinimalButton className="w-full sm:w-auto text-xs bg-amber-500/10 text-amber-500 border-amber-500/50 hover:bg-amber-500/20" icon={<ScanLine className="w-4 h-4" />}>
+                    Vincular Carnet
+                  </MinimalButton>
+                </DialogTrigger>
+                <DialogContent className="bg-zinc-950 border border-white/10 text-white w-[90%] sm:max-w-md rounded-[2rem] p-6">
+                  <DialogHeader>
+                    <DialogTitle className="text-center">Escanear Carnet</DialogTitle>
+                    <DialogDescription className="text-zinc-400 text-center">
+                      Escanea el código QR de tu carnet para verificar tu identidad y habilitar la creación de tiendas.
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="flex flex-col items-center justify-center py-6 min-h-[300px]">
+                    <div id="reader" className="w-full h-full overflow-hidden rounded-xl border border-white/10 bg-black"></div>
+                    {submitting && (
+                      <div className="mt-4 flex items-center gap-2 text-emerald-400">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span className="text-xs font-bold uppercase tracking-wider">Verificando...</span>
+                      </div>
+                    )}
                   </div>
 
-                  {user?.roles.includes('ADMIN') && (
-                    <div className="grid gap-2">
-                      <Label className="text-zinc-400">Asignar Dueño (ADMIN)</Label>
-                      <select
-                        className="bg-zinc-900 border-zinc-800 text-white rounded-md h-12 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-white/10"
-                        value={formData.owner_id}
-                        onChange={(e) => setFormData({ ...formData, owner_id: e.target.value })}
-                      >
-                        <option value="">Utilizar mi cuenta</option>
-                        {users.map(u => (
-                          <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-                </div>
-                <DialogFooter>
-                  <MinimalButton
-                    onClick={handleCreate}
-                    disabled={submitting || !formData.name.trim()}
-                    className="w-full justify-center h-12 rounded-xl"
-                  >
-                    {submitting ? "Creando..." : `Lanzar ${BRANDING.storeName}`}
+                </DialogContent>
+              </Dialog>
+            ) : (
+              <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                <DialogTrigger asChild>
+                  <MinimalButton className="w-full sm:w-auto text-xs" icon={<Plus className="w-4 h-4" />}>
+                    Nueva {BRANDING.storeName}
                   </MinimalButton>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent className="bg-zinc-950 border border-white/10 text-white w-[90%] sm:max-w-[425px] rounded-[2rem] p-6">
+                  <DialogHeader>
+                    <DialogTitle>Crear Nueva {BRANDING.storeName}</DialogTitle>
+                    <DialogDescription className="text-zinc-400">
+                      Define la identidad de tu nueva marca comercial.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="name" className="text-zinc-400">Nombre</Label>
+                      <Input
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="bg-zinc-900 border-zinc-800 text-white focus:border-white h-12"
+                        placeholder="Ej. TechMasters"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="description" className="text-zinc-400">Descripción</Label>
+                      <Input
+                        id="description"
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        className="bg-zinc-900 border-zinc-800 text-white focus:border-white h-12"
+                        placeholder="Breve descripción..."
+                      />
+                    </div>
+
+                    {user?.roles.includes('ADMIN') && (
+                      <div className="grid gap-2">
+                        <Label className="text-zinc-400">Asignar Dueño (ADMIN)</Label>
+                        <select
+                          className="bg-zinc-900 border-zinc-800 text-white rounded-md h-12 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-white/10"
+                          value={formData.owner_id}
+                          onChange={(e) => setFormData({ ...formData, owner_id: e.target.value })}
+                        >
+                          <option value="">Utilizar mi cuenta</option>
+                          {users.map(u => (
+                            <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                  <DialogFooter>
+                    <MinimalButton
+                      onClick={handleCreate}
+                      disabled={submitting || !formData.name.trim()}
+                      className="w-full justify-center h-12 rounded-xl"
+                    >
+                      {submitting ? "Creando..." : `Lanzar ${BRANDING.storeName}`}
+                    </MinimalButton>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
+
           </div>
         </PageHeader>
 

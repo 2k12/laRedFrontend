@@ -189,30 +189,44 @@ export default function MarketplaceFeed() {
                                                         <div className="w-0.5 h-3 bg-amber-400/50 rounded-full animate-pulse blur-[1px]" />
                                                     </div>
 
-                                                    {/* Price (Gold & Split Text) */}
-                                                    <div className="flex items-baseline overflow-hidden">
-                                                        {product.price.toString().split('').map((char: string, i: number) => (
-                                                            <span
-                                                                key={i}
-                                                                className="text-sm font-black tracking-tight text-amber-400 inline-block transform translate-y-0 lg:translate-y-full lg:group-hover:translate-y-0 transition-transform duration-500 backface-hidden"
-                                                                style={{ transitionDelay: `${50 + (i * 30)}ms` }}
-                                                            >
-                                                                {char}
-                                                            </span>
-                                                        ))}
-                                                    </div>
+                                                    {/* Price & Currency (Dynamic Logic) */}
+                                                    <div className="flex items-center">
+                                                        {/* Case MONEY: Green $ Prefix */}
+                                                        {product.currency === 'MONEY' && (
+                                                            <div className="overflow-hidden mr-1">
+                                                                <span className="text-sm font-black tracking-tight text-emerald-500 inline-block transform translate-y-0 lg:translate-y-full lg:group-hover:translate-y-0 transition-transform duration-500 backface-hidden">
+                                                                    $
+                                                                </span>
+                                                            </div>
+                                                        )}
 
-                                                    {/* Currency (White & Split Text) */}
-                                                    <div className="flex items-baseline overflow-hidden pl-1">
-                                                        {BRANDING.currencySymbol.split('').map((char: string, i: number) => (
-                                                            <span
-                                                                key={i}
-                                                                className="text-[8px] font-bold uppercase tracking-widest text-zinc-500 inline-block transform translate-y-0 lg:translate-y-full lg:group-hover:translate-y-0 transition-transform duration-500 backface-hidden"
-                                                                style={{ transitionDelay: `${200 + (i * 30)}ms` }}
-                                                            >
-                                                                {char}
-                                                            </span>
-                                                        ))}
+                                                        {/* Price Digits (Always White) */}
+                                                        <div className="flex items-baseline overflow-hidden">
+                                                            {product.price.toString().split('').map((char: string, i: number) => (
+                                                                <span
+                                                                    key={i}
+                                                                    className="text-sm font-black tracking-tight text-white inline-block transform translate-y-0 lg:translate-y-full lg:group-hover:translate-y-0 transition-transform duration-500 backface-hidden"
+                                                                    style={{ transitionDelay: `${50 + (i * 30)}ms` }}
+                                                                >
+                                                                    {char}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+
+                                                        {/* Case COINS: Amber Suffix */}
+                                                        {product.currency !== 'MONEY' && (
+                                                            <div className="flex items-baseline overflow-hidden pl-1">
+                                                                {BRANDING.currencySymbol.split('').map((char: string, i: number) => (
+                                                                    <span
+                                                                        key={i}
+                                                                        className="text-[8px] font-bold uppercase tracking-widest text-amber-500 inline-block transform translate-y-0 lg:translate-y-full lg:group-hover:translate-y-0 transition-transform duration-500 backface-hidden"
+                                                                        style={{ transitionDelay: `${200 + (i * 30)}ms` }}
+                                                                    >
+                                                                        {char}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>

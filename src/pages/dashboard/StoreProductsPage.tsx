@@ -30,6 +30,7 @@ interface Product {
     sku: string;
     category: string;
     condition: string;
+    currency?: 'COINS' | 'MONEY';
     variants?: any[];
 }
 
@@ -56,7 +57,8 @@ export default function StoreProductsPage() {
         sku_part: "",
         category_slug: "",
         store_id: id || "",
-        condition: "NEW"
+        condition: "NEW",
+        currency: "COINS"
     });
     const [variants, setVariants] = useState<{ name: string, sku: string, price_modifier: string, stock: string }[]>([]);
     const [newVariant, setNewVariant] = useState({ name: "", sku: "", price_modifier: "0", stock: "0" });
@@ -88,7 +90,7 @@ export default function StoreProductsPage() {
         fetchStoreTitle();
         fetchFormData();
         fetchOtherStores();
-    }, [id, isCreateOpen, user?.id]);
+    }, [id, isCreateOpen, editingProduct?.id, user?.id]);
 
 
     const fetchOtherStores = async () => {
@@ -148,7 +150,7 @@ export default function StoreProductsPage() {
     };
 
     const fetchFormData = async () => {
-        if (!isCreateOpen) return;
+        if (!isCreateOpen && !editingProduct) return;
         const token = localStorage.getItem('token');
 
         // Load Categories
@@ -225,9 +227,11 @@ export default function StoreProductsPage() {
     const handleUpdate = async () => {
         if (!editingProduct) return;
 
-        // Validation for Price Limit
+        // Validation for Price Limit (Only for COINS)
         const cat = categories.find((c: any) => c.slug === editingProduct.category);
-        if (cat && editingProduct.price > cat.max_price) {
+        const isMoney = editingProduct.currency === 'MONEY';
+
+        if (!isMoney && cat && editingProduct.price > cat.max_price) {
             toast.error(`El precio excede el límite de ${cat.max_price} ${BRANDING.currencySymbol} para ${cat.name}`);
             return;
         }
@@ -247,7 +251,8 @@ export default function StoreProductsPage() {
                     price: editingProduct.price,
                     stock: editingProduct.stock,
                     category: editingProduct.category,
-                    condition: editingProduct.condition
+                    condition: editingProduct.condition,
+                    currency: editingProduct.currency
                 })
             });
             if (res.ok) {
@@ -273,7 +278,9 @@ export default function StoreProductsPage() {
     const selectedCat = categories.find((c: any) => c.slug === formData.category_slug);
     const priceLimit = selectedCat ? selectedCat.max_price : 0;
     const currentPrice = parseFloat(formData.price) || 0;
-    const isOverLimit = selectedCat && currentPrice > priceLimit;
+    // Skip limit check if currency is MONEY
+    const isMoney = formData.currency === 'MONEY';
+    const isOverLimit = !isMoney && selectedCat && currentPrice > priceLimit;
 
     const handleCreate = async () => {
         if (isOverLimit) {
@@ -295,6 +302,7 @@ export default function StoreProductsPage() {
                     price: parseFloat(formData.price),
                     stock: parseInt(formData.stock),
                     condition: formData.condition,
+                    currency: formData.currency,
                     variants: variants
                 })
             });
@@ -302,7 +310,7 @@ export default function StoreProductsPage() {
             if (res.ok) {
                 toast.success(`${BRANDING.productName} creado exitosamente`);
                 setIsCreateOpen(false);
-                setFormData({ name: "", description: "", price: "", stock: "", sku_part: "", category_slug: "", store_id: id || "", condition: "NEW" });
+                setFormData({ name: "", description: "", price: "", stock: "", sku_part: "", category_slug: "", store_id: id || "", condition: "NEW", currency: "COINS" });
                 setVariants([]);
                 fetchProducts();
             } else {
@@ -394,6 +402,18 @@ export default function StoreProductsPage() {
                                         </Select>
                                     </div>
                                     <div className="grid gap-2">
+                                        <Label className="text-zinc-500 text-[9px] font-black uppercase">Moneda</Label>
+                                        <Select value={formData.currency} onValueChange={(v: string) => setFormData({ ...formData, currency: v })}>
+                                            <SelectTrigger className="bg-zinc-900 border-zinc-800 h-10 md:h-12 rounded-xl text-xs">
+                                                <SelectValue placeholder="Moneda" />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-zinc-900 border-zinc-800 text-white z-[200]">
+                                                <SelectItem value="COINS">{BRANDING.currencySymbol} (Puntos)</SelectItem>
+                                                <SelectItem value="MONEY">$ (Dinero Real)</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="grid gap-2">
                                         <Label className="text-zinc-500 text-[9px] font-black uppercase">Estado</Label>
                                         <Select value={formData.condition} onValueChange={(v: string) => setFormData({ ...formData, condition: v })}>
                                             <SelectTrigger className="bg-zinc-900 border-zinc-800 h-10 md:h-12 rounded-xl text-xs">
@@ -415,99 +435,100 @@ export default function StoreProductsPage() {
                                         />
                                     </div>
                                 </div>
+                            </div>
 
-                                <p className="text-[8px] text-zinc-600 font-mono">El SKU final será: {`{ID}-${formData.sku_part || 'GEN'}`}</p>
+                            <p className="text-[8px] text-zinc-600 font-mono">El SKU final será: {`{ID}-${formData.sku_part || 'GEN'}`}</p>
 
 
-                                <div className="grid gap-2">
-                                    <Label className="text-zinc-500 text-[9px] font-black uppercase">Precio ({BRANDING.currencySymbol})</Label>
+                            <div className="grid gap-2">
+                                <Label className="text-zinc-500 text-[9px] font-black uppercase">Precio ({formData.currency === 'MONEY' ? '$' : BRANDING.currencySymbol})</Label>
+                                <Input
+                                    type="number"
+                                    className={`bg-zinc-900 h-10 md:h-12 rounded-xl border-zinc-800 text-xs ${isOverLimit ? 'border-red-500 text-red-500 focus:ring-red-500' : 'focus:border-primary'}`}
+                                    value={formData.price}
+                                    onChange={e => setFormData({ ...formData, price: e.target.value })}
+                                />
+                                {selectedCat && !isMoney && (
+                                    <div className={`text-[9px] flex items-center gap-2 p-3 rounded-lg ${isOverLimit ? 'bg-red-500/10 text-red-400' : 'bg-green-500/5 text-zinc-500'}`}>
+                                        {isOverLimit ? <AlertTriangle className="w-3 h-3 shrink-0" /> : <Info className="w-3 h-3 shrink-0" />}
+                                        <span className="font-medium tracking-tight">Límite para {selectedCat.name}: <strong className="text-white">{priceLimit} {BRANDING.currencySymbol}</strong></span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Variants Manager */}
+                            <div className="grid gap-3 pt-4 border-t border-white/5 mt-2">
+                                <Label className="text-zinc-500 text-[9px] font-black uppercase">Variantes</Label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <Input
+                                        placeholder="Talla/Color"
+                                        className="bg-zinc-900 border-zinc-800 h-10 text-[10px] rounded-lg"
+                                        value={newVariant.name}
+                                        onChange={e => setNewVariant({ ...newVariant, name: e.target.value })}
+                                    />
+                                    <Input
+                                        placeholder="SKU"
+                                        className="bg-zinc-900 border-zinc-800 h-10 text-[10px] rounded-lg"
+                                        value={newVariant.sku}
+                                        onChange={e => setNewVariant({ ...newVariant, sku: e.target.value })}
+                                    />
                                     <Input
                                         type="number"
-                                        className={`bg-zinc-900 h-10 md:h-12 rounded-xl border-zinc-800 text-xs ${isOverLimit ? 'border-red-500 text-red-500 focus:ring-red-500' : 'focus:border-primary'}`}
-                                        value={formData.price}
-                                        onChange={e => setFormData({ ...formData, price: e.target.value })}
+                                        placeholder="Modif. $"
+                                        className="bg-zinc-900 border-zinc-800 h-10 text-[10px] rounded-lg"
+                                        value={newVariant.price_modifier}
+                                        onChange={e => setNewVariant({ ...newVariant, price_modifier: e.target.value })}
                                     />
-                                    {selectedCat && (
-                                        <div className={`text-[9px] flex items-center gap-2 p-3 rounded-lg ${isOverLimit ? 'bg-red-500/10 text-red-400' : 'bg-green-500/5 text-zinc-500'}`}>
-                                            {isOverLimit ? <AlertTriangle className="w-3 h-3 shrink-0" /> : <Info className="w-3 h-3 shrink-0" />}
-                                            <span className="font-medium tracking-tight">Límite para {selectedCat.name}: <strong className="text-white">{priceLimit} {BRANDING.currencySymbol}</strong></span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Variants Manager */}
-                                <div className="grid gap-3 pt-4 border-t border-white/5 mt-2">
-                                    <Label className="text-zinc-500 text-[9px] font-black uppercase">Variantes</Label>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <Input
-                                            placeholder="Talla/Color"
-                                            className="bg-zinc-900 border-zinc-800 h-10 text-[10px] rounded-lg"
-                                            value={newVariant.name}
-                                            onChange={e => setNewVariant({ ...newVariant, name: e.target.value })}
-                                        />
-                                        <Input
-                                            placeholder="SKU"
-                                            className="bg-zinc-900 border-zinc-800 h-10 text-[10px] rounded-lg"
-                                            value={newVariant.sku}
-                                            onChange={e => setNewVariant({ ...newVariant, sku: e.target.value })}
-                                        />
+                                    <div className="flex gap-2">
                                         <Input
                                             type="number"
-                                            placeholder="Modif. $"
+                                            placeholder="Stock"
                                             className="bg-zinc-900 border-zinc-800 h-10 text-[10px] rounded-lg"
-                                            value={newVariant.price_modifier}
-                                            onChange={e => setNewVariant({ ...newVariant, price_modifier: e.target.value })}
+                                            value={newVariant.stock}
+                                            onChange={e => setNewVariant({ ...newVariant, stock: e.target.value })}
                                         />
-                                        <div className="flex gap-2">
-                                            <Input
-                                                type="number"
-                                                placeholder="Stock"
-                                                className="bg-zinc-900 border-zinc-800 h-10 text-[10px] rounded-lg"
-                                                value={newVariant.stock}
-                                                onChange={e => setNewVariant({ ...newVariant, stock: e.target.value })}
-                                            />
-                                            <button
-                                                onClick={(e: React.MouseEvent) => {
-                                                    e.preventDefault();
-                                                    if (newVariant.name) {
-                                                        setVariants([...variants, newVariant]);
-                                                        setNewVariant({ name: "", sku: "", price_modifier: "0", stock: "0" });
-                                                    }
-                                                }}
-                                                className="bg-white text-black rounded-lg px-3 hover:scale-105 transition-transform"
-                                            >
-                                                +
-                                            </button>
-                                        </div>
+                                        <button
+                                            onClick={(e: React.MouseEvent) => {
+                                                e.preventDefault();
+                                                if (newVariant.name) {
+                                                    setVariants([...variants, newVariant]);
+                                                    setNewVariant({ name: "", sku: "", price_modifier: "0", stock: "0" });
+                                                }
+                                            }}
+                                            className="bg-white text-black rounded-lg px-3 hover:scale-105 transition-transform"
+                                        >
+                                            +
+                                        </button>
                                     </div>
-
-                                    {variants.length > 0 && (
-                                        <div className="space-y-2 mt-2">
-                                            {variants.map((v: any, i: number) => (
-                                                <div key={i} className="flex items-center justify-between p-2 md:p-3 bg-zinc-900/50 border border-white/5 rounded-xl text-[9px]">
-                                                    <div className="flex flex-col gap-0.5 max-w-[50%]">
-                                                        <span className="font-bold text-white uppercase tracking-wider truncate">{v.name}</span>
-                                                        <span className="text-zinc-600 font-mono italic truncate">{v.sku || 'SIN-SKU'}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 md:gap-4 text-zinc-400">
-                                                        <span className="text-zinc-500">{v.price_modifier > 0 ? `+${v.price_modifier}` : v.price_modifier} {BRANDING.currencySymbol}</span>
-                                                        <span className="font-bold text-white bg-zinc-800 px-1.5 py-0.5 rounded">{v.stock} UN</span>
-                                                        <button
-                                                            onClick={(e: React.MouseEvent) => {
-                                                                e.preventDefault();
-                                                                setVariants(variants.filter((_: any, idx: number) => idx !== i));
-                                                            }}
-                                                            className="text-zinc-700 hover:text-red-500 transition-colors"
-                                                        >
-                                                            <X className="w-3.5 h-3.5" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
                                 </div>
+
+                                {variants.length > 0 && (
+                                    <div className="space-y-2 mt-2">
+                                        {variants.map((v: any, i: number) => (
+                                            <div key={i} className="flex items-center justify-between p-2 md:p-3 bg-zinc-900/50 border border-white/5 rounded-xl text-[9px]">
+                                                <div className="flex flex-col gap-0.5 max-w-[50%]">
+                                                    <span className="font-bold text-white uppercase tracking-wider truncate">{v.name}</span>
+                                                    <span className="text-zinc-600 font-mono italic truncate">{v.sku || 'SIN-SKU'}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 md:gap-4 text-zinc-400">
+                                                    <span className="text-zinc-500">{v.price_modifier > 0 ? `+${v.price_modifier}` : v.price_modifier} {BRANDING.currencySymbol}</span>
+                                                    <span className="font-bold text-white bg-zinc-800 px-1.5 py-0.5 rounded">{v.stock} UN</span>
+                                                    <button
+                                                        onClick={(e: React.MouseEvent) => {
+                                                            e.preventDefault();
+                                                            setVariants(variants.filter((_: any, idx: number) => idx !== i));
+                                                        }}
+                                                        className="text-zinc-700 hover:text-red-500 transition-colors"
+                                                    >
+                                                        <X className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
+
                             <DialogFooter className="pt-4 border-t border-white/5">
                                 <MinimalButton
                                     onClick={handleCreate}
@@ -590,7 +611,11 @@ export default function StoreProductsPage() {
                                             </div>
                                             <div className="flex items-center gap-1.5 px-2 py-1 bg-white/5 rounded-md border border-white/5">
                                                 <span className="text-[8px] font-black text-zinc-600 uppercase">Precio</span>
-                                                <span className="text-[10px] font-bold text-white tabular-nums">{product.price}{BRANDING.currencySymbol}</span>
+                                                <span className="text-[10px] font-bold text-white tabular-nums">
+                                                    {product.currency === 'MONEY' ? <span className="text-emerald-500 mr-0.5">$</span> : ''}
+                                                    {product.price}
+                                                    {product.currency !== 'MONEY' ? <span className="text-amber-500 ml-0.5">{BRANDING.currencySymbol}</span> : ''}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -606,7 +631,11 @@ export default function StoreProductsPage() {
                                     </div>
                                     <div className="hidden lg:block text-center uppercase tracking-widest text-[9px] font-black text-zinc-600">
                                         <p className="mb-0.5">Precio</p>
-                                        <p className="text-xl md:text-2xl text-white font-black tabular-nums">{product.price}<span className="text-zinc-600 font-normal ml-1">{BRANDING.currencySymbol}</span></p>
+                                        <p className="text-xl md:text-2xl text-white font-black tabular-nums">
+                                            {product.currency === 'MONEY' && <span className="text-emerald-500 mr-1">$</span>}
+                                            {product.price}
+                                            {product.currency !== 'MONEY' && <span className="text-amber-500 font-bold ml-1">{BRANDING.currencySymbol}</span>}
+                                        </p>
                                     </div>
 
                                     <div className="flex items-center gap-2 md:gap-3 w-full lg:w-auto">
@@ -805,7 +834,7 @@ export default function StoreProductsPage() {
                                 <Label className="text-[9px] font-black uppercase text-zinc-500">Nombre</Label>
                                 <Input
                                     value={editingProduct.name}
-                                    onChange={e => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                                    onChange={e => setEditingProduct({ ...editingProduct!, name: e.target.value })}
                                     className="bg-zinc-900 border-zinc-800"
                                 />
                             </div>
@@ -813,7 +842,7 @@ export default function StoreProductsPage() {
                                 <Label className="text-[9px] font-black uppercase text-zinc-500">Descripción</Label>
                                 <Input
                                     value={editingProduct.description}
-                                    onChange={e => setEditingProduct({ ...editingProduct, description: e.target.value })}
+                                    onChange={e => setEditingProduct({ ...editingProduct!, description: e.target.value })}
                                     className="bg-zinc-900 border-zinc-800"
                                 />
                             </div>
@@ -822,7 +851,7 @@ export default function StoreProductsPage() {
                                     <Label className="text-[9px] font-black uppercase text-zinc-500">Categoría</Label>
                                     <Select
                                         value={editingProduct.category}
-                                        onValueChange={(v) => setEditingProduct({ ...editingProduct, category: v })}
+                                        onValueChange={(v) => setEditingProduct({ ...editingProduct!, category: v })}
                                     >
                                         <SelectTrigger className="bg-zinc-900 border-zinc-800 h-10 rounded-xl text-xs">
                                             <SelectValue placeholder="Categoría" />
@@ -833,10 +862,25 @@ export default function StoreProductsPage() {
                                     </Select>
                                 </div>
                                 <div className="grid gap-2">
+                                    <Label className="text-[9px] font-black uppercase text-zinc-500">Moneda</Label>
+                                    <Select
+                                        value={editingProduct.currency || "COINS"}
+                                        onValueChange={(v: any) => setEditingProduct({ ...editingProduct!, currency: v })}
+                                    >
+                                        <SelectTrigger className="bg-zinc-900 border-zinc-800 h-10 rounded-xl text-xs">
+                                            <SelectValue placeholder="Moneda" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-zinc-900 border-zinc-800 text-white z-[200]">
+                                            <SelectItem value="COINS">{BRANDING.currencySymbol} (Puntos)</SelectItem>
+                                            <SelectItem value="MONEY">$ (Dinero Real)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="grid gap-2">
                                     <Label className="text-[9px] font-black uppercase text-zinc-500">Estado</Label>
                                     <Select
                                         value={editingProduct.condition}
-                                        onValueChange={(v) => setEditingProduct({ ...editingProduct, condition: v })}
+                                        onValueChange={(v) => setEditingProduct({ ...editingProduct!, condition: v })}
                                     >
                                         <SelectTrigger className="bg-zinc-900 border-zinc-800 h-10 rounded-xl text-xs">
                                             <SelectValue placeholder="Estado" />
@@ -852,29 +896,30 @@ export default function StoreProductsPage() {
                                     <Input
                                         type="number"
                                         value={editingProduct.stock}
-                                        onChange={e => setEditingProduct({ ...editingProduct, stock: parseInt(e.target.value) })}
+                                        onChange={e => setEditingProduct({ ...editingProduct!, stock: parseInt(e.target.value) })}
                                         className="bg-zinc-900 border-zinc-800 h-10 rounded-xl"
                                     />
                                 </div>
                             </div>
 
                             <div className="grid gap-2">
-                                <Label className="text-[9px] font-black uppercase text-zinc-500">Precio ({BRANDING.currencySymbol})</Label>
+                                <Label className="text-[9px] font-black uppercase text-zinc-500">Precio ({editingProduct.currency === 'MONEY' ? '$' : BRANDING.currencySymbol})</Label>
                                 <Input
                                     type="number"
                                     value={editingProduct.price}
-                                    onChange={e => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) })}
-                                    className={`bg-zinc-900 border-zinc-800 h-10 rounded-xl ${categories.find((c: any) => c.slug === editingProduct.category && editingProduct.price > c.max_price)
+                                    onChange={e => setEditingProduct({ ...editingProduct!, price: parseFloat(e.target.value) })}
+                                    className={`bg-zinc-900 border-zinc-800 h-10 rounded-xl ${categories.find((c: any) => c.slug === editingProduct!.category && editingProduct!.currency !== 'MONEY' && editingProduct!.price > c.max_price)
                                         ? 'border-red-500 text-red-500 focus:ring-red-500'
                                         : 'focus:border-primary'
                                         }`}
                                 />
                                 {(() => {
-                                    const cat = categories.find((c: any) => c.slug === editingProduct.category);
+                                    const cat = categories.find((c: any) => c.slug === editingProduct!.category);
                                     const maxPrice = cat ? cat.max_price : 0;
-                                    const isOverLimit = cat && editingProduct.price > maxPrice;
+                                    const isMoney = editingProduct!.currency === 'MONEY';
+                                    const isOverLimit = !isMoney && cat && editingProduct!.price > maxPrice;
 
-                                    if (cat) {
+                                    if (cat && !isMoney) {
                                         return (
                                             <div className={`text-[9px] flex items-center gap-2 p-3 rounded-lg ${isOverLimit ? 'bg-red-500/10 text-red-400' : 'bg-green-500/5 text-zinc-500'}`}>
                                                 {isOverLimit ? <AlertTriangle className="w-3 h-3 shrink-0" /> : <Info className="w-3 h-3 shrink-0" />}
@@ -900,15 +945,17 @@ export default function StoreProductsPage() {
             </Dialog>
 
             {/* Ad Purchase Modal */}
-            {adProduct && (
-                <AdPurchaseModal
-                    productId={adProduct.id}
-                    productName={adProduct.name}
-                    isOpen={!!adProduct}
-                    onClose={() => setAdProduct(null)}
-                    onSuccess={() => fetchProducts()}
-                />
-            )}
+            {
+                adProduct && (
+                    <AdPurchaseModal
+                        productId={adProduct.id}
+                        productName={adProduct.name}
+                        isOpen={!!adProduct}
+                        onClose={() => setAdProduct(null)}
+                        onSuccess={() => fetchProducts()}
+                    />
+                )
+            }
 
             {/* Status Footer */}
             <div className="fixed bottom-0 left-0 right-0 h-8 md:h-10 bg-zinc-950 border-t border-white/5 flex items-center justify-between px-4 md:px-10 text-[7px] md:text-[9px] font-mono text-zinc-700 uppercase tracking-[0.1em] md:tracking-[0.3em] z-50">
