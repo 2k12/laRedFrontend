@@ -37,7 +37,14 @@ interface Product {
 
 import { ImageUpload } from "@/components/ImageUpload";
 
-
+const CATEGORY_MAP: Record<string, string> = {
+    'food': 'Alimentos y Bebidas',
+    'stationery': 'Papelería y Útiles',
+    'services': 'Servicios Académicos',
+    'clothing': 'Ropa y Accesorios',
+    'tech': 'Tecnología',
+    'other': 'Otros'
+};
 export default function StoreProductsPage() {
     const { id } = useParams(); // Current Store ID
     const { user } = useAuth();
@@ -560,7 +567,7 @@ export default function StoreProductsPage() {
                 </div>
             </PageHeader >
 
-            <main className={`pt-8 md:pt-32 pb-20 px-4 md:px-10 max-w-7xl mx-auto transition-all duration-500 ${isDragging ? 'lg:pr-[320px] opacity-50 scale-[0.98]' : ''}`}>
+            <main className={`pt-8 md:pt-16 pb-20 px-4 md:px-10 max-w-7xl mx-auto transition-all duration-500 ${isDragging ? 'lg:pr-[320px] opacity-50 scale-[0.98]' : ''}`}>
                 {loading ? (
                     <div className="h-64 flex flex-col items-center justify-center gap-4 text-zinc-600 font-mono text-[10px] tracking-tighter uppercase">
                         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -573,7 +580,7 @@ export default function StoreProductsPage() {
                         <p className="text-zinc-500 text-xs md:text-sm max-w-xs mx-auto mt-2">Esta {BRANDING.storeName.toLowerCase()} aún no tiene {BRANDING.productNamePlural.toLowerCase()} registrados.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 md:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 md:gap-4">
                         {filteredProducts.map((product: any) => (
                             <div
                                 key={product.id}
@@ -599,10 +606,10 @@ export default function StoreProductsPage() {
                                         setDraggedProductId(null);
                                     }
                                 }}
-                                className={`group relative bg-zinc-900/30 border border-white/5 rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-8 hover:bg-zinc-900/50 transition-all duration-500 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 md:gap-8 ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''} ${draggedProductId === product.id ? 'border-primary opacity-40 grayscale scale-[0.98]' : ''}`}
+                                className={`group relative bg-zinc-900/40 border border-white/5 rounded-[1.2rem] px-4 py-3 hover:bg-zinc-900/60 transition-all duration-300 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2 ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''} ${draggedProductId === product.id ? 'border-primary opacity-40 grayscale scale-[0.98]' : ''}`}
                             >
-                                <div className="flex flex-row lg:flex-row items-center gap-4 md:gap-8 w-full lg:w-auto pointer-events-none">
-                                    <div className="relative w-14 h-14 md:w-20 md:h-20 bg-zinc-950 rounded-xl md:rounded-2xl border border-white/5 flex items-center justify-center text-zinc-800 group-hover:text-primary transition-colors shrink-0 overflow-hidden">
+                                <div className="flex flex-row lg:flex-row items-center gap-3 md:gap-5 w-full lg:w-auto pointer-events-none">
+                                    <div className="relative w-12 h-12 md:w-14 md:h-14 bg-zinc-950 rounded-lg border border-white/5 flex items-center justify-center text-zinc-800 group-hover:text-primary transition-colors shrink-0 overflow-hidden">
                                         {product.images && product.images.length > 0 ? (
                                             <img
                                                 src={product.images[0]}
@@ -620,25 +627,25 @@ export default function StoreProductsPage() {
                                     </div>
                                     <div className="space-y-0.5 md:space-y-1 overflow-hidden flex-1">
                                         <div className="flex items-center gap-2 md:gap-3">
-                                            <span className="text-[8px] md:text-[9px] font-black text-primary uppercase tracking-[0.2em]">{product.category}</span>
+                                            <span className="text-[8px] md:text-[9px] font-black text-primary uppercase tracking-[0.2em]">
+                                                {CATEGORY_MAP[product.category] || product.category}
+                                            </span>
                                             <span className="text-[8px] md:text-[9px] font-black px-1.5 py-0.5 bg-zinc-800 text-zinc-400 rounded uppercase tracking-[0.1em]">{product.condition === 'NEW' ? 'Nuevo' : 'Usado'}</span>
                                             <span className="text-[8px] md:text-[9px] font-mono text-zinc-500 uppercase tracking-wider">{product.sku || `PID-${product.id.slice(0, 8)}`}</span>
                                         </div>
                                         <h3 className="text-sm md:text-xl font-bold text-white group-hover:translate-x-1 transition-transform truncate">{product.name}</h3>
                                         <p className="text-[10px] md:text-xs text-zinc-600 font-medium line-clamp-1">{product.description}</p>
 
-                                        {/* Mobile Price & Stock Mini Label */}
-                                        <div className="flex lg:hidden items-center gap-3 mt-2">
-                                            <div className="flex items-center gap-1.5 px-2 py-1 bg-white/5 rounded-md border border-white/5">
-                                                <span className="text-[8px] font-black text-zinc-600 uppercase">Stock</span>
-                                                <span className="text-[10px] font-bold text-white tabular-nums">{product.stock}</span>
+                                        {/* Mobile: Disruptive HUD Capsules */}
+                                        <div className="flex lg:hidden items-center gap-2 mt-3">
+                                            <div className="px-3 py-1 flex items-center gap-1.5 rounded-lg bg-white/5 border border-white/10 backdrop-blur-md">
+                                                <span className="text-[9px] font-black text-zinc-500 uppercase">Stk</span>
+                                                <span className="text-[10px] font-black text-white tabular-nums">{product.stock}</span>
                                             </div>
-                                            <div className="flex items-center gap-1.5 px-2 py-1 bg-white/5 rounded-md border border-white/5">
-                                                <span className="text-[8px] font-black text-zinc-600 uppercase">Precio</span>
-                                                <span className="text-[10px] font-bold text-white tabular-nums">
-                                                    {product.currency === 'MONEY' ? <span className="text-emerald-500 mr-0.5">$</span> : ''}
-                                                    {product.price}
-                                                    {product.currency !== 'MONEY' ? <span className="text-amber-500 ml-0.5">{BRANDING.currencySymbol}</span> : ''}
+                                            <div className="px-3 py-1 flex items-center gap-1.5 rounded-lg bg-primary/10 border border-primary/20 backdrop-blur-md">
+                                                <span className="text-[9px] font-black text-emerald-400 uppercase">Prc</span>
+                                                <span className="text-[10px] font-black text-white tabular-nums">
+                                                    {product.currency === 'MONEY' ? '$' : ''}{product.price}{product.currency !== 'MONEY' ? BRANDING.currencySymbol : ''}
                                                 </span>
                                             </div>
                                         </div>
@@ -646,20 +653,28 @@ export default function StoreProductsPage() {
                                 </div>
 
                                 <div className="flex items-center justify-between lg:justify-end gap-3 md:gap-12 w-full lg:w-auto mt-2 lg:mt-0 pt-4 lg:pt-0 border-t lg:border-t-0 border-white/5">
-                                    <div className="hidden lg:block text-center uppercase tracking-widest text-[9px] font-black text-zinc-600">
-                                        <p className="mb-0.5">Stock</p>
-                                        <p className={cn(
-                                            "text-xl md:text-2xl font-black tabular-nums",
-                                            product.stock === 0 ? "text-red-500" : "text-white"
-                                        )}>{product.stock}</p>
-                                    </div>
-                                    <div className="hidden lg:block text-center uppercase tracking-widest text-[9px] font-black text-zinc-600">
-                                        <p className="mb-0.5">Precio</p>
-                                        <p className="text-xl md:text-2xl text-white font-black tabular-nums">
-                                            {product.currency === 'MONEY' && <span className="text-emerald-500 mr-1">$</span>}
-                                            {product.price}
-                                            {product.currency !== 'MONEY' && <span className="text-amber-500 font-bold ml-1">{BRANDING.currencySymbol}</span>}
-                                        </p>
+                                    {/* Desktop: Rounded HUD Display */}
+                                    <div className="hidden lg:flex items-center gap-3">
+                                        {/* Stock Module */}
+                                        <div className="w-16 h-10 flex flex-col items-center justify-center bg-white/5 rounded-xl border border-white/5 backdrop-blur-sm">
+                                            <span className="text-[7px] font-black text-zinc-500 uppercase tracking-wider leading-none mb-0.5">Stock</span>
+                                            <span className={cn(
+                                                "text-xs font-black tabular-nums tracking-tight leading-none",
+                                                product.stock === 0 ? "text-red-500" : "text-white"
+                                            )}>{product.stock}</span>
+                                        </div>
+
+                                        {/* Price Module */}
+                                        <div className="px-4 h-10 flex flex-col items-center justify-center bg-zinc-950 rounded-xl border border-white/10 backdrop-blur-sm shadow-inner min-w-[80px]">
+                                            <span className="text-[8px] font-black text-zinc-500 uppercase tracking-wider leading-none mb-0.5">Precio</span>
+                                            <div className="flex items-baseline leading-none">
+                                                {product.currency === 'MONEY' && <span className="text-emerald-500 text-[10px] font-black mr-0.5">$</span>}
+                                                <span className="text-sm text-white font-black tabular-nums tracking-tight">
+                                                    {product.price}
+                                                </span>
+                                                {product.currency !== 'MONEY' && <span className="text-primary text-[8px] font-black ml-1 scale-75 transform-origin-left">{BRANDING.currencySymbol}</span>}
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div className="flex items-center gap-2 md:gap-3 w-full lg:w-auto">
@@ -668,7 +683,7 @@ export default function StoreProductsPage() {
                                                 setIsDragging(true);
                                                 setDraggedProductId(product.id);
                                             }}
-                                            className="flex-1 lg:flex-none px-4 md:px-6 h-10 md:h-12 rounded-full border border-white/5 bg-zinc-950 hover:bg-zinc-900 text-zinc-500 hover:text-white transition-all group/transfer text-[10px]"
+                                            className="flex-1 lg:flex-none px-4 h-9 md:h-10 rounded-full border border-white/5 bg-zinc-950 hover:bg-zinc-900 text-zinc-500 hover:text-white transition-all group/transfer text-[10px]"
                                         >
                                             <ArrowRightLeft className="w-3.5 h-3.5 mr-2 group-hover/transfer:rotate-180 transition-transform duration-500" />
                                             <span>Transferir</span>
@@ -677,20 +692,20 @@ export default function StoreProductsPage() {
                                         <div className="flex gap-2">
                                             <button
                                                 onClick={() => setAdProduct(product)}
-                                                className="p-2.5 md:p-3 bg-zinc-950 border border-amber-400/20 rounded-full hover:bg-amber-400/10 text-amber-500 transition-colors"
+                                                className="p-2 bg-zinc-950 border border-amber-400/20 rounded-full hover:bg-amber-400/10 text-amber-500 transition-colors"
                                                 title="Promocionar drop"
                                             >
                                                 <Zap className="w-3.5 h-3.5 fill-amber-500" />
                                             </button>
                                             <button
                                                 onClick={() => setEditingProduct(product)}
-                                                className="p-2.5 md:p-3 bg-zinc-950 border border-white/5 rounded-full hover:bg-zinc-900 text-zinc-600 hover:text-white transition-colors"
+                                                className="p-2 bg-zinc-950 border border-white/5 rounded-full hover:bg-zinc-900 text-zinc-600 hover:text-white transition-colors"
                                             >
                                                 <Edit2 className="w-3.5 h-3.5" />
                                             </button>
                                             <button
                                                 onClick={() => setProductToDelete(product.id)}
-                                                className="p-2.5 md:p-3 bg-zinc-950 border border-white/5 rounded-full hover:bg-red-500/10 hover:text-red-500 text-zinc-600 transition-colors"
+                                                className="p-2 bg-zinc-950 border border-white/5 rounded-full hover:bg-red-500/10 hover:text-red-500 text-zinc-600 transition-colors"
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" />
                                             </button>
@@ -700,8 +715,9 @@ export default function StoreProductsPage() {
                             </div>
                         ))}
                     </div>
-                )}
-            </main>
+                )
+                }
+            </main >
 
             <AlertDialog open={!!productToDelete} onOpenChange={(open) => !open && setProductToDelete(null)}>
                 <AlertDialogContent className="bg-zinc-950 border-zinc-900 text-white">

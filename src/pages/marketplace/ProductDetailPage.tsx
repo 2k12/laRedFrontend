@@ -37,7 +37,8 @@ export default function ProductDetailPage() {
 
     useEffect(() => {
         if (!id) return;
-        setLoading(true);
+        // Only show skeleton on initial load or if we don't have a product yet
+        if (!product) setLoading(true);
 
         const url = new URL(`${API_BASE_URL}/api/store/products/${id}`);
         if (context) url.searchParams.append('context', context);
@@ -207,25 +208,35 @@ export default function ProductDetailPage() {
                             />
 
                             {/* Product Image or Icon */}
-                            {activeImage ? (
-                                <motion.img
-                                    key={activeImage}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    src={activeImage}
-                                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
-                                    alt={product.name}
-                                />
-                            ) : (
-                                <motion.div
-                                    initial={{ scale: 0.8, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    transition={{ delay: 0.2, duration: 0.5 }}
-                                    className="relative z-10 p-8 md:p-12 rounded-full bg-zinc-900 border border-zinc-800 shadow-2xl group-hover:shadow-[0_0_50px_-10px_rgba(var(--primary-rgb),0.3)] group-hover:scale-110 transition-transform duration-500"
-                                >
-                                    <ShoppingCart className="w-12 h-12 md:w-32 md:h-32 text-zinc-500 group-hover:text-primary transition-colors duration-500" />
-                                </motion.div>
-                            )}
+                            <div className="absolute inset-0 w-full h-full">
+                                <AnimatePresence mode="popLayout" initial={false}>
+                                    {activeImage ? (
+                                        <motion.img
+                                            key={activeImage}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.5, ease: "easeInOut" }}
+                                            src={activeImage}
+                                            className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100"
+                                            alt={product.name}
+                                        />
+                                    ) : (
+                                        <motion.div
+                                            key="empty-state"
+                                            initial={{ scale: 0.8, opacity: 0 }}
+                                            animate={{ scale: 1, opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.5 }}
+                                            className="absolute inset-0 flex items-center justify-center p-8 md:p-12"
+                                        >
+                                            <div className="rounded-full bg-zinc-900 border border-zinc-800 shadow-2xl p-8 md:p-12 group-hover:shadow-[0_0_50px_-10px_rgba(var(--primary-rgb),0.3)] group-hover:scale-110 transition-all duration-500">
+                                                <ShoppingCart className="w-12 h-12 md:w-32 md:h-32 text-zinc-500 group-hover:text-primary transition-colors" />
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
 
                             {/* Image Selection Thumbnails (if multiple) */}
                             {product.images && product.images.length > 1 && (
@@ -404,13 +415,13 @@ export default function ProductDetailPage() {
                                             onClick={() => setShowPurchase(true)}
                                             disabled={product.stock <= 0}
                                             className={cn(
-                                                "flex-[2] h-14 px-10 text-[11px] font-black tracking-[0.3em] uppercase transition-all duration-500 rounded-2xl border relative overflow-hidden group/btn",
+                                                "flex-[2] h-14 px-4 md:px-10 text-[10px] md:text-[11px] font-black tracking-[0.2em] md:tracking-[0.3em] uppercase transition-all duration-500 rounded-2xl border relative overflow-hidden group/btn min-w-0",
                                                 product.stock <= 0
                                                     ? "bg-zinc-950 text-zinc-700 border-white/5 cursor-not-allowed"
                                                     : "bg-transparent border-white/20 text-white hover:border-white hover:bg-white hover:text-black active:scale-[0.98]"
                                             )}
                                         >
-                                            <span className="relative z-10">{product.stock <= 0 ? "Agotado" : "Adquirir Ahora"}</span>
+                                            <span className="relative z-10 truncate block">{product.stock <= 0 ? "Agotado" : "Adquirir Ahora"}</span>
                                         </button>
                                         <div className="flex gap-3">
                                             <MinimalButton size="icon" className="h-14 w-14 hover:text-pink-500 hover:border-pink-500/50 transition-all border-white/10 bg-zinc-900/50" icon={<Heart className="w-5 h-5" />} />

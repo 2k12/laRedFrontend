@@ -106,3 +106,38 @@ input[type="number"] {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   @apply bg-zinc-700/80;
 }
+
+/* Futuristic HUD Animations */
+@keyframes scan {
+  from {
+    top: -100%;
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  to {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes quantum-scan {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(2) drop-shadow(0 0 10px white);
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
