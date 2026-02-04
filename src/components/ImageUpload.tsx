@@ -1,11 +1,10 @@
 
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { X, Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { X, Upload, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { API_BASE_URL } from '@/config/api';
 import { toast } from 'sonner';
-import { MinimalButton } from './MinimalButton';
 
 interface ImageUploadProps {
     value: string[];
