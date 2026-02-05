@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Package, ArrowLeft, Edit2, Trash2, ArrowRightLeft, Search, Plus, Store, AlertTriangle, Info, X, ShieldAlert, Zap, Settings, Image as ImageIcon } from "lucide-react";
+import { Package, ArrowLeft, Edit2, Trash2, ArrowRightLeft, Search, Plus, Store, AlertTriangle, Info, X, ShieldAlert, Zap, Settings } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { MinimalButton } from "@/components/MinimalButton";
 import { PageHeader } from "@/components/PageHeader";

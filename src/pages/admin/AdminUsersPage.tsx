@@ -10,7 +10,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Users, Search, Loader2, CheckSquare, Trash2, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Users, Search, Loader2, ShieldCheck, ShieldAlert } from "lucide-react";
 import BadgeAwardModal from "@/components/BadgeAwardModal";
 import UserProfileModal from "@/components/UserProfileModal";
 import RoleManagementModal from "@/components/RoleManagementModal";
@@ -97,16 +97,7 @@ export default function AdminUsersPage() {
         const loadingToast = toast.loading(`Actualizando ${count} usuarios...`);
 
         try {
-            const promises = Array.from(selectedUsers).map(id =>
-                fetch(`${API_BASE_URL}/api/admin/users/toggle/${id}`, { // Note: This API toggles, doesn't set. 
-                    // Verify if API supports setting specific status or if we need to check current status.
-                    // The toggle endpoint usually just flips. 
-                    // IF the API only toggles, we must only call it for users who NOT (currently in target status).
-                    // Let's check status of each user from 'users' state.
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                })
-            );
+
 
             // Wait, the API is /toggle/. If I want to SET to ACTIVE, I should only call it for INACTIVE users.
             const usersToToggle = users.filter(u => selectedUsers.has(u.id) && u.status !== newStatus);
