@@ -23,7 +23,8 @@ export default function MarketplaceFeed() {
     const {
         searchTerm, priceRange, selectedStatus, selectedCategory, selectedStore, setSelectedStore,
         selectedCurrency, // New filter
-        page, setPage, setTotalPages, limit
+        page, setPage, setTotalPages, limit,
+        showGhostDropsOnly // New filter
     } = useFilters();
 
     // Sync storeId from URL to global filter state on mount and URL changes
@@ -54,6 +55,7 @@ export default function MarketplaceFeed() {
         if (selectedCategory && selectedCategory.toUpperCase() !== 'ALL') params.append('category', selectedCategory);
         if (selectedStore && selectedStore.toUpperCase() !== 'ALL') params.append('storeId', selectedStore);
         if (selectedCurrency && selectedCurrency.toUpperCase() !== 'ALL') params.append('currency', selectedCurrency);
+        if (showGhostDropsOnly) params.append('ghost', 'true');
 
         axios.get(`${API_BASE_URL}/api/store/products/public?${params.toString()}`)
             .then(res => {
@@ -67,7 +69,7 @@ export default function MarketplaceFeed() {
                 console.error("Error fetching products:", err);
                 setLoading(false);
             });
-    }, [page, limit, searchTerm, priceRange, selectedStatus, selectedCategory, selectedStore, selectedCurrency, setTotalPages]);
+    }, [page, limit, searchTerm, priceRange, selectedStatus, selectedCategory, selectedStore, selectedCurrency, showGhostDropsOnly, setTotalPages]);
 
     const handleProductClick = async (productId: any) => {
         setIsExiting(true);

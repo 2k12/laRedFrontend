@@ -19,6 +19,8 @@ interface FilterContextType {
   setTotalPages: (pages: number) => void;
   limit: number;
   setLimit: (limit: number) => void;
+  showGhostDropsOnly: boolean;
+  setShowGhostDropsOnly: (show: boolean) => void;
 }
 
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
@@ -33,6 +35,7 @@ export function FilterProvider({ children }: { children: ReactNode }) {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(12);
+  const [showGhostDropsOnly, setShowGhostDropsOnly] = useState(false);
 
   const value = {
     searchTerm,
@@ -52,7 +55,9 @@ export function FilterProvider({ children }: { children: ReactNode }) {
     totalPages,
     setTotalPages,
     limit,
-    setLimit
+    setLimit,
+    showGhostDropsOnly,
+    setShowGhostDropsOnly
   };
 
   return (

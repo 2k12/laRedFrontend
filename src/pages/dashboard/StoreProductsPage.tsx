@@ -6,6 +6,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Package, ArrowLeft, Edit2, Trash2, ArrowRightLeft, Search, Plus, Store, AlertTriangle, Info, X, ShieldAlert, Zap } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { MinimalButton } from "@/components/MinimalButton";
@@ -33,9 +34,15 @@ interface Product {
     currency?: 'COINS' | 'MONEY';
     variants?: any[];
     images?: string[];
+    is_ghost_drop?: boolean;
+    ghost_lat?: string;
+    ghost_lng?: string;
+    ghost_radius?: number;
+    ghost_clue?: string;
 }
 
 import { ImageUpload } from "@/components/ImageUpload";
+import { GeofenceMap } from "@/components/GeofenceMap";
 
 const CATEGORY_MAP: Record<string, string> = {
     'food': 'Alimentos y Bebidas',
@@ -70,10 +77,45 @@ export default function StoreProductsPage() {
         store_id: id || "",
         condition: "NEW",
         currency: "COINS",
-        images: [] as string[]
+        images: [] as string[],
+        is_ghost_drop: false,
+        ghost_lat: "",
+        ghost_lng: "",
+        ghost_radius: "50",
+        ghost_clue: ""
     });
     const [variants, setVariants] = useState<{ name: string, sku: string, price_modifier: string, stock: string }[]>([]);
     const [newVariant, setNewVariant] = useState({ name: "", sku: "", price_modifier: "0", stock: "0" });
+    const [campusPolygon, setCampusPolygon] = useState<{ lat: number, lng: number }[]>([]);
+
+    useEffect(() => {
+        const fetchConfig = async () => {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/config/geofence`);
+                const data = await res.json();
+                if (data.polygon) setCampusPolygon(data.polygon);
+            } catch (e) {
+                console.error("Failed to load geofence", e);
+            }
+        };
+        fetchConfig();
+    }, []);
+
+    const getCurrentLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    setFormData(prev => ({
+                        ...prev,
+                        ghost_lat: pos.coords.latitude.toString(),
+                        ghost_lng: pos.coords.longitude.toString()
+                    }));
+                    toast.success("Ubicación actual capturada");
+                },
+                () => toast.error("Error al obtener ubicación")
+            );
+        }
+    };
 
     // Drag & Drop State
     const [isDragging, setIsDragging] = useState(false);
@@ -324,7 +366,10 @@ export default function StoreProductsPage() {
             if (res.ok) {
                 toast.success(`${BRANDING.productName} creado exitosamente`);
                 setIsCreateOpen(false);
-                setFormData({ name: "", description: "", price: "", stock: "", sku_part: "", category_slug: "", store_id: id || "", condition: "NEW", currency: "COINS", images: [] });
+                setFormData({
+                    name: "", description: "", price: "", stock: "", sku_part: "", category_slug: "", store_id: id || "", condition: "NEW", currency: "COINS", images: [],
+                    is_ghost_drop: false, ghost_lat: "", ghost_lng: "", ghost_radius: "50", ghost_clue: ""
+                });
                 setVariants([]);
                 fetchProducts();
             } else {
@@ -372,7 +417,7 @@ export default function StoreProductsPage() {
                                 Nuevo Drop
                             </MinimalButton>
                         </DialogTrigger>
-                        <DialogContent className="bg-zinc-950 border border-white/10 text-white w-[90%] sm:max-w-[500px] max-h-[90vh] overflow-y-auto rounded-[2rem] p-6">
+                        <DialogContent className="bg-zinc-950 border border-white/10 text-white w-[95%] sm:max-w-4xl max-h-[90vh] overflow-y-auto rounded-[2rem] p-6">
                             <DialogHeader>
                                 <DialogTitle className="text-xl md:text-2xl font-black uppercase italic tracking-tighter">Publicar Nuevo Drop</DialogTitle>
                             </DialogHeader>
@@ -477,6 +522,100 @@ export default function StoreProductsPage() {
                                     onChange={(urls) => setFormData({ ...formData, images: urls })}
                                     maxFiles={3}
                                 />
+                            </div>
+
+                            {/* GHOST DROP CONFIGURATION */}
+                            <div className="border border-zinc-800 bg-zinc-900/40 rounded-xl p-4 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className={`p-2 rounded-full transition-colors ${formData.is_ghost_drop ? 'bg-purple-500/20' : 'bg-zinc-800'}`}>
+                                            <Zap className={`w-4 h-4 ${formData.is_ghost_drop ? 'text-purple-400 fill-purple-400' : 'text-zinc-500'}`} />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <Label
+                                                className={`text-[10px] font-bold uppercase tracking-wider cursor-pointer select-none transition-colors ${formData.is_ghost_drop ? 'text-white' : 'text-zinc-500'}`}
+                                                onClick={() => setFormData({ ...formData, is_ghost_drop: !formData.is_ghost_drop })}
+                                            >
+                                                Campus Ghost Drop
+                                            </Label>
+                                            <span className="text-[8px] text-zinc-600 font-mono">Geo-restricted content</span>
+                                        </div>
+                                    </div>
+                                    <Switch
+                                        checked={formData.is_ghost_drop}
+                                        onCheckedChange={(checked) => setFormData({ ...formData, is_ghost_drop: checked })}
+                                        className="data-[state=checked]:bg-purple-600"
+                                    />
+                                </div>
+
+                                {formData.is_ghost_drop && (<>
+                                    <div className="grid gap-3 pt-2 animate-in fade-in slide-in-from-top-2">
+                                        <p className="text-[9px] text-zinc-500 font-mono leading-tight">
+                                            Este drop solo será visible y adquirible cuando el usuario esté dentro del radio especificado.
+                                        </p>
+
+                                        <div className="flex flex-col gap-2 bg-black/40 p-3 rounded-lg border border-white/5">
+                                            <div className="flex items-center justify-between">
+                                                <Label className="text-zinc-400 text-[9px] uppercase">Coordenadas</Label>
+                                                <button
+                                                    onClick={(e) => { e.preventDefault(); getCurrentLocation(); }}
+                                                    className="text-[9px] bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 px-2 py-1 rounded-full flex items-center gap-1 transition-colors"
+                                                >
+                                                    <Store className="w-3 h-3" /> Usar mi ubicación
+                                                </button>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <Input
+                                                    placeholder="Latitud"
+                                                    className="bg-zinc-950 border-zinc-800 text-[10px] h-8 font-mono"
+                                                    value={formData.ghost_lat}
+                                                    onChange={e => setFormData({ ...formData, ghost_lat: e.target.value })}
+                                                />
+                                                <Input
+                                                    placeholder="Longitud"
+                                                    className="bg-zinc-950 border-zinc-800 text-[10px] h-8 font-mono"
+                                                    value={formData.ghost_lng}
+                                                    onChange={e => setFormData({ ...formData, ghost_lng: e.target.value })}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-3 gap-2">
+                                            <div className="col-span-1 grid gap-1">
+                                                <Label className="text-zinc-500 text-[9px] uppercase">Radio (mts)</Label>
+                                                <Input
+                                                    type="number"
+                                                    placeholder="50"
+                                                    className="bg-zinc-900 border-zinc-800 text-[10px] h-9"
+                                                    value={formData.ghost_radius}
+                                                    onChange={e => setFormData({ ...formData, ghost_radius: e.target.value })}
+                                                />
+                                            </div>
+                                            <div className="col-span-2 grid gap-1">
+                                                <Label className="text-zinc-500 text-[9px] uppercase">Pista (Clue)</Label>
+                                                <Input
+                                                    placeholder="Ej. Frente a la biblioteca..."
+                                                    className="bg-zinc-900 border-zinc-800 text-[10px] h-9"
+                                                    value={formData.ghost_clue}
+                                                    onChange={e => setFormData({ ...formData, ghost_clue: e.target.value })}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Interactive Map */}
+                                    <div className="mt-4 border border-white/10 rounded-xl overflow-hidden">
+                                        <div className="bg-black/40 p-2 text-[9px] text-zinc-400 border-b border-white/5 flex justify-between items-center">
+                                            <span>Selecciona la ubicación exacta dentro del campus (área morada)</span>
+                                            {formData.ghost_lat && <span className="text-emerald-400">Ubicación Seleccionada</span>}
+                                        </div>
+                                        <GeofenceMap
+                                            polygon={campusPolygon}
+                                            initialLocation={formData.ghost_lat ? { lat: parseFloat(formData.ghost_lat), lng: parseFloat(formData.ghost_lng) } : null}
+                                            onLocationSelect={(lat, lng) => setFormData({ ...formData, ghost_lat: lat.toString(), ghost_lng: lng.toString() })}
+                                        />
+                                    </div>
+                                </>)}
                             </div>
 
                             {/* Variants Manager */}
@@ -864,7 +1003,7 @@ export default function StoreProductsPage() {
 
             {/* Edit Dialog */}
             <Dialog open={!!editingProduct} onOpenChange={(open) => !open && setEditingProduct(null)}>
-                <DialogContent className="bg-zinc-950 border border-white/10 text-white w-[90%] sm:max-w-[425px] rounded-[2rem] p-6">
+                <DialogContent className="bg-zinc-950 border border-white/10 text-white w-[95%] sm:max-w-4xl max-h-[90vh] overflow-y-auto rounded-[2rem] p-6">
                     <DialogHeader>
                         <DialogTitle className="uppercase italic font-black text-xl">Editar Drop</DialogTitle>
                     </DialogHeader>
@@ -979,7 +1118,104 @@ export default function StoreProductsPage() {
                                     return null;
                                 })()}
                             </div>
+
+                            {/* GHOST DROP CONFIGURATION FOR EDIT */}
+                            <div className="border border-zinc-800 bg-zinc-900/40 rounded-xl p-4 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className={`p-2 rounded-full transition-colors ${editingProduct.is_ghost_drop ? 'bg-purple-500/20' : 'bg-zinc-800'}`}>
+                                            <Zap className={`w-4 h-4 ${editingProduct.is_ghost_drop ? 'text-purple-400 fill-purple-400' : 'text-zinc-500'}`} />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <Label
+                                                className={`text-[10px] font-bold uppercase tracking-wider cursor-pointer select-none transition-colors ${editingProduct.is_ghost_drop ? 'text-white' : 'text-zinc-500'}`}
+                                                onClick={() => setEditingProduct({ ...editingProduct, is_ghost_drop: !editingProduct.is_ghost_drop })}
+                                            >
+                                                Campus Ghost Drop
+                                            </Label>
+                                            <span className="text-[8px] text-zinc-600 font-mono">Geo-restricted content</span>
+                                        </div>
+                                    </div>
+                                    <Switch
+                                        checked={editingProduct.is_ghost_drop}
+                                        onCheckedChange={(checked) => setEditingProduct({ ...editingProduct, is_ghost_drop: checked })}
+                                        className="data-[state=checked]:bg-purple-600"
+                                    />
+                                </div>
+
+                                {editingProduct.is_ghost_drop && (
+                                    <>
+                                        <div className="grid gap-3 pt-2 animate-in fade-in slide-in-from-top-2">
+                                            <p className="text-[9px] text-zinc-500 font-mono leading-tight">
+                                                Este drop solo será visible y adquirible cuando el usuario esté dentro del radio especificado.
+                                            </p>
+
+                                            <div className="flex flex-col gap-2 bg-black/40 p-3 rounded-lg border border-white/5">
+                                                <div className="flex items-center justify-between">
+                                                    <Label className="text-zinc-400 text-[9px] uppercase">Coordenadas</Label>
+                                                    <button
+                                                        onClick={(e) => { e.preventDefault(); getCurrentLocation(); }}
+                                                        className="text-[9px] bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 px-2 py-1 rounded-full flex items-center gap-1 transition-colors"
+                                                    >
+                                                        <Store className="w-3 h-3" /> Usar mi ubicación
+                                                    </button>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <Input
+                                                        placeholder="Latitud"
+                                                        className="bg-zinc-950 border-zinc-800 text-[10px] h-8 font-mono"
+                                                        value={editingProduct.ghost_lat || ''}
+                                                        onChange={e => setEditingProduct({ ...editingProduct, ghost_lat: e.target.value })}
+                                                    />
+                                                    <Input
+                                                        placeholder="Longitud"
+                                                        className="bg-zinc-900 border-zinc-800 text-[10px] h-8 font-mono"
+                                                        value={editingProduct.ghost_lng || ''}
+                                                        onChange={e => setEditingProduct({ ...editingProduct, ghost_lng: e.target.value })}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-3 gap-2">
+                                                <div className="col-span-1 grid gap-1">
+                                                    <Label className="text-zinc-500 text-[9px] uppercase">Radio (mts)</Label>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="50"
+                                                        className="bg-zinc-900 border-zinc-800 text-[10px] h-9"
+                                                        value={editingProduct.ghost_radius || ''}
+                                                        onChange={e => setEditingProduct({ ...editingProduct, ghost_radius: e.target.value })}
+                                                    />
+                                                </div>
+                                                <div className="col-span-2 grid gap-1">
+                                                    <Label className="text-zinc-500 text-[9px] uppercase">Pista (Clue)</Label>
+                                                    <Input
+                                                        placeholder="Ej. Frente a la biblioteca..."
+                                                        className="bg-zinc-900 border-zinc-800 text-[10px] h-9"
+                                                        value={editingProduct.ghost_clue || ''}
+                                                        onChange={e => setEditingProduct({ ...editingProduct, ghost_clue: e.target.value })}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Interactive Map */}
+                                        <div className="mt-4 border border-white/10 rounded-xl overflow-hidden">
+                                            <div className="bg-black/40 p-2 text-[9px] text-zinc-400 border-b border-white/5 flex justify-between items-center">
+                                                <span>Selecciona la ubicación exacta dentro del campus (área morada)</span>
+                                                {editingProduct.ghost_lat && <span className="text-emerald-400">Ubicación Seleccionada</span>}
+                                            </div>
+                                            <GeofenceMap
+                                                polygon={campusPolygon}
+                                                initialLocation={editingProduct.ghost_lat ? { lat: parseFloat(editingProduct.ghost_lat), lng: parseFloat(editingProduct.ghost_lng) } : null}
+                                                onLocationSelect={(lat, lng) => setEditingProduct({ ...editingProduct, ghost_lat: lat.toString(), ghost_lng: lng.toString() })}
+                                            />
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                         </div>
+
                     )}
                     <DialogFooter>
                         <MinimalButton

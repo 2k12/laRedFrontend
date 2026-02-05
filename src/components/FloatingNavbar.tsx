@@ -1,6 +1,7 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Coins, User, LogOut, Menu, Search, SlidersHorizontal, RotateCcw } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Coins, User, LogOut, Menu, Search, SlidersHorizontal, RotateCcw, Zap } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { MinimalButton } from "@/components/MinimalButton";
 import { useFilters } from "@/context/FilterContext";
@@ -26,7 +27,8 @@ const FeedFilterSheet = ({ children }: { children: ReactNode }) => {
         selectedCategory, setSelectedCategory,
         selectedStore, setSelectedStore,
         selectedCurrency, setSelectedCurrency,
-        setSearchTerm, setPage
+        setSearchTerm, setPage,
+        showGhostDropsOnly, setShowGhostDropsOnly
     } = useFilters();
 
     const [stores, setStores] = useState<{ id: string, name: string }[]>([]);
@@ -46,6 +48,7 @@ const FeedFilterSheet = ({ children }: { children: ReactNode }) => {
         setSelectedCurrency("all");
         setSearchTerm("");
         setPage(1);
+        setShowGhostDropsOnly(false);
     };
 
     return (
@@ -73,6 +76,29 @@ const FeedFilterSheet = ({ children }: { children: ReactNode }) => {
                 </SheetHeader>
 
                 <div className="space-y-8">
+                    {/* Categories */}
+                    <div className="space-y-4">
+                        <Label className="text-sm font-bold uppercase tracking-wider text-zinc-500">Modo</Label>
+                        <div className="flex items-center justify-between bg-zinc-900/50 p-3 rounded-xl border border-white/5">
+                            <div className="flex items-center gap-3">
+                                <div className={`p-2 rounded-full transition-colors ${showGhostDropsOnly ? 'bg-purple-500/20' : 'bg-zinc-800'}`}>
+                                    <Zap className={`w-4 h-4 ${showGhostDropsOnly ? 'text-purple-400 fill-purple-400' : 'text-zinc-500'}`} />
+                                </div>
+                                <div className="flex flex-col">
+                                    <Label className={`text-sm font-bold uppercase tracking-wider cursor-pointer select-none transition-colors ${showGhostDropsOnly ? 'text-white' : 'text-zinc-500'}`}>
+                                        Campus Ghost Drops
+                                    </Label>
+                                    <span className="text-[10px] text-zinc-600 font-mono">Ver solo drops ocultos</span>
+                                </div>
+                            </div>
+                            <Switch
+                                checked={showGhostDropsOnly}
+                                onCheckedChange={setShowGhostDropsOnly}
+                                className="data-[state=checked]:bg-purple-600"
+                            />
+                        </div>
+                    </div>
+
                     {/* Categories */}
                     <div className="space-y-4">
                         <Label className="text-sm font-bold uppercase tracking-wider text-zinc-500">Categorías</Label>
