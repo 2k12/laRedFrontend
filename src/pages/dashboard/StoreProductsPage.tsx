@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Package, ArrowLeft, Edit2, Trash2, ArrowRightLeft, Search, Plus, Store, AlertTriangle, Info, X, ShieldAlert, Zap } from "lucide-react";
+import { Package, ArrowLeft, Edit2, Trash2, ArrowRightLeft, Search, Plus, Store, AlertTriangle, Info, X, ShieldAlert, Zap, Settings, Image as ImageIcon } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { MinimalButton } from "@/components/MinimalButton";
 import { PageHeader } from "@/components/PageHeader";
@@ -141,7 +141,7 @@ export default function StoreProductsPage() {
     useEffect(() => {
         if (!user) return; // Wait for user to be loaded to know roles
         fetchProducts();
-        fetchStoreTitle();
+        fetchStoreDetails();
         fetchFormData();
         fetchOtherStores();
     }, [id, isCreateOpen, editingProduct?.id, user?.id]);
@@ -220,7 +220,13 @@ export default function StoreProductsPage() {
         }
     };
 
-    const fetchStoreTitle = async () => {
+    const [storeLogo, setStoreLogo] = useState("");
+    const [storeBanner, setStoreBanner] = useState("");
+    const [storeDescription, setStoreDescription] = useState("");
+    const [isBrandingOpen, setIsBrandingOpen] = useState(false);
+
+    // Re-fetch logic
+    const fetchStoreDetails = async () => {
         const token = localStorage.getItem('token');
         const isAdmin = user?.roles?.includes('ADMIN');
         try {
@@ -231,9 +237,46 @@ export default function StoreProductsPage() {
             const data = await res.json();
             if (res.ok) {
                 const store = data.stores.find((s: any) => s.id === id);
-                if (store) setStoreName(store.name);
+                if (store) {
+                    setStoreName(store.name);
+                    setStoreDescription(store.description || "");
+                    setStoreLogo(store.image_url || "");
+                    setStoreBanner(store.banner_url || "");
+                }
             }
         } catch (e) { console.error(e); }
+    };
+
+    const handleUpdateBranding = async () => {
+        setSubmitting(true);
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/stores/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: storeName,
+                    description: storeDescription,
+                    image_url: storeLogo,
+                    banner_url: storeBanner
+                })
+            });
+
+            if (res.ok) {
+                toast.success("Identidad de tienda actualizada");
+                setIsBrandingOpen(false);
+                fetchStoreDetails();
+            } else {
+                toast.error("Error al actualizar branding");
+            }
+        } catch (e) {
+            toast.error("Error de conexión");
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const fetchProducts = async () => {
@@ -407,6 +450,61 @@ export default function StoreProductsPage() {
                             />
                         </div>
                     </div>
+
+                    {/* Branding Modal */}
+                    <Dialog open={isBrandingOpen} onOpenChange={setIsBrandingOpen}>
+                        <DialogTrigger asChild>
+                            <MinimalButton variant="ghost" className="hidden sm:flex" icon={<Settings className="w-4 h-4" />}>
+                                Identidad
+                            </MinimalButton>
+                        </DialogTrigger>
+                        <DialogContent className="bg-zinc-950 border border-white/10 text-white w-[95%] sm:max-w-xl max-h-[90vh] overflow-y-auto rounded-[2rem] p-6 z-[200]">
+                            <DialogHeader>
+                                <DialogTitle className="text-xl font-black uppercase italic tracking-tighter">Identidad Visual</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                                <div className="grid gap-2">
+                                    <Label className="text-zinc-500 text-[9px] font-black uppercase">Banner de Tienda (1920x400)</Label>
+                                    <ImageUpload
+                                        value={storeBanner ? [storeBanner] : []}
+                                        onChange={(urls) => setStoreBanner(urls[0] || "")}
+                                        maxFiles={1}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-[100px_1fr] gap-4">
+                                    <div className="grid gap-2">
+                                        <Label className="text-zinc-500 text-[9px] font-black uppercase">Logo (Square)</Label>
+                                        <ImageUpload
+                                            value={storeLogo ? [storeLogo] : []}
+                                            onChange={(urls) => setStoreLogo(urls[0] || "")}
+                                            maxFiles={1}
+                                        />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label className="text-zinc-500 text-[9px] font-black uppercase">Nombre Público</Label>
+                                        <Input
+                                            value={storeName}
+                                            onChange={e => setStoreName(e.target.value)}
+                                            className="bg-zinc-900 border-zinc-800 h-10 rounded-xl"
+                                        />
+                                        <Label className="text-zinc-500 text-[9px] font-black uppercase mt-1">Descripción Corta</Label>
+                                        <Input
+                                            value={storeDescription}
+                                            onChange={e => setStoreDescription(e.target.value)}
+                                            className="bg-zinc-900 border-zinc-800 h-10 rounded-xl"
+                                            placeholder="Ej. La mejor ropa vintage..."
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <MinimalButton onClick={handleUpdateBranding} disabled={submitting}>
+                                    {submitting ? "Guardando..." : "Guardar Cambios"}
+                                </MinimalButton>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
 
                     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                         <DialogTrigger asChild>

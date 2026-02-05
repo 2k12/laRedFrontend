@@ -286,9 +286,9 @@ export function FloatingNavbar({ title, onToggleSidebar }: FloatingNavbarProps) 
 
                 <div className="flex items-center gap-3 shrink-0">
                     {/* Ultra-Minimalist Vault Display */}
-                    <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/5 bg-black/20 mr-2">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/5 bg-black/20 mr-2 hover:bg-black/40 transition-colors">
                         <Coins className="w-3.5 h-3.5 text-zinc-400" />
-                        <span className="font-mono text-xs text-zinc-300 tracking-tight">
+                        <span className="font-mono text-[10px] sm:text-xs text-zinc-300 tracking-tight">
                             {wallet?.balance?.toLocaleString() || 0} <span className="text-zinc-500">{wallet?.currency_symbol || BRANDING.currencySymbol}</span>
                         </span>
                     </div>

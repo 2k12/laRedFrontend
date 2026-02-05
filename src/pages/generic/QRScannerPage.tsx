@@ -4,6 +4,7 @@ import QrScanner from 'qr-scanner';
 import { PageHeader } from '@/components/PageHeader';
 import { Camera, ShieldCheck, AlertCircle, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 export default function QRScannerPage() {
     const navigate = useNavigate();
@@ -26,23 +27,87 @@ export default function QRScannerPage() {
 
         scanner.start().then(() => setHasCamera(true)).catch(() => setHasCamera(false));
 
+        const { token, refreshProfile } = useAuth(); // Needed for linking carnet using current user's token
+        const [processing, setProcessing] = useState(false);
+
         function onScanSuccess(decodedText: string) {
+            if (processing) return;
+
             try {
-                const url = new URL(decodedText);
-                if (url.pathname.endsWith('/rewards/claim')) {
-                    scanner.stop();
-                    const eventId = url.searchParams.get('eventId');
-                    const token = url.searchParams.get('token');
+                // 1. Check if it's a Reward URL
+                let isRewardUrl = false;
+                try {
+                    const url = new URL(decodedText);
+                    if (url.pathname.endsWith('/rewards/claim')) {
+                        isRewardUrl = true;
+                        scanner.stop();
+                        const eventId = url.searchParams.get('eventId');
+                        const qrToken = url.searchParams.get('token');
 
-                    // Simple Haptic Feedback
-                    if ('vibrate' in navigator) navigator.vibrate(200);
-
-                    navigate(`/dashboard/rewards/claim?eventId=${eventId}&token=${token}`);
-                } else {
-                    toast.error("QR no válido para recompensas");
+                        if ('vibrate' in navigator) navigator.vibrate(200);
+                        navigate(`/dashboard/rewards/claim?eventId=${eventId}&token=${qrToken}`);
+                    }
+                } catch (e) {
+                    // Not a URL -> Treat as Carnet/UTN_ID
                 }
+
+                // 2. If not reward, treat as Carnet/UTN_ID Linking
+                if (!isRewardUrl) {
+                    // Simple validation: Ensure it's not a huge JSON or weird string? 
+                    // For now, accept alphanumeric.
+                    if (decodedText.length > 200 || decodedText.startsWith('{')) {
+                        // Ignore complex JSONs (like certificates) if we are in "Self-Service" mode, 
+                        // UNLESS we want to support that too. But User request focused on "Carnet Scan".
+                        // Let's assume Carnet is a simple string.
+                        if (decodedText.includes('CERTIFICATE')) return; // Ignore certificates here to avoid confusion
+                    }
+
+                    scanner.stop();
+                    handleCarnetLink(decodedText);
+                }
+
             } catch (e) {
-                // Silently ignore if it's not a URL
+                console.error("Scan Error", e);
+            }
+        }
+
+        async function handleCarnetLink(utnId: string) {
+            setProcessing(true);
+            toast.loading("Vinculando Carnet...", { id: 'carnet-scan' });
+            if ('vibrate' in navigator) navigator.vibrate([50, 50]);
+
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/users/link-utnid`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ utn_id: utnId })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    toast.success("Carnet Vinculado y Rol de VENDEDOR Asignado", {
+                        id: 'carnet-scan',
+                        description: "Ahora puedes crear tiendas y vender productos.",
+                        duration: 5000
+                    });
+                    if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+
+                    await refreshProfile();
+                    setTimeout(() => navigate('/dashboard'), 2000);
+                } else {
+                    throw new Error(data.error || "Error al vincular");
+                }
+            } catch (error: any) {
+                console.error(error);
+                toast.error(error.message || "Error al procesar carnet", { id: 'carnet-scan' });
+                setTimeout(() => {
+                    setProcessing(false);
+                    scanner.start(); // Resume scanning
+                }, 2000);
             }
         }
 

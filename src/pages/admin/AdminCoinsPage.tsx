@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { BRANDING } from "@/config/branding";
 
 
-const MAX_COINS = 5000;
+const MAX_COINS = 1000;
 
 export default function AdminCoinsPage() {
     const { user, wallet } = useAuth();

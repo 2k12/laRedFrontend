@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { QRCodeSVG } from 'qrcode.react';
 import { gsap } from 'gsap';
 import {
     Mail, Shield, Calendar, Wallet,
@@ -141,7 +142,16 @@ export default function UserProfileModal({ userId, isOpen, onClose }: UserProfil
                                                     </div>
                                                     <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Credencial del Sistema</span>
                                                 </div>
-                                                <p className="text-[9px] font-mono text-zinc-600 break-all">{profile.user.id}</p>
+                                                <div className="flex flex-col items-center justify-center py-4">
+                                                    <div className="bg-white p-2 rounded-xl mb-3">
+                                                        <QRCodeSVG
+                                                            value={JSON.stringify({ type: 'CERTIFICATE', userId: profile.user.id })}
+                                                            size={100}
+                                                            level="L"
+                                                        />
+                                                    </div>
+                                                    <p className="text-[8px] font-mono text-zinc-600 break-all text-center">{profile.user.id}</p>
+                                                </div>
                                                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                                     <Shield className="w-12 h-12" />
                                                 </div>

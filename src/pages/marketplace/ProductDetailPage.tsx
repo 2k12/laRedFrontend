@@ -382,44 +382,7 @@ export default function ProductDetailPage() {
                                     </button>
                                 </div>
 
-                                {/* Mobile Action Dock - Top Centered */}
-                                <div className="absolute top-6 left-1/2 -translate-x-1/2 lg:hidden z-50">
-                                    <motion.div
-                                        initial={{ opacity: 0, y: -20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.5, type: "spring", stiffness: 300, damping: 30 }}
-                                        className="px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-2xl border border-white/10 shadow-2xl flex items-center gap-2"
-                                    >
-                                        <button
-                                            onClick={() => setShowPurchase(true)}
-                                            disabled={product.stock <= 0}
-                                            className={cn(
-                                                "h-9 px-6 text-[9px] font-black tracking-[0.2em] uppercase transition-all duration-300 rounded-full border",
-                                                product.stock <= 0
-                                                    ? "bg-zinc-900/50 text-zinc-600 border-white/5 cursor-not-allowed"
-                                                    : "bg-white text-black border-white active:scale-95 shadow-[0_10px_20px_-10px_rgba(255,255,255,0.3)]"
-                                            )}
-                                        >
-                                            {product.stock <= 0 ? "Agotado" : "Adquirir"}
-                                        </button>
 
-                                        <div className="flex gap-1.5 ml-0.5">
-                                            <button
-                                                className="w-8 h-8 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white/70 hover:text-pink-500 transition-all active:scale-90"
-                                                title="Me gusta"
-                                            >
-                                                <Heart className="w-3.5 h-3.5" />
-                                            </button>
-                                            <button
-                                                onClick={handleShare}
-                                                className="w-8 h-8 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white/70 hover:text-primary transition-all active:scale-90"
-                                                title="Compartir"
-                                            >
-                                                <Share2 className="w-3.5 h-3.5" />
-                                            </button>
-                                        </div>
-                                    </motion.div>
-                                </div>
 
                                 {/* Mobile Navigation Arrows */}
                                 <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4 lg:hidden z-40 pointer-events-none">
@@ -481,6 +444,35 @@ export default function ProductDetailPage() {
                                             <span className="flex items-center gap-1 text-[10px] md:text-xs text-muted-foreground font-mono">
                                                 <ShieldCheck className="w-3 h-3" /> Verificado
                                             </span>
+
+                                            {/* Mobile Actions - Relocated */}
+                                            <div className="flex lg:hidden items-center gap-2 ml-auto">
+                                                <button
+                                                    className="w-8 h-8 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white/70 hover:text-pink-500 transition-all active:scale-90"
+                                                    title="Me gusta"
+                                                >
+                                                    <Heart className="w-3.5 h-3.5" />
+                                                </button>
+                                                <button
+                                                    onClick={handleShare}
+                                                    className="w-8 h-8 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white/70 hover:text-primary transition-all active:scale-90"
+                                                    title="Compartir"
+                                                >
+                                                    <Share2 className="w-3.5 h-3.5" />
+                                                </button>
+                                                <button
+                                                    onClick={() => setShowPurchase(true)}
+                                                    disabled={product.stock <= 0}
+                                                    className={cn(
+                                                        "h-8 px-4 text-[9px] font-black tracking-[0.2em] uppercase transition-all duration-300 rounded-full border border-white/10",
+                                                        product.stock <= 0
+                                                            ? "bg-zinc-900/50 text-zinc-600 cursor-not-allowed"
+                                                            : "bg-white text-black active:scale-95"
+                                                    )}
+                                                >
+                                                    {product.stock <= 0 ? "Agotado" : "Adquirir"}
+                                                </button>
+                                            </div>
                                         </div>
                                         <h1 className="gsap-title text-4xl sm:text-5xl lg:text-7xl font-black tracking-tighter leading-[0.9] drop-shadow-lg">
                                             {product.name}

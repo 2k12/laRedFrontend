@@ -90,6 +90,19 @@ export default function MarketplaceFeed() {
         }
     };
 
+    // Store Profile State
+    const [storeProfile, setStoreProfile] = useState<any>(null);
+
+    useEffect(() => {
+        if (selectedStore && selectedStore !== 'ALL') {
+            axios.get(`${API_BASE_URL}/api/public/stores/${selectedStore}`)
+                .then(res => setStoreProfile(res.data))
+                .catch(() => setStoreProfile(null));
+        } else {
+            setStoreProfile(null);
+        }
+    }, [selectedStore]);
+
     return (
         <AnimatePresence mode="wait">
             {!isExiting && (
@@ -112,17 +125,70 @@ export default function MarketplaceFeed() {
 
                         {/* Right Content */}
                         <div className="flex-1 w-full flex flex-col pt-4 md:pt-14 pb-24 min-h-[80vh]">
-                            {/* Featured Slide Section */}
-                            {!searchTerm && <FeaturedSlide />}
+                            {/* Featured Slide Section - Only show if NO store selected */}
+                            {!searchTerm && !storeProfile && <FeaturedSlide />}
 
-                            <PageHeader
-                                title={BRANDING.productNamePlural}
-                                description={`Explora ${BRANDING.productNamePlural.toLowerCase()} de la comunidad universitaria.`}
-                            >
-                                <div className="hidden sm:flex gap-2 text-xs font-mono text-zinc-500">
-                                    {!loading && <span>{products.length} Resultados</span>}
+                            {/* Dynamic Header: Store Profile OR Default Header */}
+                            {storeProfile ? (
+                                <div className="mb-10 relative group">
+                                    {/* Pro Banner */}
+                                    <div className="w-full h-48 md:h-64 rounded-[2.5rem] overflow-hidden relative shadow-2xl border border-white/5 bg-zinc-900">
+                                        {storeProfile.banner_url ? (
+                                            <img src={storeProfile.banner_url} alt="Banner" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full bg-gradient-to-br from-primary/20 via-purple-900/20 to-zinc-900 flex items-center justify-center">
+                                                <span className="text-white/10 font-black text-6xl uppercase tracking-tighter italic">{storeProfile.name}</span>
+                                            </div>
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
+                                    </div>
+
+                                    {/* Store Info Overlay */}
+                                    <div className="absolute -bottom-6 left-6 md:left-12 flex items-end gap-6 z-20">
+                                        {/* Avatar */}
+                                        <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-[6px] border-zinc-950 bg-zinc-900 shadow-xl overflow-hidden group-hover:scale-105 transition-transform duration-500">
+                                            {storeProfile.image_url ? (
+                                                <img src={storeProfile.image_url} alt="Logo" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-zinc-800 text-white font-bold text-2xl">
+                                                    {storeProfile.name.charAt(0)}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Text Info */}
+                                        <div className="mb-4 space-y-1">
+                                            <h1 className="text-3xl md:text-5xl font-black text-white italic tracking-tighter drop-shadow-lg uppercase leading-none">
+                                                {storeProfile.name}
+                                            </h1>
+                                            {storeProfile.description && (
+                                                <p className="text-xs md:text-sm text-zinc-400 font-medium max-w-lg line-clamp-2 drop-shadow-md">
+                                                    {storeProfile.description}
+                                                </p>
+                                            )}
+
+                                            {/* Stats Badges */}
+                                            <div className="flex gap-2 mt-2">
+                                                <span className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-bold text-white uppercase border border-white/10">
+                                                    {storeProfile.product_count || products.length} Drops
+                                                </span>
+                                                <span className="px-3 py-1 bg-emerald-500/20 backdrop-blur-md rounded-full text-[10px] font-bold text-emerald-400 uppercase border border-emerald-500/20">
+                                                    Verificado
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </PageHeader>
+                            ) : (
+                                <PageHeader
+                                    title={BRANDING.productNamePlural}
+                                    description={`Explora ${BRANDING.productNamePlural.toLowerCase()} de la comunidad universitaria.`}
+                                >
+                                    <div className="hidden sm:flex gap-2 text-xs font-mono text-zinc-500">
+                                        {!loading && <span>{products.length} Resultados</span>}
+                                    </div>
+                                </PageHeader>
+                            )}
 
                             {/* Modern Grid - Optimized Density */}
                             <div
