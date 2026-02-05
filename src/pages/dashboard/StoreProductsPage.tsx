@@ -1137,7 +1137,7 @@ export default function StoreProductsPage() {
                                         </div>
                                     </div>
                                     <Switch
-                                        checked={editingProduct.is_ghost_drop}
+                                        checked={!!editingProduct.is_ghost_drop}
                                         onCheckedChange={(checked) => setEditingProduct({ ...editingProduct, is_ghost_drop: checked })}
                                         className="data-[state=checked]:bg-purple-600"
                                     />
@@ -1184,7 +1184,7 @@ export default function StoreProductsPage() {
                                                         placeholder="50"
                                                         className="bg-zinc-900 border-zinc-800 text-[10px] h-9"
                                                         value={editingProduct.ghost_radius || ''}
-                                                        onChange={e => setEditingProduct({ ...editingProduct, ghost_radius: e.target.value })}
+                                                        onChange={e => setEditingProduct({ ...editingProduct, ghost_radius: Number(e.target.value) })}
                                                     />
                                                 </div>
                                                 <div className="col-span-2 grid gap-1">
@@ -1207,7 +1207,7 @@ export default function StoreProductsPage() {
                                             </div>
                                             <GeofenceMap
                                                 polygon={campusPolygon}
-                                                initialLocation={editingProduct.ghost_lat ? { lat: parseFloat(editingProduct.ghost_lat), lng: parseFloat(editingProduct.ghost_lng) } : null}
+                                                initialLocation={editingProduct.ghost_lat ? { lat: parseFloat(editingProduct.ghost_lat), lng: parseFloat(editingProduct.ghost_lng || '0') } : null}
                                                 onLocationSelect={(lat, lng) => setEditingProduct({ ...editingProduct, ghost_lat: lat.toString(), ghost_lng: lng.toString() })}
                                             />
                                         </div>

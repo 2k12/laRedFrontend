@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRef } from "react";
 import { useLocation } from "@/context/LocationContext";
-import { Lock, Move, ChevronLeft as BackIcon } from "lucide-react";
+import { Lock, ChevronLeft as BackIcon } from "lucide-react";
 import gsap from "gsap";
 import {
     AlertDialog,
