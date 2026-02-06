@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Award, Loader2, Check, Send } from 'lucide-react';
-import { BADGE_CONFIG } from '@/config/badges';
+import { ICON_MAP } from '@/config/badges';
 import { API_BASE_URL } from '@/config/api';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
@@ -15,6 +15,7 @@ interface Badge {
     description: string;
     icon_url: string;
     rarity: string;
+    color?: string;
 }
 
 interface BadgeAwardModalProps {
@@ -94,10 +95,6 @@ export default function BadgeAwardModal({ userId, userName, isOpen, onClose }: B
         }
     };
 
-    const getBadgeUI = (badgeName: string) => {
-        return BADGE_CONFIG[badgeName] || BADGE_CONFIG['DEFAULT'];
-    }
-
     const unearnedBadges = allBadges.filter(b => !userBadgeIds.includes(b.id));
     const earnedBadges = allBadges.filter(b => userBadgeIds.includes(b.id));
 
@@ -139,8 +136,9 @@ export default function BadgeAwardModal({ userId, userName, isOpen, onClose }: B
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                         {unearnedBadges.map((badge, i) => {
                                             const isSelected = selectedIds.includes(badge.id);
-                                            const ui = getBadgeUI(badge.name);
-                                            const Icon = ui.icon;
+                                            const Icon = ICON_MAP[badge.icon_url] || ICON_MAP['default'];
+                                            const badgeColor = badge.color || 'text-zinc-500 fill-zinc-500/20';
+
                                             return (
                                                 <motion.button
                                                     key={badge.id}
@@ -170,9 +168,9 @@ export default function BadgeAwardModal({ userId, userName, isOpen, onClose }: B
 
                                                     <div className={cn(
                                                         "w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 transition-all duration-500",
-                                                        isSelected ? "bg-amber-500 text-black shadow-lg shadow-amber-500/20" : "bg-zinc-950 border border-white/5 " + ui.color
+                                                        isSelected ? "bg-amber-500 text-black shadow-lg shadow-amber-500/20" : "bg-zinc-950 border border-white/5 " + badgeColor
                                                     )}>
-                                                        <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                                                        <Icon className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.5]" />
                                                     </div>
 
                                                     <h4 className={cn(
@@ -200,14 +198,17 @@ export default function BadgeAwardModal({ userId, userName, isOpen, onClose }: B
                                     </div>
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                         {earnedBadges.map((badge) => {
-                                            const ui = getBadgeUI(badge.name);
-                                            const Icon = ui.icon;
+                                            const Icon = ICON_MAP[badge.icon_url] || ICON_MAP['default'];
+                                            const badgeColor = badge.color || 'text-zinc-500';
+
                                             return (
                                                 <div
                                                     key={badge.id}
                                                     className="p-4 rounded-3xl border border-emerald-500/5 bg-emerald-500/[0.02] flex flex-col items-center text-center cursor-not-allowed group"
                                                 >
-                                                    <div className="w-10 h-10 rounded-xl bg-zinc-950 border border-white/5 flex items-center justify-center mb-2 text-emerald-500/40 group-hover:text-emerald-500 group-hover:scale-110 transition-all">
+                                                    <div className={cn(
+                                                        "w-10 h-10 rounded-xl bg-zinc-950 border border-white/5 flex items-center justify-center mb-2 group-hover:scale-110 transition-all text-emerald-500/40 group-hover:text-emerald-500"
+                                                    )}>
                                                         <Icon className="w-5 h-5" />
                                                     </div>
                                                     <h4 className="text-[10px] font-black uppercase italic tracking-tighter text-zinc-500">

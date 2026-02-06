@@ -156,7 +156,7 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start">
 
-                {/* Left Column: Minimalist ID Card */}
+                {/* Left Column: Identity & Assets */}
                 <div className="relative overflow-hidden sm:overflow-visible">
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-[2rem] md:rounded-[2.5rem] blur-xl opacity-20" />
                     <div className="relative bg-zinc-900/80 backdrop-blur-md border border-white/10 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10">
@@ -164,13 +164,54 @@ export default function DashboardPage() {
                         <div className="absolute top-0 right-0 w-48 md:w-64 h-48 md:h-64 bg-gradient-to-bl from-white/5 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
                         <div className="relative z-10 flex flex-col h-full justify-between min-h-[250px] md:min-h-[300px]">
+                            {/* Header: Verified & Wallet */}
                             <div className="flex justify-between items-start mb-6 md:mb-8">
-                                <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-zinc-950 border border-zinc-800 flex items-center justify-center shadow-lg">
-                                    <ShieldCheck className="w-6 h-6 md:w-8 md:h-8 text-white" />
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-zinc-950 border border-zinc-800 flex items-center justify-center shadow-lg">
+                                        <ShieldCheck className="w-6 h-6 md:w-8 md:h-8 text-white" />
+                                    </div>
+
+                                    {/* Merged Wallet Display */}
+                                    <div className="hidden sm:block">
+                                        <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
+                                            <Wallet className="w-3.5 h-3.5 text-zinc-500" />
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-sm font-black text-white">{wallet?.balance?.toLocaleString() || 0}</span>
+                                                <span className="text-[10px] font-bold text-zinc-600">{wallet?.currency_symbol || 'PL'}</span>
+                                            </div>
+                                            <div className="w-px h-3 bg-white/10 mx-1" />
+                                            <button
+                                                onClick={() => setIsHistoryOpen(true)}
+                                                className="text-[9px] font-black uppercase text-primary hover:text-white transition-colors"
+                                            >
+                                                Historial
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
+
                                 <div className="px-3 md:px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2">
                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                     <span className="text-[9px] md:text-[10px] font-mono font-bold text-emerald-500 tracking-wider">VERIFICADO</span>
+                                </div>
+                            </div>
+
+                            {/* Mobile Wallet (Visible only on small screens) */}
+                            <div className="sm:hidden mb-6">
+                                <div className="flex items-center justify-between bg-white/5 px-4 py-3 rounded-2xl border border-white/5">
+                                    <div className="flex items-center gap-3">
+                                        <Wallet className="w-4 h-4 text-zinc-500" />
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-xl font-black text-white">{wallet?.balance?.toLocaleString() || 0}</span>
+                                            <span className="text-xs font-bold text-zinc-600">{wallet?.currency_symbol || 'PL'}</span>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setIsHistoryOpen(true)}
+                                        className="text-[10px] font-black uppercase text-primary hover:text-white transition-colors bg-primary/10 px-3 py-1 rounded-lg"
+                                    >
+                                        Historial
+                                    </button>
                                 </div>
                             </div>
 
@@ -194,17 +235,12 @@ export default function DashboardPage() {
 
                     {/* Badge System Section */}
                     <div className="mt-8">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="p-2 rounded-lg bg-white/5 text-zinc-300">
-                                <Award className="w-4 h-4 md:w-5 md:h-5" />
-                            </div>
-                            <h3 className="text-base md:text-lg font-bold text-white uppercase tracking-tight">Mis Insignias</h3>
-                        </div>
+
                         <BadgeDisplay />
                     </div>
                 </div>
 
-                {/* Right Column: Settings & Wallet */}
+                {/* Right Column: Settings */}
                 <div className="space-y-6">
                     {/* Navigation Cards */}
                     <div className="grid grid-cols-2 gap-3 md:gap-4">
@@ -359,32 +395,6 @@ export default function DashboardPage() {
                                     </DialogFooter>
                                 </DialogContent>
                             </Dialog>
-                        </div>
-                    </div>
-
-                    {/* Wallet Section */}
-                    <div className="bg-zinc-900/50 border border-white/5 rounded-[1.5rem] md:rounded-3xl p-5 md:p-8 backdrop-blur-sm">
-                        <div className="flex items-center gap-3 mb-5 md:mb-6">
-                            <div className="p-2 rounded-lg bg-white/5 text-zinc-300">
-                                <Wallet className="w-4 h-4 md:w-5 md:h-5" />
-                            </div>
-                            <h3 className="text-base md:text-lg font-bold text-white uppercase tracking-tight">Estado de Cuenta</h3>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 md:p-6 bg-gradient-to-r from-black/40 to-black/20 rounded-xl md:rounded-2xl border border-white/5 gap-4">
-                            <div>
-                                <p className="text-[8px] md:text-[10px] text-zinc-500 uppercase tracking-widest mb-1">Disponible</p>
-                                <div className="flex items-baseline gap-1">
-                                    <span className="text-2xl md:text-3xl font-bold text-white tracking-tighter">{wallet?.balance?.toLocaleString() || 0}</span>
-                                    <span className="text-xs md:text-sm font-medium text-zinc-500">{wallet?.currency_symbol || BRANDING.currencySymbol}</span>
-                                </div>
-                            </div>
-                            <MinimalButton
-                                onClick={() => setIsHistoryOpen(true)}
-                                className="w-full sm:w-auto justify-center"
-                            >
-                                Ver Historial
-                            </MinimalButton>
                         </div>
                     </div>
                 </div>

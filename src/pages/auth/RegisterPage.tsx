@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,8 +9,11 @@ import gsap from "gsap";
 import { toast } from "sonner";
 import { API_BASE_URL } from "@/config/api";
 import PulseCoin from "@/components/PulseCoin";
+import { useAuth } from "@/context/AuthContext";
 
 export default function RegisterPage() {
+    const { login } = useAuth();
+    const navigate = useNavigate();
     const location = useLocation();
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
@@ -58,8 +61,17 @@ export default function RegisterPage() {
 
             if (!res.ok) throw new Error(data.error || 'Error al registrarse');
 
-            setIsSuccess(true);
-            toast.success("Registro exitoso");
+            // AUTO-LOGIN & REDIRECT
+            toast.success("Registro exitoso. Iniciando sesión...");
+
+            if (data.token && data.user) {
+                login(data.token, data.user);
+                // Redirect immediately
+                const from = (location.state as any)?.from?.pathname || "/dashboard";
+                setTimeout(() => navigate(from, { replace: true }), 1500);
+            } else {
+                setIsSuccess(true);
+            }
 
         } catch (err: any) {
             toast.error(err.message || "Error al registrarse");

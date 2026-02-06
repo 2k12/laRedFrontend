@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -10,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Package, ArrowLeft, Edit2, Trash2, ArrowRightLeft, Search, Plus, Store, AlertTriangle, Info, X, ShieldAlert, Zap, Settings } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { MinimalButton } from "@/components/MinimalButton";
-import { PageHeader } from "@/components/PageHeader";
+
 import AdPurchaseModal from "@/components/AdPurchaseModal";
 import { BRANDING } from "@/config/branding";
 import { API_BASE_URL } from "@/config/api";
@@ -427,12 +428,98 @@ export default function StoreProductsPage() {
     };
 
     return (
-        <div className="container mx-auto max-w-7xl px-4 pb-20">
-            <PageHeader
-                title={storeName || "Cargando..."}
-                description={`Inventario de ${BRANDING.storeName}`}
-                icon={<Store className="w-8 h-8" />}
+        <div className="relative min-h-screen">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="container mx-auto max-w-7xl px-4 pb-20"
             >
+                {/* Futuristic Ultra-Minimalist Header */}
+                {/* Futuristic Ultra-Minimalist Header - Centered Layout */}
+                <div className="relative mb-8 md:mb-12 group h-[250px] md:h-[400px]">
+                    {/* Parallax/Cinematic Banner - Background */}
+                    <div className="absolute inset-0 rounded-[2rem] md:rounded-[3rem] overflow-hidden">
+                        <div className="absolute inset-0 bg-zinc-900" />
+                        {loading && !storeBanner ? (
+                            <div className="w-full h-full bg-zinc-900 animate-pulse" />
+                        ) : storeBanner ? (
+                            <div className="absolute inset-0">
+                                <img
+                                    src={storeBanner}
+                                    alt="Banner"
+                                    className="w-full h-full object-cover opacity-60 md:opacity-50 group-hover:scale-105 transition-transform duration-[2s] ease-out grayscale hover:grayscale-0"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/20 via-zinc-950/40 to-zinc-950" />
+                                <div className="absolute inset-0 bg-black/10" />
+                            </div>
+                        ) : (
+                            <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-800 via-zinc-900 to-black opacity-50" />
+                        )}
+                    </div>
+
+                    {/* Content Container - Centered */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center z-10 p-6 text-center">
+
+                        {/* Levitating Logo - Centered */}
+                        <div className="relative mb-4 md:mb-6 group/logo">
+                            <div className="w-20 h-20 md:w-40 md:h-40 rounded-2xl md:rounded-[2rem] bg-zinc-950/80 backdrop-blur-xl border border-white/10 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] overflow-hidden flex items-center justify-center relative z-10 transition-transform duration-500 ease-out hover:scale-105">
+                                {storeLogo ? (
+                                    <img src={storeLogo} alt="Logo" className="w-full h-full object-cover" />
+                                ) : (
+                                    <Store className="w-8 h-8 md:w-16 md:h-16 text-zinc-700" />
+                                )}
+
+                                <button
+                                    onClick={() => setIsBrandingOpen(true)}
+                                    className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/logo:opacity-100 transition-opacity duration-300"
+                                    title="Editar Identidad Visual"
+                                >
+                                    <Settings className="w-8 h-8 text-white animate-[spin_4s_linear_infinite]" />
+                                </button>
+                            </div>
+
+                            {/* Decorative Glow */}
+                            <div className="absolute inset-0 bg-primary/20 blur-3xl -z-10 rounded-full opacity-20 group-hover/logo:opacity-40 transition-opacity" />
+                        </div>
+
+                        {/* Text & Identity */}
+                        <div className="space-y-2 md:space-y-3 max-w-2xl mx-auto">
+                            {loading && !storeName ? (
+                                <div className="h-8 md:h-16 w-48 md:w-96 bg-white/10 rounded-lg mx-auto animate-pulse" />
+                            ) : (
+                                <h1 className="text-2xl md:text-7xl font-black text-white tracking-tighter uppercase leading-[0.85] drop-shadow-2xl">
+                                    {storeName}
+                                </h1>
+                            )}
+
+                            <div className="flex items-center justify-center gap-2 md:gap-4">
+                                <div className="h-px w-8 md:w-12 bg-white/20" />
+                                {loading && !storeDescription ? (
+                                    <div className="h-3 md:h-4 w-32 md:w-64 bg-white/10 rounded mx-auto animate-pulse" />
+                                ) : (
+                                    <p className="text-zinc-300 text-[10px] md:text-sm font-mono tracking-[0.2em] uppercase truncate max-w-[200px] md:max-w-none">
+                                        {storeDescription}
+                                    </p>
+                                )}
+                                <div className="h-px w-8 md:w-12 bg-white/20" />
+                            </div>
+                        </div>
+
+                        {/* Header Actions - Desktop Only Floating Bottom */}
+                        <div className="hidden md:flex absolute bottom-8 items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-4 group-hover:translate-y-0">
+                            <MinimalButton
+                                onClick={() => setIsBrandingOpen(true)}
+                                className="bg-white/10 hover:bg-white text-white hover:text-black border-white/10 backdrop-blur-md rounded-full px-6 h-10"
+                            >
+                                <span className="text-[10px] font-bold uppercase tracking-widest">Editar Perfil</span>
+                            </MinimalButton>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Action Bar (Search, Back, etc) - Formerly children of PageHeader */}
                 <div className="flex flex-row items-center justify-between w-full sm:w-auto gap-4 mt-4 sm:mt-0">
                     <div className="flex items-center gap-3">
                         <button onClick={() => navigate('/dashboard/stores')} className="p-2 hover:bg-zinc-900 rounded-full transition-colors text-zinc-500 hover:text-white shrink-0">
@@ -452,57 +539,93 @@ export default function StoreProductsPage() {
                     </div>
 
                     {/* Branding Modal */}
+                    {/* Branding Modal - Rendered but triggered via Header */}
                     <Dialog open={isBrandingOpen} onOpenChange={setIsBrandingOpen}>
-                        <DialogTrigger asChild>
-                            <MinimalButton variant="ghost" className="hidden sm:flex" icon={<Settings className="w-4 h-4" />}>
-                                Identidad
-                            </MinimalButton>
-                        </DialogTrigger>
-                        <DialogContent className="bg-zinc-950 border border-white/10 text-white w-[95%] sm:max-w-xl max-h-[90vh] overflow-y-auto rounded-[2rem] p-6 z-[200]">
-                            <DialogHeader>
-                                <DialogTitle className="text-xl font-black uppercase italic tracking-tighter">Identidad Visual</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4 py-4">
-                                <div className="grid gap-2">
-                                    <Label className="text-zinc-500 text-[9px] font-black uppercase">Banner de Tienda (1920x400)</Label>
-                                    <ImageUpload
-                                        value={storeBanner ? [storeBanner] : []}
-                                        onChange={(urls) => setStoreBanner(urls[0] || "")}
-                                        maxFiles={1}
-                                    />
+                        <DialogContent className="bg-zinc-950 border border-white/5 text-white w-[95%] sm:max-w-2xl rounded-[2.5rem] p-0 overflow-hidden shadow-2xl">
+                            {/* Preview Header in Modal */}
+                            <div className="h-40 relative bg-zinc-900 overflow-hidden group">
+                                {storeBanner ? (
+                                    <img src={storeBanner} className="w-full h-full object-cover opacity-50 grayscale group-hover:grayscale-0 transition-all duration-700" alt="Banner Preview" />
+                                ) : (
+                                    <div className="w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-800 via-zinc-900 to-black" />
+                                )}
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                    <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white drop-shadow-xl">Identidad Visual</h2>
                                 </div>
+                            </div>
 
-                                <div className="grid grid-cols-[100px_1fr] gap-4">
-                                    <div className="grid gap-2">
-                                        <Label className="text-zinc-500 text-[9px] font-black uppercase">Logo (Square)</Label>
-                                        <ImageUpload
-                                            value={storeLogo ? [storeLogo] : []}
-                                            onChange={(urls) => setStoreLogo(urls[0] || "")}
-                                            maxFiles={1}
-                                        />
+                            <div className="p-8 -mt-6 relative z-10 bg-zinc-950 rounded-t-[2rem]">
+                                <div className="flex flex-col md:flex-row gap-8">
+
+                                    {/* Left Column: Visuals */}
+                                    <div className="flex-1 space-y-6">
+                                        <div className="space-y-3">
+                                            <Label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                                                <div className="w-1 h-1 bg-primary rounded-full" />
+                                                Banner de Tienda
+                                            </Label>
+                                            <ImageUpload
+                                                value={storeBanner ? [storeBanner] : []}
+                                                onChange={(urls) => setStoreBanner(urls[0] || "")}
+                                                maxFiles={1}
+                                            />
+                                            <p className="text-[10px] text-zinc-600 font-mono">Recomendado: 1920x600px (JPG/PNG)</p>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <Label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                                                <div className="w-1 h-1 bg-primary rounded-full" />
+                                                Logotipo (Square)
+                                            </Label>
+                                            <div className="flex gap-4">
+                                                <div className="w-24 h-24 shrink-0 rounded-2xl bg-zinc-900 border border-white/10 overflow-hidden relative">
+                                                    {storeLogo && <img src={storeLogo} className="w-full h-full object-cover" alt="Logo Preview" />}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <ImageUpload
+                                                        value={storeLogo ? [storeLogo] : []}
+                                                        onChange={(urls) => setStoreLogo(urls[0] || "")}
+                                                        maxFiles={1}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="grid gap-2">
-                                        <Label className="text-zinc-500 text-[9px] font-black uppercase">Nombre Público</Label>
-                                        <Input
-                                            value={storeName}
-                                            onChange={e => setStoreName(e.target.value)}
-                                            className="bg-zinc-900 border-zinc-800 h-10 rounded-xl"
-                                        />
-                                        <Label className="text-zinc-500 text-[9px] font-black uppercase mt-1">Descripción Corta</Label>
-                                        <Input
-                                            value={storeDescription}
-                                            onChange={e => setStoreDescription(e.target.value)}
-                                            className="bg-zinc-900 border-zinc-800 h-10 rounded-xl"
-                                            placeholder="Ej. La mejor ropa vintage..."
-                                        />
+
+                                    {/* Right Column: Info */}
+                                    <div className="flex-1 space-y-6">
+                                        <div className="space-y-3">
+                                            <Label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">Nombre Público</Label>
+                                            <Input
+                                                value={storeName}
+                                                onChange={e => setStoreName(e.target.value)}
+                                                className="bg-zinc-900/50 border-zinc-800 h-12 rounded-xl focus:border-white/20 transition-colors font-bold text-lg"
+                                                placeholder="Nombre de la marca"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <Label className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">Eslogan / Concepto</Label>
+                                            <Input
+                                                value={storeDescription}
+                                                onChange={e => setStoreDescription(e.target.value)}
+                                                className="bg-zinc-900/50 border-zinc-800 h-12 rounded-xl focus:border-white/20 transition-colors"
+                                                placeholder="Breve descripción del concepto..."
+                                            />
+                                        </div>
+
+                                        <div className="pt-4">
+                                            <MinimalButton
+                                                onClick={handleUpdateBranding}
+                                                disabled={submitting}
+                                                className="w-full justify-center h-12 bg-white text-black hover:bg-zinc-200"
+                                            >
+                                                {submitting ? "Guardando..." : "Aplicar Cambios"}
+                                            </MinimalButton>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <DialogFooter>
-                                <MinimalButton onClick={handleUpdateBranding} disabled={submitting}>
-                                    {submitting ? "Guardando..." : "Guardar Cambios"}
-                                </MinimalButton>
-                            </DialogFooter>
                         </DialogContent>
                     </Dialog>
 
@@ -802,159 +925,160 @@ export default function StoreProductsPage() {
                     </Dialog>
 
                 </div>
-            </PageHeader >
 
-            <main className={`pt-8 md:pt-16 pb-20 px-4 md:px-10 max-w-7xl mx-auto transition-all duration-500 ${isDragging ? 'lg:pr-[320px] opacity-50 scale-[0.98]' : ''}`}>
-                {loading ? (
-                    <div className="h-64 flex flex-col items-center justify-center gap-4 text-zinc-600 font-mono text-[10px] tracking-tighter uppercase">
-                        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                        Sincronizando {BRANDING.storeName}...
-                    </div>
-                ) : filteredProducts.length === 0 ? (
-                    <div className="text-center py-20 md:py-32 border border-dashed border-white/5 rounded-[2rem] md:rounded-[3rem] bg-zinc-900/10 px-6">
-                        <Package className="w-12 h-12 md:w-16 md:h-16 text-zinc-800 mx-auto mb-6" />
-                        <h3 className="text-xl md:text-2xl font-black text-white uppercase italic tracking-tighter">Sin Existencias</h3>
-                        <p className="text-zinc-500 text-xs md:text-sm max-w-xs mx-auto mt-2">Esta {BRANDING.storeName.toLowerCase()} aún no tiene {BRANDING.productNamePlural.toLowerCase()} registrados.</p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 md:gap-4">
-                        {filteredProducts.map((product: any) => (
-                            <div
-                                key={product.id}
-                                draggable={!isMobile}
-                                onDragStart={(e) => {
-                                    if (isMobile) return;
-                                    setIsDragging(true);
-                                    setDraggedProductId(product.id);
 
-                                    // Custom Drag Preview (Simplified)
-                                    const ghost = document.getElementById('drag-ghost');
-                                    if (ghost) {
-                                        ghost.innerHTML = `<div class="flex items-center gap-2 p-3 bg-black border-2 border-emerald-500 rounded-xl overflow-hidden shadow-2xl">
+                <main className={`pt-8 md:pt-16 pb-20 px-4 md:px-10 max-w-7xl mx-auto transition-all duration-500 ${isDragging ? 'lg:pr-[320px] opacity-50 scale-[0.98]' : ''}`}>
+                    {loading ? (
+                        <div className="h-64 flex flex-col items-center justify-center gap-4 text-zinc-600 font-mono text-[10px] tracking-tighter uppercase">
+                            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                            Sincronizando {BRANDING.storeName}...
+                        </div>
+                    ) : filteredProducts.length === 0 ? (
+                        <div className="text-center py-20 md:py-32 border border-dashed border-white/5 rounded-[2rem] md:rounded-[3rem] bg-zinc-900/10 px-6">
+                            <Package className="w-12 h-12 md:w-16 md:h-16 text-zinc-800 mx-auto mb-6" />
+                            <h3 className="text-xl md:text-2xl font-black text-white uppercase italic tracking-tighter">Sin Existencias</h3>
+                            <p className="text-zinc-500 text-xs md:text-sm max-w-xs mx-auto mt-2">Esta {BRANDING.storeName.toLowerCase()} aún no tiene {BRANDING.productNamePlural.toLowerCase()} registrados.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 md:gap-4">
+                            {filteredProducts.map((product: any) => (
+                                <div
+                                    key={product.id}
+                                    draggable={!isMobile}
+                                    onDragStart={(e) => {
+                                        if (isMobile) return;
+                                        setIsDragging(true);
+                                        setDraggedProductId(product.id);
+
+                                        // Custom Drag Preview (Simplified)
+                                        const ghost = document.getElementById('drag-ghost');
+                                        if (ghost) {
+                                            ghost.innerHTML = `<div class="flex items-center gap-2 p-3 bg-black border-2 border-emerald-500 rounded-xl overflow-hidden shadow-2xl">
                                             <div class="w-6 h-6 bg-emerald-500 rounded flex items-center justify-center"><svg class="w-4 h-4 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 8l-2-2H5L3 8v10a2 2 0 002 2h14a2 2 0 002-2V8z"></path><path d="M3 8h18"></path><path d="M10 12h4"></path></svg></div>
                                             <span class="text-[10px] font-black uppercase text-white truncate max-w-[100px]">${product.name}</span>
                                         </div>`;
-                                        e.dataTransfer.setDragImage(ghost, 0, 0);
-                                    }
-                                }}
-                                onDragEnd={() => {
-                                    if (!dropTargetId) {
-                                        setIsDragging(false);
-                                        setDraggedProductId(null);
-                                    }
-                                }}
-                                className={`group relative bg-zinc-900/40 border border-white/5 rounded-[1.2rem] px-4 py-3 hover:bg-zinc-900/60 transition-all duration-300 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2 ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''} ${draggedProductId === product.id ? 'border-primary opacity-40 grayscale scale-[0.98]' : ''}`}
-                            >
-                                <div className="flex flex-row lg:flex-row items-center gap-3 md:gap-5 w-full lg:w-auto pointer-events-none">
-                                    <div className="relative w-12 h-12 md:w-14 md:h-14 bg-zinc-950 rounded-lg border border-white/5 flex items-center justify-center text-zinc-800 group-hover:text-primary transition-colors shrink-0 overflow-hidden">
-                                        {product.images && product.images.length > 0 ? (
-                                            <img
-                                                src={product.images[0]}
-                                                alt={product.name}
-                                                className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity"
-                                            />
-                                        ) : (
-                                            <Package className="w-7 h-7 md:w-10 md:h-10" />
-                                        )}
-                                        {product.stock === 0 && (
-                                            <div className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-bounce z-10">
-                                                <ShieldAlert className="w-3 h-3 md:w-4 md:h-4" />
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="space-y-0.5 md:space-y-1 overflow-hidden flex-1">
-                                        <div className="flex items-center gap-2 md:gap-3">
-                                            <span className="text-[8px] md:text-[9px] font-black text-primary uppercase tracking-[0.2em]">
-                                                {CATEGORY_MAP[product.category] || product.category}
-                                            </span>
-                                            <span className="text-[8px] md:text-[9px] font-black px-1.5 py-0.5 bg-zinc-800 text-zinc-400 rounded uppercase tracking-[0.1em]">{product.condition === 'NEW' ? 'Nuevo' : 'Usado'}</span>
-                                            <span className="text-[8px] md:text-[9px] font-mono text-zinc-500 uppercase tracking-wider">{product.sku || `PID-${product.id.slice(0, 8)}`}</span>
+                                            e.dataTransfer.setDragImage(ghost, 0, 0);
+                                        }
+                                    }}
+                                    onDragEnd={() => {
+                                        if (!dropTargetId) {
+                                            setIsDragging(false);
+                                            setDraggedProductId(null);
+                                        }
+                                    }}
+                                    className={`group relative bg-zinc-900/40 border border-white/5 rounded-[1.2rem] px-4 py-3 hover:bg-zinc-900/60 transition-all duration-300 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2 ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''} ${draggedProductId === product.id ? 'border-primary opacity-40 grayscale scale-[0.98]' : ''}`}
+                                >
+                                    <div className="flex flex-row lg:flex-row items-center gap-3 md:gap-5 w-full lg:w-auto pointer-events-none">
+                                        <div className="relative w-12 h-12 md:w-14 md:h-14 bg-zinc-950 rounded-lg border border-white/5 flex items-center justify-center text-zinc-800 group-hover:text-primary transition-colors shrink-0 overflow-hidden">
+                                            {product.images && product.images.length > 0 ? (
+                                                <img
+                                                    src={product.images[0]}
+                                                    alt={product.name}
+                                                    className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity"
+                                                />
+                                            ) : (
+                                                <Package className="w-7 h-7 md:w-10 md:h-10" />
+                                            )}
+                                            {product.stock === 0 && (
+                                                <div className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-bounce z-10">
+                                                    <ShieldAlert className="w-3 h-3 md:w-4 md:h-4" />
+                                                </div>
+                                            )}
                                         </div>
-                                        <h3 className="text-sm md:text-xl font-bold text-white group-hover:translate-x-1 transition-transform truncate">{product.name}</h3>
-                                        <p className="text-[10px] md:text-xs text-zinc-600 font-medium line-clamp-1">{product.description}</p>
-
-                                        {/* Mobile: Disruptive HUD Capsules */}
-                                        <div className="flex lg:hidden items-center gap-2 mt-3">
-                                            <div className="px-3 py-1 flex items-center gap-1.5 rounded-lg bg-white/5 border border-white/10 backdrop-blur-md">
-                                                <span className="text-[9px] font-black text-zinc-500 uppercase">Stk</span>
-                                                <span className="text-[10px] font-black text-white tabular-nums">{product.stock}</span>
-                                            </div>
-                                            <div className="px-3 py-1 flex items-center gap-1.5 rounded-lg bg-primary/10 border border-primary/20 backdrop-blur-md">
-                                                <span className="text-[9px] font-black text-emerald-400 uppercase">Prc</span>
-                                                <span className="text-[10px] font-black text-white tabular-nums">
-                                                    {product.currency === 'MONEY' ? '$' : ''}{product.price}{product.currency !== 'MONEY' ? BRANDING.currencySymbol : ''}
+                                        <div className="space-y-0.5 md:space-y-1 overflow-hidden flex-1">
+                                            <div className="flex items-center gap-2 md:gap-3">
+                                                <span className="text-[8px] md:text-[9px] font-black text-primary uppercase tracking-[0.2em]">
+                                                    {CATEGORY_MAP[product.category] || product.category}
                                                 </span>
+                                                <span className="text-[8px] md:text-[9px] font-black px-1.5 py-0.5 bg-zinc-800 text-zinc-400 rounded uppercase tracking-[0.1em]">{product.condition === 'NEW' ? 'Nuevo' : 'Usado'}</span>
+                                                <span className="text-[8px] md:text-[9px] font-mono text-zinc-500 uppercase tracking-wider">{product.sku || `PID-${product.id.slice(0, 8)}`}</span>
+                                            </div>
+                                            <h3 className="text-sm md:text-xl font-bold text-white group-hover:translate-x-1 transition-transform truncate">{product.name}</h3>
+                                            <p className="text-[10px] md:text-xs text-zinc-600 font-medium line-clamp-1">{product.description}</p>
+
+                                            {/* Mobile: Disruptive HUD Capsules */}
+                                            <div className="flex lg:hidden items-center gap-2 mt-3">
+                                                <div className="px-3 py-1 flex items-center gap-1.5 rounded-lg bg-white/5 border border-white/10 backdrop-blur-md">
+                                                    <span className="text-[9px] font-black text-zinc-500 uppercase">Stk</span>
+                                                    <span className="text-[10px] font-black text-white tabular-nums">{product.stock}</span>
+                                                </div>
+                                                <div className="px-3 py-1 flex items-center gap-1.5 rounded-lg bg-primary/10 border border-primary/20 backdrop-blur-md">
+                                                    <span className="text-[9px] font-black text-emerald-400 uppercase">Prc</span>
+                                                    <span className="text-[10px] font-black text-white tabular-nums">
+                                                        {product.currency === 'MONEY' ? '$' : ''}{product.price}{product.currency !== 'MONEY' ? BRANDING.currencySymbol : ''}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center justify-between lg:justify-end gap-3 md:gap-12 w-full lg:w-auto mt-2 lg:mt-0 pt-4 lg:pt-0 border-t lg:border-t-0 border-white/5">
+                                        {/* Desktop: Rounded HUD Display */}
+                                        <div className="hidden lg:flex items-center gap-3">
+                                            {/* Stock Module */}
+                                            <div className="w-16 h-10 flex flex-col items-center justify-center bg-white/5 rounded-xl border border-white/5 backdrop-blur-sm">
+                                                <span className="text-[7px] font-black text-zinc-500 uppercase tracking-wider leading-none mb-0.5">Stock</span>
+                                                <span className={cn(
+                                                    "text-xs font-black tabular-nums tracking-tight leading-none",
+                                                    product.stock === 0 ? "text-red-500" : "text-white"
+                                                )}>{product.stock}</span>
+                                            </div>
+
+                                            {/* Price Module */}
+                                            <div className="px-4 h-10 flex flex-col items-center justify-center bg-zinc-950 rounded-xl border border-white/10 backdrop-blur-sm shadow-inner min-w-[80px]">
+                                                <span className="text-[8px] font-black text-zinc-500 uppercase tracking-wider leading-none mb-0.5">Precio</span>
+                                                <div className="flex items-baseline leading-none">
+                                                    {product.currency === 'MONEY' && <span className="text-emerald-500 text-[10px] font-black mr-0.5">$</span>}
+                                                    <span className="text-sm text-white font-black tabular-nums tracking-tight">
+                                                        {product.price}
+                                                    </span>
+                                                    {product.currency !== 'MONEY' && <span className="text-primary text-[8px] font-black ml-1 scale-75 transform-origin-left">{BRANDING.currencySymbol}</span>}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-2 md:gap-3 w-full lg:w-auto">
+                                            <MinimalButton
+                                                onClick={() => {
+                                                    setIsDragging(true);
+                                                    setDraggedProductId(product.id);
+                                                }}
+                                                className="flex-1 lg:flex-none px-4 h-9 md:h-10 rounded-full border border-white/5 bg-zinc-950 hover:bg-zinc-900 text-zinc-500 hover:text-white transition-all group/transfer text-[10px]"
+                                            >
+                                                <ArrowRightLeft className="w-3.5 h-3.5 mr-2 group-hover/transfer:rotate-180 transition-transform duration-500" />
+                                                <span>Transferir</span>
+                                            </MinimalButton>
+
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => setAdProduct(product)}
+                                                    className="p-2 bg-zinc-950 border border-amber-400/20 rounded-full hover:bg-amber-400/10 text-amber-500 transition-colors"
+                                                    title="Promocionar drop"
+                                                >
+                                                    <Zap className="w-3.5 h-3.5 fill-amber-500" />
+                                                </button>
+                                                <button
+                                                    onClick={() => setEditingProduct(product)}
+                                                    className="p-2 bg-zinc-950 border border-white/5 rounded-full hover:bg-zinc-900 text-zinc-600 hover:text-white transition-colors"
+                                                >
+                                                    <Edit2 className="w-3.5 h-3.5" />
+                                                </button>
+                                                <button
+                                                    onClick={() => setProductToDelete(product.id)}
+                                                    className="p-2 bg-zinc-950 border border-white/5 rounded-full hover:bg-red-500/10 hover:text-red-500 text-zinc-600 transition-colors"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="flex items-center justify-between lg:justify-end gap-3 md:gap-12 w-full lg:w-auto mt-2 lg:mt-0 pt-4 lg:pt-0 border-t lg:border-t-0 border-white/5">
-                                    {/* Desktop: Rounded HUD Display */}
-                                    <div className="hidden lg:flex items-center gap-3">
-                                        {/* Stock Module */}
-                                        <div className="w-16 h-10 flex flex-col items-center justify-center bg-white/5 rounded-xl border border-white/5 backdrop-blur-sm">
-                                            <span className="text-[7px] font-black text-zinc-500 uppercase tracking-wider leading-none mb-0.5">Stock</span>
-                                            <span className={cn(
-                                                "text-xs font-black tabular-nums tracking-tight leading-none",
-                                                product.stock === 0 ? "text-red-500" : "text-white"
-                                            )}>{product.stock}</span>
-                                        </div>
-
-                                        {/* Price Module */}
-                                        <div className="px-4 h-10 flex flex-col items-center justify-center bg-zinc-950 rounded-xl border border-white/10 backdrop-blur-sm shadow-inner min-w-[80px]">
-                                            <span className="text-[8px] font-black text-zinc-500 uppercase tracking-wider leading-none mb-0.5">Precio</span>
-                                            <div className="flex items-baseline leading-none">
-                                                {product.currency === 'MONEY' && <span className="text-emerald-500 text-[10px] font-black mr-0.5">$</span>}
-                                                <span className="text-sm text-white font-black tabular-nums tracking-tight">
-                                                    {product.price}
-                                                </span>
-                                                {product.currency !== 'MONEY' && <span className="text-primary text-[8px] font-black ml-1 scale-75 transform-origin-left">{BRANDING.currencySymbol}</span>}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-2 md:gap-3 w-full lg:w-auto">
-                                        <MinimalButton
-                                            onClick={() => {
-                                                setIsDragging(true);
-                                                setDraggedProductId(product.id);
-                                            }}
-                                            className="flex-1 lg:flex-none px-4 h-9 md:h-10 rounded-full border border-white/5 bg-zinc-950 hover:bg-zinc-900 text-zinc-500 hover:text-white transition-all group/transfer text-[10px]"
-                                        >
-                                            <ArrowRightLeft className="w-3.5 h-3.5 mr-2 group-hover/transfer:rotate-180 transition-transform duration-500" />
-                                            <span>Transferir</span>
-                                        </MinimalButton>
-
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={() => setAdProduct(product)}
-                                                className="p-2 bg-zinc-950 border border-amber-400/20 rounded-full hover:bg-amber-400/10 text-amber-500 transition-colors"
-                                                title="Promocionar drop"
-                                            >
-                                                <Zap className="w-3.5 h-3.5 fill-amber-500" />
-                                            </button>
-                                            <button
-                                                onClick={() => setEditingProduct(product)}
-                                                className="p-2 bg-zinc-950 border border-white/5 rounded-full hover:bg-zinc-900 text-zinc-600 hover:text-white transition-colors"
-                                            >
-                                                <Edit2 className="w-3.5 h-3.5" />
-                                            </button>
-                                            <button
-                                                onClick={() => setProductToDelete(product.id)}
-                                                className="p-2 bg-zinc-950 border border-white/5 rounded-full hover:bg-red-500/10 hover:text-red-500 text-zinc-600 transition-colors"
-                                            >
-                                                <Trash2 className="w-3.5 h-3.5" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )
-                }
-            </main >
+                            ))}
+                        </div>
+                    )
+                    }
+                </main>
+            </motion.div>
 
             <AlertDialog open={!!productToDelete} onOpenChange={(open) => !open && setProductToDelete(null)}>
                 <AlertDialogContent className="bg-zinc-950 border-zinc-900 text-white">

@@ -86,7 +86,7 @@ export function ImageUpload({ value = [], onChange, maxFiles = 3, disabled = fal
                                 e.preventDefault();
                                 removeImage(index);
                             }}
-                            className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"
+                            className="absolute top-2 right-2 p-1.5 bg-red-500 hover:bg-red-600 rounded-full text-white opacity-100 shadow-sm transition-all hover:scale-110"
                             type="button"
                         >
                             <X className="w-3 h-3" />

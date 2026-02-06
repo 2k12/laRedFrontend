@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Store, Plus, Edit2, Trash2, Package, ArrowRight, ShoppingCart, Clock, Share2, ScanLine, Loader2, AlertCircle } from "lucide-react";
+import { Plus, Store, Trash2, Share2, ScanLine, Package, AlertCircle, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { MinimalButton } from "@/components/MinimalButton";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/PageHeader";
 import { BRANDING } from "@/config/branding";
 import { API_BASE_URL } from "@/config/api";
+import { ImageUpload } from "@/components/ImageUpload";
 import QrScanner from 'qr-scanner';
 
 interface StoreData {
@@ -20,6 +21,8 @@ interface StoreData {
   description: string;
   owner_id: string;
   created_at: string;
+  image_url?: string;
+  banner_url?: string;
 }
 
 interface UserListItem {
@@ -36,8 +39,7 @@ export default function AdminStoresPage() {
   const [loading, setLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isQrOpen, setIsQrOpen] = useState(false);
-  const [editingStore, setEditingStore] = useState<StoreData | null>(null);
-  const [formData, setFormData] = useState({ name: "", description: "", owner_id: "" });
+  const [formData, setFormData] = useState({ name: "", description: "", owner_id: "", image_url: "", banner_url: "" });
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [storeToDelete, setStoreToDelete] = useState<string | null>(null);
@@ -236,8 +238,9 @@ export default function AdminStoresPage() {
 
       if (res.ok) {
         await fetchStores();
+        await fetchStores();
         setIsCreateOpen(false);
-        setFormData({ name: "", description: "", owner_id: "" });
+        setFormData({ name: "", description: "", owner_id: "", image_url: "", banner_url: "" });
         toast.success(`${BRANDING.storeName} creada exitosamente`);
       } else {
         toast.error("Error al crear la tienda");
@@ -245,37 +248,6 @@ export default function AdminStoresPage() {
     } catch (e) {
       console.error(e);
       toast.error("Error de conexión");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleEdit = async () => {
-    if (!editingStore || !formData.name.trim()) return;
-
-    setSubmitting(true);
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${API_BASE_URL}/api/stores/${editingStore.id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (res.ok) {
-        await fetchStores();
-        setEditingStore(null);
-        setFormData({ name: "", description: "", owner_id: "" });
-        toast.success(`${BRANDING.storeName} actualizada`);
-      } else {
-        toast.error("Error al actualizar");
-      }
-    } catch (e) {
-      console.error(e);
-      toast.error("Error inesperado");
     } finally {
       setSubmitting(false);
     }
@@ -303,11 +275,6 @@ export default function AdminStoresPage() {
     } finally {
       setStoreToDelete(null);
     }
-  };
-
-  const openEditDialog = (store: StoreData) => {
-    setEditingStore(store);
-    setFormData({ name: store.name, description: store.description || "", owner_id: store.owner_id });
   };
 
   const handleShareStore = (storeId: string) => {
@@ -462,6 +429,25 @@ export default function AdminStoresPage() {
                       />
                     </div>
 
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label className="text-zinc-500 text-[10px] font-black uppercase">Logo</Label>
+                        <ImageUpload
+                          value={formData.image_url ? [formData.image_url] : []}
+                          onChange={(urls) => setFormData({ ...formData, image_url: urls[0] || "" })}
+                          maxFiles={1}
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label className="text-zinc-500 text-[10px] font-black uppercase">Banner</Label>
+                        <ImageUpload
+                          value={formData.banner_url ? [formData.banner_url] : []}
+                          onChange={(urls) => setFormData({ ...formData, banner_url: urls[0] || "" })}
+                          maxFiles={1}
+                        />
+                      </div>
+                    </div>
+
                     {user?.roles.includes('ADMIN') && (
                       <div className="grid gap-2">
                         <Label className="text-zinc-400">Asignar Dueño (ADMIN)</Label>
@@ -513,123 +499,94 @@ export default function AdminStoresPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {stores.map((store) => (
-              <div key={store.id} className="group relative bg-zinc-900/50 border border-white/5 backdrop-blur-sm rounded-2xl md:rounded-3xl p-5 md:p-6 hover:border-white/20 hover:bg-zinc-900/80 hover:brightness-110 transition-all duration-300 shadow-lg hover:shadow-xl">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl md:rounded-3xl pointer-events-none" />
+              <div key={store.id} className="group relative bg-zinc-950 border border-white/5 rounded-[1.5rem] overflow-hidden hover:border-white/10 transition-all duration-500 h-[220px] md:h-[320px] w-full aspect-auto">
 
-                <div className="flex items-start justify-between mb-4 md:mb-6">
-                  <div className="flex items-center gap-3 md:gap-4">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <Store className="w-5 h-5 md:w-6 md:h-6 text-zinc-400 group-hover:text-white transition-colors" />
-                    </div>
-                    <div>
-                      <h3 className="text-base md:text-lg font-bold text-white group-hover:text-primary transition-colors line-clamp-1">{store.name}</h3>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[9px] md:text-[10px] bg-white/5 px-1.5 py-0.5 rounded text-zinc-600 font-mono uppercase tracking-wider">ID: {store.id.slice(0, 8)}...</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-zinc-400 text-xs md:text-sm mb-4 md:mb-6 line-clamp-2 min-h-[32px] md:min-h-[40px]">
-                  {store.description || "Sin descripción disponible."}
-                </p>
-
-                <div className="mb-4 md:mb-6 space-y-2">
-                  {viewMode === 'all' && (
-                    <MinimalButton
-                      onClick={() => navigate(`/feed?storeId=${store.id}`)}
-                      className="w-full bg-zinc-900 hover:bg-zinc-800 text-zinc-400 border-white/5 justify-between px-4 py-3 md:py-4 rounded-xl md:rounded-2xl group/btn2 text-[10px] md:text-xs"
-                    >
-                      <span className="flex items-center gap-2">
-                        <ShoppingCart className="w-4 h-4 text-zinc-700 group-hover/btn2:text-primary transition-colors" />
-                        Catálogo Público
-                      </span>
-                      <ArrowRight className="w-3.5 h-3.5 text-zinc-800 group-hover/btn2:translate-x-1 transition-transform" />
-                    </MinimalButton>
+                {/* Full Card Banner Background */}
+                <div className="absolute inset-0 z-0">
+                  {store.banner_url ? (
+                    <img
+                      src={store.banner_url}
+                      alt={store.name}
+                      className="w-full h-full object-cover opacity-60 md:opacity-40 group-hover:scale-105 transition-transform duration-700 ease-out"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-zinc-900 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-800 via-zinc-900 to-black" />
                   )}
-
-                  <MinimalButton
-                    onClick={() => navigate(`/dashboard/stores/${store.id}/products`)}
-                    className="w-full bg-zinc-800 hover:bg-zinc-700 text-white border-white/5 justify-between px-4 py-4 md:py-5 rounded-xl md:rounded-2xl group/btn text-[10px] md:text-xs"
-                  >
-                    <span className="flex items-center gap-2">
-                      <Package className="w-4 h-4 text-zinc-500 group-hover/btn:text-primary transition-colors" />
-                      Gestionar {BRANDING.productNamePlural}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 text-zinc-600 group-hover/btn:translate-x-1 transition-transform" />
-                  </MinimalButton>
+                  {/* Gradients for readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/50 to-transparent" />
+                  <div className="absolute inset-0 bg-black/30" />
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                  <div className="flex items-center gap-1.5 text-[10px] md:text-xs text-zinc-600">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span>{new Date(store.created_at).toLocaleDateString()}</span>
+                {/* Content Layer - Centered Layout */}
+                <div className="relative z-10 h-full flex flex-col items-center justify-center p-3 md:p-4 text-center">
+
+                  {/* Floating Logo Badge (Centered) */}
+                  <div className="mb-2 md:mb-4 relative">
+                    <div className="w-12 h-12 md:w-20 md:h-20 rounded-2xl bg-zinc-950/80 backdrop-blur-md border border-white/10 shadow-2xl flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform duration-500 ease-out relative z-10">
+                      {store.image_url ? (
+                        <img src={store.image_url} alt={store.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <Store className="w-6 h-6 text-zinc-600" />
+                      )}
+                    </div>
+                    {/* Decorative Ring */}
+                    <div className="absolute -inset-2 border border-white/5 rounded-[2rem] scale-90 group-hover:scale-100 transition-transform duration-700 opacity-0 group-hover:opacity-100" />
                   </div>
 
-                  <div className="flex gap-2">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
+                  {/* Text Details */}
+                  <div className="mb-3 md:mb-6 space-y-1.5 max-w-[180px]">
+                    <h3 className="text-lg md:text-2xl font-black text-white uppercase tracking-tighter leading-[0.85]">
+                      {store.name}
+                    </h3>
+                    <div className="h-px w-6 bg-white/20 mx-auto my-2" />
+                    <p className="text-zinc-400 text-[9px] md:text-[10px] font-mono uppercase tracking-widest line-clamp-1">
+                      {store.description || "STORE BRAND"}
+                    </p>
+                  </div>
+
+                  {/* Actions (Hidden by default, reveal on interaction or always visible on mobile?) 
+                      User asked for optimized mobile actions. Let's keep them visible but clean.
+                  */}
+                  <div className="absolute bottom-3 left-3 right-3 md:bottom-4 md:left-4 md:right-4 flex items-center justify-center gap-2">
+                    {/* Primary Action Button */}
+                    <MinimalButton
+                      onClick={() => navigate(`/dashboard/stores/${store.id}/products`)}
+                      className="bg-white/10 hover:bg-white text-white hover:text-black border-white/10 backdrop-blur-md justify-center group/manage transition-all duration-300 h-9 px-4 rounded-lg flex-1 max-w-[120px]"
+                    >
+                      <span className="flex items-center gap-1.5 text-[9px] uppercase font-bold tracking-wider">
+                        <Package className="w-3 h-3" />
+                        Gestionar
+                      </span>
+                    </MinimalButton>
+
+                    {/* Secondary Actions Row */}
+                    <div className="flex gap-1.5">
+                      {viewMode === 'all' && (
                         <MinimalButton
                           size="icon"
-                          onClick={() => handleShareStore(store.id)}
-                          icon={<Share2 className="w-3.5 h-3.5" />}
-                          className="h-8 w-8 md:h-10 md:w-10 group-hover:border-emerald-500/50 hover:text-emerald-500 transition-all"
+                          onClick={() => navigate(`/feed?storeId=${store.id}`)}
+                          className="w-9 h-9 rounded-lg bg-black/40 border-white/10 hover:bg-white hover:text-black text-white backdrop-blur-md"
+                          icon={<ScanLine className="w-3.5 h-3.5" />}
                         />
-                      </TooltipTrigger>
-                      <TooltipContent className="bg-zinc-950 border-white/10 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg mb-2">
-                        Compartir {BRANDING.storeName}
-                      </TooltipContent>
-                    </Tooltip>
-                    <Dialog open={editingStore?.id === store.id} onOpenChange={(open) => !open && setEditingStore(null)}>
-                      <DialogTrigger asChild>
-                        <MinimalButton size="icon" onClick={() => openEditDialog(store)} icon={<Edit2 className="w-3.5 h-3.5" />} className="h-8 w-8 md:h-10 md:w-10">
-                        </MinimalButton>
-                      </DialogTrigger>
-                      <DialogContent className="bg-zinc-950 border-zinc-900 text-white sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle>Editar {BRANDING.storeName}</DialogTitle>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                          <div className="grid gap-2">
-                            <Label className="text-zinc-400">Nombre</Label>
-                            <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="bg-zinc-900 border-zinc-800 text-white h-12" />
-                          </div>
-                          <div className="grid gap-2">
-                            <Label className="text-zinc-400">Descripción</Label>
-                            <Input value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="bg-zinc-900 border-zinc-800 text-white h-12" />
-                          </div>
+                      )}
+                      <MinimalButton
+                        size="icon"
+                        onClick={() => handleShareStore(store.id)}
+                        className="w-9 h-9 rounded-lg bg-black/40 border-white/10 hover:bg-white hover:text-black text-white backdrop-blur-md"
+                        icon={<Share2 className="w-3.5 h-3.5" />}
+                      />
+                      <MinimalButton
+                        size="icon"
+                        onClick={() => setStoreToDelete(store.id)}
+                        className="w-9 h-9 rounded-lg bg-black/40 border-white/10 hover:bg-red-500 hover:text-white text-zinc-400 backdrop-blur-md hover:border-red-500"
+                        icon={<Trash2 className="w-3.5 h-3.5" />}
+                      />
+                    </div>
+                  </div>
 
-                          {user?.roles.includes('ADMIN') && (
-                            <div className="grid gap-2">
-                              <Label className="text-zinc-400">Dueño (ADMIN)</Label>
-                              <select
-                                className="bg-zinc-900 border-zinc-800 text-white rounded-md h-12 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-white/10"
-                                value={formData.owner_id}
-                                onChange={(e) => setFormData({ ...formData, owner_id: e.target.value })}
-                              >
-                                <option value="">Mantener Actual / Propio</option>
-                                {users.map(u => (
-                                  <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
-                                ))}
-                              </select>
-                            </div>
-                          )}
-                        </div>
-                        <DialogFooter>
-                          <MinimalButton onClick={handleEdit} disabled={submitting} className="w-full justify-center h-12 rounded-xl">
-                            Guardar Cambios
-                          </MinimalButton>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-
-                    <MinimalButton
-                      size="icon"
-                      onClick={() => setStoreToDelete(store.id)}
-                      className="h-8 w-8 md:h-10 md:w-10 text-zinc-500 hover:text-red-500 hover:border-red-500/50"
-                      icon={<Trash2 className="w-3.5 h-3.5" />}
-                    >
-                    </MinimalButton>
+                  {/* ID Badge */}
+                  <div className="absolute top-4 right-4">
+                    <span className="text-[8px] font-mono text-white/30">#{store.id.slice(0, 4)}</span>
                   </div>
                 </div>
               </div>
