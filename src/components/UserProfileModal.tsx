@@ -12,7 +12,6 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ICON_MAP } from '@/config/badges';
 import { cn } from '@/lib/utils';
 import { HistoryModal } from '@/components/HistoryModal';
-import { MinimalButton } from '@/components/MinimalButton';
 
 interface UserProfile {
     user: {

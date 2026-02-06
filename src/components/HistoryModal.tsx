@@ -5,7 +5,6 @@ import { X, History, TrendingUp, TrendingDown, Clock, ShoppingBag, ArrowLeft } f
 import { API_BASE_URL } from "@/config/api";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
-import { BRANDING } from "@/config/branding";
 
 interface HistoryItem {
     id: string;

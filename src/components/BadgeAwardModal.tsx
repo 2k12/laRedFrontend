@@ -199,7 +199,6 @@ export default function BadgeAwardModal({ userId, userName, isOpen, onClose }: B
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                         {earnedBadges.map((badge) => {
                                             const Icon = ICON_MAP[badge.icon_url] || ICON_MAP['default'];
-                                            const badgeColor = badge.color || 'text-zinc-500';
 
                                             return (
                                                 <div

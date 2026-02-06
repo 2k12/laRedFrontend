@@ -4,7 +4,7 @@ import { API_BASE_URL } from '@/config/api';
 import { useAuth } from '@/context/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { Award, Lock } from 'lucide-react';
+import { Award } from 'lucide-react';
 import {
     Tooltip,
     TooltipContent,
