@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ShoppingBag, Tag, Smartphone, CheckCircle2, Clock, X, History } from "lucide-react";
+import { ShoppingBag, Tag, Smartphone, CheckCircle2, X, History } from "lucide-react";
 import { motion } from "framer-motion";
 import { API_BASE_URL } from "@/config/api";
 import { useAuth } from "@/context/AuthContext";
@@ -7,7 +7,6 @@ import { PageHeader } from "@/components/PageHeader";
 import { MinimalButton } from "@/components/MinimalButton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { BRANDING } from "@/config/branding";
 import { HistoryModal } from "@/components/HistoryModal";
 
 export default function OrdersPage() {
@@ -147,110 +146,102 @@ function OrderCard({ order, type, onConfirm }: { order: any, type: 'purchase' | 
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="group relative bg-zinc-900/40 border border-white/5 rounded-3xl overflow-hidden hover:border-primary/20 transition-all duration-500"
+            className="group relative bg-zinc-900/40 border border-white/5 rounded-2xl overflow-hidden hover:border-white/10 transition-all duration-300"
         >
-            <div className="p-6 md:p-8 flex flex-col md:flex-row gap-6 items-center">
+            <div className="p-3 flex flex-col sm:flex-row gap-3 items-center">
 
-                {/* Product Snapshot Image/Icon */}
-                <div className="w-24 h-24 shrink-0 rounded-2xl bg-zinc-950 border border-white/5 flex items-center justify-center overflow-hidden">
+                {/* Compact Product Image */}
+                <div className="w-12 h-12 shrink-0 rounded-lg bg-zinc-950 border border-white/5 flex items-center justify-center overflow-hidden">
                     {order.image_url ? (
-                        <img src={order.image_url} alt={order.product_name} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
+                        <img src={order.image_url} alt={order.product_name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                     ) : (
-                        <div className="text-zinc-800 text-3xl font-black">{order.product_name?.[0]}</div>
+                        <div className="text-zinc-700 text-lg font-black">{order.product_name?.[0]}</div>
                     )}
                 </div>
 
-                {/* Details */}
-                <div className="flex-1 space-y-2 text-center md:text-left">
-                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-2">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase ${isDelivered ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                {/* Compact Details */}
+                <div className="flex-1 min-w-0 text-center sm:text-left space-y-1">
+                    <div className="flex items-center justify-center sm:justify-start gap-2">
+                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase ${isDelivered ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'
                             }`}>
-                            {isDelivered ? <CheckCircle2 className="w-3 h-3 mr-1" /> : <Clock className="w-3 h-3 mr-1" />}
-                            {isDelivered ? 'Entregado' : 'Pendiente de Entrega'}
+                            {isDelivered ? 'Entregado' : 'Pendiente'}
                         </span>
-                        <span className="text-zinc-500 text-[10px] uppercase font-mono tracking-tighter">
-                            ID: {order.id.substring(0, 8)} • {new Date(order.created_at).toLocaleDateString()}
+                        <span className="text-zinc-600 text-[9px] uppercase font-mono tracking-wider truncate">
+                            ID: {order.id.substring(0, 6)}
                         </span>
                     </div>
 
-                    <h3 className="text-xl font-bold text-white tracking-tight leading-none group-hover:text-primary transition-colors">
+                    <h3 className="text-sm font-bold text-white truncate group-hover:text-zinc-200 transition-colors">
                         {order.product_name}
                     </h3>
-
-                    <p className="text-sm text-zinc-500">
-                        {type === 'purchase' ? `Vendido por ${order.store_name}` : `Comprado por ${order.buyer_name}`}
-                    </p>
                 </div>
 
-                {/* Actions Section */}
-                <div className="shrink-0 flex flex-col gap-3 w-full md:w-auto">
+                {/* Ultra-Compact Actions */}
+                <div className="shrink-0 w-full sm:w-auto flex justify-center sm:justify-end">
                     {type === 'purchase' && isPending && (
-                        <>
-                            <div className="bg-zinc-950/50 p-4 rounded-2xl border border-white/5 text-center">
-                                <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1">Tu Código Maestro</p>
-                                <p className="text-3xl font-mono font-black text-white tracking-widest">{order.delivery_code}</p>
+                        <div className="flex items-center gap-2">
+                            <div className="bg-zinc-950 px-3 py-1 rounded-lg border border-white/5">
+                                <span className="text-[10px] text-zinc-500 font-mono mr-2">CÓDIGO:</span>
+                                <span className="text-sm font-mono font-bold text-white tracking-widest">{order.delivery_code}</span>
                             </div>
                             <MinimalButton
-                                aria-label="Contactar Vendedor"
                                 onClick={() => {
-                                    // Generate dynamic WhatsApp link
-                                    const text = encodeURIComponent(`Hola, compré tu producto "${order.product_name}" en ${BRANDING.appName}. ¿Dónde coordinamos?`);
+                                    const text = encodeURIComponent(`Hola, compré "${order.product_name}". ¿Coordinamos?`);
                                     window.open(`https://wa.me/?text=${text}`, '_blank');
                                 }}
-                                className="bg-[#25D366] text-black hover:bg-[#20bd5a] hover:scale-105"
-                                icon={<Smartphone className="w-4 h-4" />}
+                                className="h-8 w-8 p-0 flex items-center justify-center bg-[#25D366] text-black hover:bg-[#20bd5a] rounded-lg"
                             >
-                                Contactar Vendedor
+                                <Smartphone className="w-4 h-4" />
                             </MinimalButton>
-                        </>
+                        </div>
                     )}
 
                     {type === 'sale' && isPending && (
-                        <div className="space-y-3">
+                        <div className="w-full sm:w-auto">
                             {!showCodeInput ? (
-                                <MinimalButton
+                                <button
                                     onClick={() => setShowCodeInput(true)}
-                                    className="bg-primary text-black hover:bg-primary/90 rounded-2xl w-full"
+                                    className="w-full sm:w-auto px-4 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all"
                                 >
-                                    Confirmar Entrega
-                                </MinimalButton>
+                                    Confirmar
+                                </button>
                             ) : (
-                                <div className="flex gap-2">
+                                <div className="flex items-center justify-center sm:justify-start gap-3 sm:gap-1 bg-zinc-950 p-2 sm:p-1 rounded-xl sm:rounded-lg border border-white/10 animate-in fade-in slide-in-from-right-2 w-full sm:w-auto">
                                     <input
                                         type="text"
                                         maxLength={4}
-                                        placeholder="CÓDIGO"
-                                        className="bg-black border border-primary/20 rounded-xl px-4 w-24 text-center text-primary font-mono font-bold focus:outline-primary"
+                                        placeholder="0000"
+                                        autoFocus
+                                        className="bg-transparent border-none w-20 sm:w-12 text-center text-lg sm:text-sm font-mono font-bold text-white placeholder:text-zinc-700 focus:ring-0 p-0 tracking-[0.2em]"
                                         value={tempCode}
                                         onChange={(e) => setTempCode(e.target.value.replace(/\D/g, ''))}
                                     />
-                                    <MinimalButton
-                                        className="bg-primary text-black flex-1 font-black italic uppercase text-[10px] tracking-tighter"
+                                    <div className="h-5 w-px bg-white/10 hidden sm:block" />
+                                    <button
                                         onClick={() => onConfirm?.(order.id, tempCode)}
-                                        icon={<CheckCircle2 className="w-4 h-4" />}
+                                        className="h-8 w-8 sm:h-6 sm:w-6 flex items-center justify-center bg-primary text-black rounded-lg sm:rounded hover:bg-primary/90 transition-colors shadow-lg sm:shadow-none"
                                     >
-                                        VERIFICAR
-                                    </MinimalButton>
-                                    <MinimalButton
-                                        variant="outline"
+                                        <CheckCircle2 className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+                                    </button>
+                                    <button
                                         onClick={() => setShowCodeInput(false)}
-                                        className="w-10 h-10 px-0 flex items-center justify-center border-red-500/20 text-red-500 hover:bg-red-500/10 hover:border-red-500/40"
+                                        className="h-8 w-8 sm:h-6 sm:w-6 flex items-center justify-center text-zinc-500 hover:text-white transition-colors"
                                     >
-                                        <X className="w-4 h-4" />
-                                    </MinimalButton>
+                                        <X className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+                                    </button>
                                 </div>
                             )}
                         </div>
                     )}
-                </div>
-            </div>
 
-            {/* Background Kinetic Element */}
-            <div className={`absolute -right-4 -bottom-4 opacity-0 group-hover:opacity-10 transition-opacity duration-700 pointer-events-none ${isDelivered ? 'text-green-500' : 'text-primary'
-                }`}>
-                <ShoppingBag className="w-32 h-32 rotate-12" />
+                    {isDelivered && (
+                        <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest px-2">
+                            Completado
+                        </span>
+                    )}
+                </div>
             </div>
         </motion.div>
     );

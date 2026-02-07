@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -10,6 +10,8 @@ import { BRANDING } from '@/config/branding';
 export default function MarketplaceShowcase() {
     const containerRef = useRef<HTMLDivElement>(null);
     const shapesRef = useRef<HTMLDivElement>(null);
+    const [hoveredCard, setHoveredCard] = useState<'normal' | 'ghost' | null>(null);
+
 
     // GSAP "Physics-like" Floating Animation
     useGSAP(() => {
@@ -51,16 +53,7 @@ export default function MarketplaceShowcase() {
 
         window.addEventListener('mousemove', onMouseMove);
 
-        // Version Char Physics (Split Effect)
-        gsap.from(".version-char", {
-            y: 20,
-            opacity: 0,
-            rotateX: -90,
-            stagger: 0.1,
-            duration: 0.8,
-            ease: "back.out(1.7)",
-            delay: 0.5
-        });
+
 
         return () => window.removeEventListener('mousemove', onMouseMove);
 
@@ -74,64 +67,32 @@ export default function MarketplaceShowcase() {
 
             {/* --- GSAP Physics Shapes (Abstract SVG Elements) --- */}
             <div ref={shapesRef} className="absolute inset-0 pointer-events-none z-0 opacity-40">
-                {/* Large Wireframe Circle */}
-                <svg className="physics-shape absolute top-[10%] left-[10%] w-64 h-64 text-zinc-800" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="0.5" />
-                </svg>
 
-                {/* Filled Pill */}
-                <div className="physics-shape absolute top-[30%] right-[20%] w-32 h-12 rounded-full border border-zinc-800 bg-zinc-900/50 backdrop-blur-sm" />
-
-                {/* Dashed Line */}
-                <svg className="physics-shape absolute bottom-[20%] left-[30%] w-96 h-2 text-zinc-700" viewBox="0 0 100 2">
-                    <line x1="0" y1="1" x2="100" y2="1" stroke="currentColor" strokeWidth="0.5" strokeDasharray="5,5" />
-                </svg>
-
-                {/* Abstract Text Shape */}
-                <div className="physics-shape absolute bottom-[40%] right-[10%] text-[200px] font-black text-zinc-900/40 select-none leading-none">
-                    PL
-                </div>
-
-                {/* Floating Currency Symbol */}
-                <div className="physics-shape absolute top-[20%] right-[35%] text-[100px] font-thin text-zinc-800/20 select-none">
-                    $
-                </div>
             </div>
 
             {/* --- Foreground Content --- */}
-            <div className="relative z-10 container mx-auto px-6 h-screen flex flex-col justify-center">
+            <div className="relative z-10 container mx-auto px-6 min-h-screen flex flex-col justify-center pt-32 pb-12">
 
-                {/* Version Tag */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    className="mb-8"
-                >
-                    <span className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 text-[10px] uppercase tracking-[0.2em] font-medium backdrop-blur-md">
-                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_10px_rgba(129,140,248,0.5)]" />
-                        Mercado
-                        <span className="flex overflow-hidden">
-                            {/* Manual Split for Physics */}
-                            {"v2.0".split("").map((char, i) => (
-                                <span key={i} className="version-char inline-block origin-bottom">
-                                    {char}
-                                </span>
-                            ))}
+
+
+                {/* Main Headline Group */}
+                <div className="relative mt-8 md:mt-0">
+                    <motion.h1
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                        className="text-5xl sm:text-7xl md:text-9xl font-bold tracking-tighter leading-[0.9] mix-blend-difference relative z-10"
+                    >
+                        MERCADO<br />
+                        <span className="text-zinc-600">HÍBRIDO</span>
+                    </motion.h1>
+
+                    <div className="absolute right-0 top-0 md:left-[55%] md:right-auto md:bottom-[8%] md:top-auto -z-10 select-none pointer-events-none">
+                        <span className="text-[40px] md:text-[100px] font-semibold tracking-tighter leading-none text-purple-900/10 [-webkit-text-stroke:1px_rgba(168,85,247,0.2)]  opacity-50">
+                            v3.0.0
                         </span>
-                    </span>
-                </motion.div>
-
-                {/* Main Headline */}
-                <motion.h1
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="text-5xl sm:text-7xl md:text-9xl font-bold tracking-tighter leading-[0.9] mix-blend-difference mt-8 md:mt-0"
-                >
-                    MERCADO<br />
-                    <span className="text-zinc-600">HÍBRIDO</span>
-                </motion.h1>
+                    </div>
+                </div>
 
                 {/* Description */}
                 <motion.p
@@ -165,29 +126,77 @@ export default function MarketplaceShowcase() {
                     </Link>
                 </motion.div>
 
-                {/* Bottom Stats / Ticker */}
+                {/* Drops Info - Ultraminimalist Interaction */}
                 <motion.div
-                    className="absolute bottom-12 left-6 right-6 flex justify-between items-end border-t border-white/10 pt-6"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1.2, duration: 1 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 1 }}
+                    className="w-full max-w-4xl mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 relative z-20 mx-auto"
                 >
-                    <div className="hidden md:block">
-                        <p className="text-[10px] uppercase tracking-widest text-zinc-600">
-                            LaRed.
-                        </p>
-                    </div>
-                    <div className="flex gap-12">
-                        {/* <div>
-                            <p className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1">Volumen 24h</p>
-                            <p className="text-xl font-mono">2.4M {BRANDING.currencySymbol}</p>
-                        </div> */}
-                        {/* <div>
-                            <p className="text-[10px] uppercase tracking-widest text-zinc-600 mb-1">Usuarios</p>
-                            <p className="text-xl font-mono"></p>
-                        </div> */}
-                    </div>
+                    {/* Normal Drops Card */}
+                    <motion.div
+                        className="group relative p-8 rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-sm transition-all duration-500 hover:bg-white/[0.04] hover:border-white/10 overflow-hidden"
+                        onMouseEnter={() => setHoveredCard('normal')}
+                        onMouseLeave={() => setHoveredCard(null)}
+                        animate={{ opacity: hoveredCard === 'ghost' ? 0.3 : 1 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+
+                        <div className="relative z-10 flex flex-col items-start text-left">
+                            <span className="inline-block px-2 py-1 mb-4 text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-500 border border-white/10 rounded-full bg-black/40">
+                                Estándar
+                            </span>
+                            <h3 className="text-xl md:text-2xl font-bold text-white mb-2 tracking-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-zinc-500 transition-all">
+                                Drops Normales
+                            </h3>
+                            <p className="text-sm text-zinc-500 font-light leading-relaxed max-w-xs group-hover:text-zinc-400 transition-colors">
+                                Intercambio directo y visible. La forma estándar de comerciar en el campus con total transparencia.
+                            </p>
+                        </div>
+                    </motion.div>
+
+                    {/* Ghost Drops Card - Layout Redesign */}
+                    <motion.div
+                        className="group relative p-8 rounded-2xl border border-white/5 bg-black/40 backdrop-blur-sm transition-all duration-500 hover:bg-purple-900/[0.05] hover:border-purple-500/20 overflow-hidden"
+                        onMouseEnter={() => {
+                            setHoveredCard('ghost');
+                            // Trigger GSAP magnetic pull on enter if not already animating (handled by useGSAP usually)
+                        }}
+                        onMouseLeave={() => setHoveredCard(null)}
+                        animate={{ opacity: hoveredCard === 'normal' ? 0.3 : 1 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+
+
+                        <div className="relative z-10 flex flex-col items-start text-left">
+                            <span className="inline-block px-2 py-1 mb-4 text-[9px] font-mono uppercase tracking-[0.2em] text-purple-400/80 border border-purple-500/20 rounded-full bg-purple-900/10 backdrop-blur-md">
+                                DROPS INTERACTIVOS
+                            </span>
+                            <h3 className="text-xl md:text-2xl font-bold text-white mb-2 tracking-tight group-hover:text-purple-200 transition-colors">
+                                Drops Fantasma
+                            </h3>
+
+                            <div className="mt-2 space-y-2 w-full">
+                                <div className="flex items-center gap-3 text-sm text-zinc-500 group-hover:text-zinc-400 transition-colors">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500/50"></span>
+                                    <span>Adivina la pista</span>
+                                </div>
+                                <div className="flex items-center gap-3 text-sm text-zinc-500 group-hover:text-zinc-400 transition-colors">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500/50"></span>
+                                    <span>Ve a la ubicación</span>
+                                </div>
+                                <div className="flex items-center gap-3 text-sm text-purple-400/90 font-medium">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse"></span>
+                                    <span>Desbloquea el Drop</span>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
                 </motion.div>
+
+                {/* Bottom Stats / Ticker */}
 
             </div>
         </div>

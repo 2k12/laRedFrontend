@@ -157,76 +157,70 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start">
 
                 {/* Left Column: Identity & Assets */}
-                <div className="relative overflow-hidden sm:overflow-visible">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-[2rem] md:rounded-[2.5rem] blur-xl opacity-20" />
-                    <div className="relative bg-zinc-900/80 backdrop-blur-md border border-white/10 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10">
-                        {/* Background Pattern */}
-                        <div className="absolute top-0 right-0 w-48 md:w-64 h-48 md:h-64 bg-gradient-to-bl from-white/5 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                {/* Left Column: Identity & Assets - Ultra Minimalist Redesign */}
+                <div className="relative group">
+                    <div className="relative bg-zinc-950 border border-white/5 rounded-[2.5rem] p-8 md:p-10 overflow-hidden hover:border-white/10 transition-colors duration-500">
 
-                        <div className="relative z-10 flex flex-col h-full justify-between min-h-[250px] md:min-h-[300px]">
-                            {/* Header: Verified & Wallet */}
-                            <div className="flex justify-between items-start mb-6 md:mb-8">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-zinc-950 border border-zinc-800 flex items-center justify-center shadow-lg">
-                                        <ShieldCheck className="w-6 h-6 md:w-8 md:h-8 text-white" />
-                                    </div>
+                        {/* Subtle Glow Effect on Hover */}
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-[100px] opacity-0 group-hover:opacity-20 transition-opacity duration-1000 -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-                                    {/* Merged Wallet Display */}
-                                    <div className="hidden sm:block">
-                                        <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
-                                            <Wallet className="w-3.5 h-3.5 text-zinc-500" />
-                                            <div className="flex items-baseline gap-1">
-                                                <span className="text-sm font-black text-white">{wallet?.balance?.toLocaleString() || 0}</span>
-                                                <span className="text-[10px] font-bold text-zinc-600">{wallet?.currency_symbol || 'PL'}</span>
-                                            </div>
-                                            <div className="w-px h-3 bg-white/10 mx-1" />
-                                            <button
-                                                onClick={() => setIsHistoryOpen(true)}
-                                                className="text-[9px] font-black uppercase text-primary hover:text-white transition-colors"
-                                            >
-                                                Historial
-                                            </button>
-                                        </div>
-                                    </div>
+                        <div className="relative z-10 flex flex-col h-full justify-between min-h-[300px] space-y-8">
+
+                            {/* Top Row: Shield & Status */}
+                            <div className="flex justify-between items-start">
+                                <div className="w-12 h-12 rounded-2xl bg-zinc-900/50 border border-white/5 flex items-center justify-center">
+                                    <ShieldCheck className="w-5 h-5 text-white" strokeWidth={1.5} />
                                 </div>
 
-                                <div className="px-3 md:px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                    <span className="text-[9px] md:text-[10px] font-mono font-bold text-emerald-500 tracking-wider">VERIFICADO</span>
+                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/30 border border-emerald-900/50">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                                    <span className="text-[9px] font-bold text-emerald-500 tracking-widest uppercase">Verificado</span>
                                 </div>
                             </div>
 
-                            {/* Mobile Wallet (Visible only on small screens) */}
-                            <div className="sm:hidden mb-6">
-                                <div className="flex items-center justify-between bg-white/5 px-4 py-3 rounded-2xl border border-white/5">
-                                    <div className="flex items-center gap-3">
-                                        <Wallet className="w-4 h-4 text-zinc-500" />
-                                        <div className="flex items-baseline gap-1">
-                                            <span className="text-xl font-black text-white">{wallet?.balance?.toLocaleString() || 0}</span>
-                                            <span className="text-xs font-bold text-zinc-600">{wallet?.currency_symbol || 'PL'}</span>
-                                        </div>
-                                    </div>
+                            {/* Middle: Wallet Display */}
+                            <div className="bg-zinc-900/30 border border-white/5 rounded-3xl p-6 backdrop-blur-sm group-hover:bg-zinc-900/50 transition-colors duration-500">
+                                <div className="flex items-center justify-between mb-2">
+                                    <Wallet className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
                                     <button
                                         onClick={() => setIsHistoryOpen(true)}
-                                        className="text-[10px] font-black uppercase text-primary hover:text-white transition-colors bg-primary/10 px-3 py-1 rounded-lg"
+                                        className="text-[9px] font-bold uppercase text-zinc-500 hover:text-white transition-colors tracking-widest"
                                     >
                                         Historial
                                     </button>
                                 </div>
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-4xl md:text-5xl font-bold text-white tracking-tighter tabular-nums">
+                                        {wallet?.balance?.toLocaleString() || 0}
+                                    </span>
+                                    <span className="text-sm font-medium text-zinc-600 tracking-wider">
+                                        {wallet?.currency_symbol || 'PL'}
+                                    </span>
+                                </div>
                             </div>
 
+                            {/* Bottom: User Info */}
                             <div>
-                                <h3 className="text-2xl md:text-3xl font-bold text-white mb-1 md:2 tracking-tight">{user?.name || 'Invitado'}</h3>
-                                <p className="text-zinc-400 font-mono text-[10px] uppercase tracking-widest mb-6 md:mb-8">{user?.roles.join(' • ') || 'ESTUDIANTE'}</p>
+                                <h3 className="text-2xl md:text-3xl font-bold text-white mb-2 tracking-tight">{user?.name || 'Invitado'}</h3>
+                                <div className="flex items-center gap-3 mb-8">
+                                    <span className="px-2 py-0.5 rounded bg-white/5 border border-white/5 text-[9px] font-bold text-zinc-400 uppercase tracking-widest">
+                                        {user?.roles?.[0] || 'USER'}
+                                    </span>
+                                    <span className="text-[10px] text-zinc-600 uppercase tracking-widest px-2 border-l border-zinc-800">
+                                        {user?.roles?.includes('SELLER') ? 'Seller' : 'Member'}
+                                    </span>
+                                </div>
 
-                                <div className="grid grid-cols-2 gap-3 md:gap-4">
-                                    <div className="p-3 md:p-4 rounded-xl md:rounded-2xl bg-black/40 border border-white/5 overflow-hidden">
-                                        <p className="text-[8px] md:text-[10px] text-zinc-600 uppercase tracking-wider mb-1">ID</p>
-                                        <p className="text-zinc-300 font-mono text-[10px] md:text-sm truncate">{user?.id?.substring(0, 12)}...</p>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="p-4 rounded-2xl bg-zinc-900/30 border border-white/5">
+                                        <p className="text-[9px] text-zinc-600 uppercase tracking-widest font-bold mb-1.5">ID</p>
+                                        <p className="text-zinc-400 font-mono text-[10px] tracking-wide truncate opacity-70">
+                                            {user?.id?.substring(0, 12)}...
+                                        </p>
                                     </div>
-                                    <div className="p-3 md:p-4 rounded-xl md:rounded-2xl bg-black/40 border border-white/5">
-                                        <p className="text-[8px] md:text-[10px] text-zinc-600 uppercase tracking-wider mb-1">Ingreso</p>
-                                        <p className="text-zinc-300 font-mono text-xs md:text-sm">2026</p>
+                                    <div className="p-4 rounded-2xl bg-zinc-900/30 border border-white/5">
+                                        <p className="text-[9px] text-zinc-600 uppercase tracking-widest font-bold mb-1.5">Ingreso</p>
+                                        <p className="text-zinc-400 font-mono text-xs opacity-70">2026</p>
                                     </div>
                                 </div>
                             </div>
@@ -235,7 +229,6 @@ export default function DashboardPage() {
 
                     {/* Badge System Section */}
                     <div className="mt-8">
-
                         <BadgeDisplay />
                     </div>
                 </div>

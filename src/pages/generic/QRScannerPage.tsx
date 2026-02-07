@@ -9,10 +9,20 @@ import { useAuth } from '@/context/AuthContext';
 export default function QRScannerPage() {
     const navigate = useNavigate();
     const videoRef = useRef<HTMLVideoElement>(null);
+    const scannerRef = useRef<QrScanner | null>(null);
     const [hasCamera, setHasCamera] = useState<boolean | null>(null);
+    const { token, refreshProfile } = useAuth();
+    const [processing, setProcessing] = useState(false);
 
     useEffect(() => {
         if (!videoRef.current) return;
+
+        // Cleanup any existing scanner to prevent duplicates
+        if (scannerRef.current) {
+            scannerRef.current.stop();
+            scannerRef.current.destroy();
+            scannerRef.current = null;
+        }
 
         const scanner = new QrScanner(
             videoRef.current,
@@ -25,10 +35,20 @@ export default function QRScannerPage() {
             }
         );
 
-        scanner.start().then(() => setHasCamera(true)).catch(() => setHasCamera(false));
+        scannerRef.current = scanner;
 
-        const { token, refreshProfile } = useAuth(); // Needed for linking carnet using current user's token
-        const [processing, setProcessing] = useState(false);
+        // Small delay to ensure video element is ready
+        const timeoutId = setTimeout(() => {
+            // Check if component is still mounted/scanner is still valid
+            if (scannerRef.current === scanner) {
+                scanner.start()
+                    .then(() => setHasCamera(true))
+                    .catch((e) => {
+                        console.error("Camera start error:", e);
+                        setHasCamera(false);
+                    });
+            }
+        }, 500);
 
         function onScanSuccess(decodedText: string) {
             if (processing) return;
@@ -112,9 +132,14 @@ export default function QRScannerPage() {
         }
 
         return () => {
-            scanner.destroy();
+            clearTimeout(timeoutId);
+            if (scannerRef.current) {
+                scannerRef.current.stop();
+                scannerRef.current.destroy();
+                scannerRef.current = null;
+            }
         };
-    }, [navigate]);
+    }, [navigate, token, refreshProfile, processing]); // Added dependencies to ensure effect re-runs if auth state changes, although ideally it shouldn't frequently
 
     return (
         <div className="container mx-auto max-w-4xl px-4 min-h-[85vh] flex flex-col items-center justify-center pb-32 lg:pb-12">

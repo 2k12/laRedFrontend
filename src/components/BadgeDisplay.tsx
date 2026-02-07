@@ -99,7 +99,7 @@ export default function BadgeDisplay() {
             <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-4">
                 {badges.map((badge) => {
                     const Icon = ICON_MAP[badge.icon_url] || ICON_MAP['default'];
-                    const colorClass = badge.color || 'text-zinc-500 fill-zinc-500/20';
+
 
                     const BadgeIcon = (
                         <div className={cn(
@@ -109,7 +109,7 @@ export default function BadgeDisplay() {
                         )}>
                             <div className={cn(
                                 "w-8 h-8 sm:w-10 sm:h-10 transition-transform duration-500 group-hover:scale-110",
-                                colorClass
+                                badge.color || 'text-zinc-500 fill-zinc-500/20'
                             )}>
                                 <Icon className="w-full h-full stroke-[1.5]" />
                             </div>
@@ -129,7 +129,7 @@ export default function BadgeDisplay() {
                                     <DialogHeader className="flex flex-col items-center text-center pt-6">
                                         <div className={cn(
                                             "w-20 h-20 rounded-[2rem] flex items-center justify-center mb-6 bg-zinc-950 border border-white/10 shadow-2xl",
-                                            colorClass
+                                            badge.color || 'text-zinc-500'
                                         )}>
                                             <Icon className="w-10 h-10 stroke-[1.5]" />
                                         </div>

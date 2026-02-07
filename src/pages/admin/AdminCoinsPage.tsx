@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import "react";
 import { useNavigate } from "react-router-dom";
 import { MinimalButton } from "@/components/MinimalButton";
 import { Plus, Wallet, TrendingUp } from "lucide-react";
@@ -12,30 +12,12 @@ const MAX_COINS = 1000;
 export default function AdminCoinsPage() {
     const { user, wallet } = useAuth();
     const navigate = useNavigate();
-    const [animatedBalance, setAnimatedBalance] = useState(0);
+
 
     const balance = wallet?.balance || 0;
     const fillPercentage = Math.min((balance / MAX_COINS) * 100, 100);
 
-    // Smooth counter animation
-    useEffect(() => {
-        let start = 0;
-        const end = balance;
-        const duration = 2000;
-        const increment = end / (duration / 16);
 
-        const timer = setInterval(() => {
-            start += increment;
-            if (start >= end) {
-                setAnimatedBalance(end);
-                clearInterval(timer);
-            } else {
-                setAnimatedBalance(Math.floor(start));
-            }
-        }, 16);
-
-        return () => clearInterval(timer);
-    }, [balance]);
 
     // Color based on fill percentage
     const getColor = () => {
@@ -139,7 +121,7 @@ export default function AdminCoinsPage() {
                                     </div>
                                     <div className="text-center space-y-1">
                                         <div className="text-4xl md:text-6xl font-black text-white tracking-tighter tabular-nums drop-shadow-2xl">
-                                            {animatedBalance.toLocaleString()}
+                                            {balance.toLocaleString()}
                                         </div>
                                         <div className="text-zinc-400 font-medium tracking-widest uppercase text-[10px] md:text-xs">
                                             {BRANDING.currencyNamePlural}

@@ -2,6 +2,17 @@
 export default {
   darkMode: ["class"],
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  safelist: [
+    {
+      pattern:
+        /text-(blue|cyan|lime|amber|emerald|orange|purple|rose|indigo|yellow|pink|red|green|teal|sky|violet|fuchsia)-(200|300|400|500)/,
+    },
+    {
+      pattern:
+        /fill-(blue|cyan|lime|amber|emerald|orange|purple|rose|indigo|yellow|pink|red|green|teal|sky|violet|fuchsia)-(200|300|400|500)\/20/,
+    },
+    { pattern: /drop-shadow-.*/ },
+  ],
   theme: {
     extend: {
       borderRadius: {

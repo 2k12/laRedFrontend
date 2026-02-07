@@ -55,7 +55,7 @@ export const SentientCard: React.FC<SentientCardProps> = ({ product, onClick }) 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ scale: isGhostLocked ? 1 : 1.01 }}
-            className={`group relative w-full h-full min-h-[400px] cursor-pointer ${isGhostLocked ? 'grayscale opacity-80' : ''}`}
+            className={`group relative w-full h-full min-h-[320px] md:min-h-[400px] cursor-pointer ${isGhostLocked ? 'grayscale opacity-80' : ''}`}
             onClick={() => !isGhostLocked && onClick(product.id)}
         >
             {/* CLEAN BACKGROUND */}
@@ -150,14 +150,14 @@ export const SentientCard: React.FC<SentientCardProps> = ({ product, onClick }) 
                         {isGhostLocked ? getGlitchedText(product.name) : product.name}
                     </motion.h3>
 
-                    <motion.div layout className="flex items-center justify-between gap-2 w-full mt-1">
-                        <div className="flex flex-col">
-                            <span className="text-[10px] font-medium text-white/40 uppercase tracking-wider leading-none mb-0.5">Precio</span>
-                            <div className="flex items-baseline gap-1 overflow-hidden min-w-0">
-                                <span className="text-xl font-black text-white truncate leading-none">
+                    <motion.div layout className="flex items-end justify-between gap-3 w-full mt-2">
+                        <div className="flex flex-col min-w-0 flex-1">
+                            <span className="text-[9px] font-bold text-white/50 uppercase tracking-wider mb-0.5">Precio</span>
+                            <div className="flex items-baseline gap-1 w-full">
+                                <span className="text-xl md:text-2xl font-black text-white truncate leading-none">
                                     {product.currency === 'MONEY' ? '$' : ''}{product.price}
                                 </span>
-                                <span className="text-[10px] font-bold text-primary/80 uppercase shrink-0 leading-none">
+                                <span className="text-[9px] font-black text-primary/80 uppercase shrink-0">
                                     {product.currency === 'MONEY' ? 'USD' : 'PL'}
                                 </span>
                             </div>
@@ -167,9 +167,9 @@ export const SentientCard: React.FC<SentientCardProps> = ({ product, onClick }) 
                             whileHover={{ scale: 1.1, backgroundColor: "#fff" }}
                             whileTap={{ scale: 0.9 }}
                             disabled={isGhostLocked}
-                            className={`flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full transition-all shrink-0 ${isGhostLocked ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed' : 'bg-white/90 text-black'}`}
+                            className={`flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full transition-all shrink-0 ${isGhostLocked ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed' : 'bg-white text-black shadow-lg hover:shadow-white/20'}`}
                         >
-                            <ArrowUpRight className="w-4 h-4" />
+                            <ArrowUpRight className="w-4 h-4 md:w-5 md:h-5" strokeWidth={2.5} />
                         </motion.button>
                     </motion.div>
                 </div>

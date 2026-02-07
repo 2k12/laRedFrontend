@@ -20,7 +20,7 @@ export default function Footer() {
 
         {/* Center: Minimal Tagline (Desktop only) */}
         <div className="hidden md:block select-none">
-          <span className="text-zinc-800 text-[10px] tracking-[0.2em] font-light uppercase">Desarrollado por 2k12 SOLUTIONS</span>
+          <span className="text-zinc-600 text-[10px] tracking-[0.2em] font-light uppercase">Desarrollado por KUVRO TECH</span>
         </div>
 
         {/* Right: Links */}
