@@ -63,7 +63,6 @@ function App() {
               <Route path="coins" element={<AdminCoinsPage />} />
               <Route path="stores" element={<AdminStoresPage />} />
               <Route path="products" element={<DashboardProductsPage />} />
-              <Route path="mint" element={<MintConfirmPage />} />
               <Route path="stores/:id/products" element={<StoreProductsPage />} />
               <Route path="products/transfer/:productId" element={<ProductTransferPage />} />
               <Route path="rewards" element={<AdminRewardsPage />} />
@@ -74,6 +73,16 @@ function App() {
 
             <Route path="/economy" element={<EconomyManagementPage />} />
           </Route>
+
+          {/* Standalone Protected Routes (No Layout) */}
+          <Route
+            path="/dashboard/mint"
+            element={
+              <ProtectedRoute>
+                <MintConfirmPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

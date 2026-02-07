@@ -1,17 +1,16 @@
 import { useState } from "react";
 import { MinimalButton } from "@/components/MinimalButton";
-import { Lock, Coins, ArrowRight, ShieldCheck, ArrowLeft, CheckCircle2, X } from "lucide-react";
+import { Lock, ArrowRight, ShieldCheck, ArrowLeft, CheckCircle2, X, Coins } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import { BRANDING } from "@/config/branding";
 import { API_BASE_URL } from "@/config/api";
 
 export default function MintConfirmPage() {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
-
     const [amount, setAmount] = useState("");
     const [concept, setConcept] = useState("");
     const [password, setPassword] = useState("");
@@ -38,6 +37,7 @@ export default function MintConfirmPage() {
 
         setLoading(true);
         const token = localStorage.getItem('token');
+
         try {
             const res = await fetch(`${API_BASE_URL}/api/economy/mint`, {
                 method: 'POST',
@@ -71,14 +71,21 @@ export default function MintConfirmPage() {
 
     if (success) {
         return (
-            <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6 md:p-4">
-                <div className="text-center space-y-6 md:space-y-8 animate-in zoom-in-95 duration-700">
+            <div className="h-screen w-full bg-black text-white flex flex-col items-center justify-center p-6 md:p-4 overflow-hidden relative">
+                {/* Background Grid */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
+                    style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }}
+                />
+
+                <div className="text-center space-y-6 md:space-y-8 animate-in zoom-in-95 duration-700 relative z-10">
                     <div className="w-24 h-24 md:w-32 md:h-32 bg-zinc-900 border border-white/5 rounded-full flex items-center justify-center mx-auto shadow-2xl">
                         <CheckCircle2 className="w-12 h-12 md:w-16 md:h-16 text-green-500 animate-pulse" />
                     </div>
                     <div className="space-y-3 md:space-y-4">
-                        <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-tight">Protocolo<br className="md:hidden" /> Finalizado</h1>
-                        <p className="text-zinc-500 font-mono text-[10px] md:text-sm tracking-[0.2em] md:tracking-widest">TRANSACTION_HASH: SPLCESS_EMISSION</p>
+                        <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-tight">
+                            Protocolo Finalizado
+                        </h1>
+                        <p className="text-zinc-500 font-mono text-[10px] md:text-sm tracking-[0.2em] md:tracking-widest">TRANSACTION_HASH: SUCCESS_EMISSION</p>
                     </div>
                     <div className="text-5xl md:text-7xl font-black text-white tabular-nums tracking-tighter">
                         +{parseInt(amount).toLocaleString()} <span className="text-xl md:text-2xl text-zinc-600 font-normal">{BRANDING.currencySymbol}</span>
@@ -95,7 +102,7 @@ export default function MintConfirmPage() {
     }
 
     return (
-        <div className="container mx-auto max-w-7xl px-4 pb-20">
+        <div className="h-screen w-full bg-black overflow-hidden flex flex-col relative">
             <style>
                 {`
                 /* Hide number input arrows */
@@ -110,15 +117,20 @@ export default function MintConfirmPage() {
                 `}
             </style>
 
+            {/* Ambient Background Grid */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
+                style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }}
+            />
+
             {/* Header Navigation */}
-            <header className="fixed top-0 left-0 right-0 h-16 md:h-20 border-b border-white/5 flex items-center justify-between px-4 md:px-10 z-50 backdrop-blur-md bg-black/50">
+            <header className="absolute top-0 left-0 right-0 h-16 md:h-20 border-b border-white/5 flex items-center justify-between px-4 md:px-10 z-50 backdrop-blur-md bg-black/50">
                 <div className="flex items-center gap-3 md:gap-4">
                     <div className="p-1.5 md:p-2 bg-zinc-900 rounded-lg border border-white/5">
                         <ShieldCheck className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
                     </div>
                     <div className="space-y-0.5">
                         <h2 className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-white">Seguridad</h2>
-                        <p className="text-[8px] md:text-[9px] font-mono text-zinc-600 tracking-wider">{BRANDING.appName}</p>
+                        <p className="text-[8px] md:text-[9px] font-mono text-zinc-600 tracking-wider text-left">{BRANDING.appName}</p>
                     </div>
                 </div>
                 <button
@@ -129,12 +141,12 @@ export default function MintConfirmPage() {
                 </button>
             </header>
 
-            <main className="min-h-screen flex pt-16 md:pt-20">
+            <main className="flex-1 flex flex-col lg:flex-row pt-16 md:pt-20 overflow-hidden relative z-10">
                 {/* Left Side: Visual/Context */}
-                <div className="hidden lg:flex w-1/3 border-r border-white/5 flex-col justify-center p-16 space-y-12">
+                <div className="hidden lg:flex w-1/3 border-r border-white/5 flex-col justify-center p-16 space-y-12 h-full overflow-y-auto custom-scrollbar">
                     <div className="space-y-6">
                         <div className="w-12 h-1 h-amber-500 opacity-50" />
-                        <h1 className="text-6xl font-black italic uppercase tracking-tighter leading-none">
+                        <h1 className="text-6xl font-black italic uppercase tracking-tighter leading-none text-white">
                             Tesorería<br />Admin
                         </h1>
                         <p className="text-zinc-500 text-sm leading-relaxed max-w-xs font-medium">
@@ -151,34 +163,50 @@ export default function MintConfirmPage() {
                             </div>
                         </div>
                         <div className="flex items-start gap-4 p-6 rounded-3xl bg-zinc-900/30 border border-white/5">
-                            <Coins className="w-5 h-5 text-zinc-700 mt-1" />
+                            <div className="w-5 h-5 text-zinc-700 mt-1">
+                                <Coins className="w-5 h-5" />
+                            </div>
                             <div className="space-y-2">
-                                <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-400">Impacto Económico</p>
-                                <p className="text-[10px] text-zinc-600 leading-relaxed">La emisión aumenta la oferta circulante de {BRANDING.currencySymbol}. Los fondos se depositan en (1111...1111).</p>
+                                <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-400">
+                                    Impacto Económico
+                                </p>
+                                <p className="text-[10px] text-zinc-600 leading-relaxed">
+                                    La emisión aumenta la oferta circulante de {BRANDING.currencySymbol}. Los fondos se depositan en (1111...1111).
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Right Side: Interactive Flow */}
-                <div className="flex-1 flex flex-col justify-center items-center px-4 md:px-8 lg:px-0 relative overflow-hidden pb-16 md:pb-0">
-                    <div className="w-full max-w-xl space-y-12 md:space-y-16 relative z-10">
+                <div className="flex-1 flex flex-col justify-center items-center px-4 md:px-8 lg:px-0 relative overflow-y-auto custom-scrollbar h-full">
+                    <div className="w-full max-w-xl space-y-8 md:space-y-12 relative z-10 py-8">
                         {step === 1 ? (
-                            <div className="space-y-8 md:space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
                                 <div className="space-y-3 md:space-y-4 text-center lg:text-left">
                                     <span className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-500/80 italic">Etapa 01 — Declaración</span>
-                                    <h3 className="text-2xl md:text-4xl font-black tracking-tight text-white uppercase italic">Configurar Emisión</h3>
+                                    <h3 className="text-2xl md:text-4xl font-black tracking-tight text-white uppercase italic">
+                                        Configurar Emisión
+                                    </h3>
                                 </div>
 
-                                <div className="space-y-8 md:space-y-10">
+                                <div className="space-y-3">
                                     <div className="space-y-3">
-                                        <Label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Monto de Emisión ({BRANDING.currencyName}s)</Label>
+                                        <Label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Monto ({BRANDING.currencyName}s)</Label>
                                         <Input
                                             type="number"
                                             placeholder="0"
-                                            className="bg-transparent border-none text-6xl sm:text-7xl md:text-8xl font-black text-center lg:text-left h-24 md:h-32 focus:ring-0 text-white placeholder:text-zinc-900 p-0 selection:bg-amber-500 selection:text-black tabular-nums tracking-tighter"
+                                            min="0"
+                                            onKeyDown={(e) => ["-", "+", "e"].includes(e.key) && e.preventDefault()}
+                                            className="bg-transparent border-none text-6xl sm:text-7xl md:text-8xl font-black text-center lg:text-left h-24 md:h-32 focus:ring-0 text-white placeholder:text-zinc-900 p-0 lg:pl-4 selection:bg-amber-500 selection:text-black tabular-nums tracking-tighter"
                                             value={amount}
-                                            onChange={e => setAmount(e.target.value)}
+                                            onChange={e => {
+                                                const val = e.target.value;
+                                                // Allow empty string or non-negative numbers
+                                                if (val === '' || parseFloat(val) >= 0) {
+                                                    setAmount(val);
+                                                }
+                                            }}
                                             autoFocus
                                         />
                                     </div>
@@ -197,15 +225,15 @@ export default function MintConfirmPage() {
                                 <div className="pt-6 md:pt-8 text-center lg:text-left">
                                     <MinimalButton
                                         onClick={handleVerify}
-                                        className="w-full h-16 md:h-20 rounded-full bg-white text-black font-black uppercase tracking-[0.2em] hover:bg-zinc-200 border-none flex items-center justify-center gap-3 md:gap-4 group shadow-2xl transition-all hover:scale-[1.02] text-xs md:text-sm"
+                                        className="w-full h-16 md:h-20 rounded-full bg-white text-black hover:text-black font-black uppercase tracking-[0.2em] hover:bg-zinc-200 border-none flex items-center justify-center gap-3 md:gap-4 group shadow-2xl transition-all hover:scale-[1.02] text-xs md:text-sm"
                                     >
                                         Protocolo de Firma
-                                        <ArrowRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform" />
+                                        <ArrowRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform text-black" />
                                     </MinimalButton>
                                 </div>
                             </div>
                         ) : (
-                            <div className="space-y-8 md:space-y-12 animate-in fade-in slide-in-from-right-8 duration-700">
+                            <div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-700">
                                 <div className="space-y-3 md:space-y-4 text-center lg:text-left">
                                     <span className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-500/80 italic">Etapa 02 — Autorización</span>
                                     <h3 className="text-2xl md:text-4xl font-black tracking-tight text-white uppercase italic">Firmar Operación</h3>
@@ -258,7 +286,7 @@ export default function MintConfirmPage() {
                                                 <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
                                                 Firmando...
                                             </div>
-                                        ) : 'Autorizar Emisión'}
+                                        ) : 'Autorizar'}
                                     </MinimalButton>
                                 </div>
                             </div>
@@ -267,14 +295,9 @@ export default function MintConfirmPage() {
                 </div>
             </main>
 
-            {/* Ambient Background Grid */}
-            <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-0"
-                style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-
             {/* Status Bar */}
             <div className="fixed bottom-0 left-0 right-0 h-8 md:h-10 bg-zinc-950 border-t border-white/5 flex items-center justify-between px-4 md:px-10 text-[7px] md:text-[9px] font-mono text-zinc-700 uppercase tracking-[0.1em] md:tracking-[0.3em] z-50">
-
-                <div>{BRANDING.appName} SEGURIDAD</div>
+                <div>{BRANDING.appName} SEGURIDAD </div>
             </div>
         </div>
     );

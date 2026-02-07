@@ -1,7 +1,7 @@
 import "react";
 import { useNavigate } from "react-router-dom";
 import { MinimalButton } from "@/components/MinimalButton";
-import { Plus, Wallet, TrendingUp } from "lucide-react";
+import { Wallet, TrendingUp, Zap } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { PageHeader } from "@/components/PageHeader";
 import { BRANDING } from "@/config/branding";
@@ -54,28 +54,14 @@ export default function AdminCoinsPage() {
                     description={`Gestión de Liquidez y ${BRANDING.currencyNamePlural} de ${BRANDING.appName}.`}
                     icon={<Wallet className="w-8 h-8" />}
                 >
-                    {user?.roles?.includes('ADMIN') && (
-                        <div className="relative group w-full sm:w-auto mt-4 sm:mt-0">
-                            {/* Outer Glow */}
-                            <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full blur opacity-30 group-hover:opacity-75 transition duration-1000 group-hover:duration-200 animate-pulse" />
-
-                            <MinimalButton
-                                icon={<div className="relative">
-                                    <Plus className="w-4 h-4 text-black group-hover:rotate-90 transition-transform duration-500" />
-                                    <div className="absolute inset-0 bg-white/40 blur-sm rounded-full scale-0 group-hover:scale-150 transition-transform duration-700" />
-                                </div>}
-                                onClick={() => navigate('/dashboard/mint')}
-                                className="w-full sm:relative bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-black font-black border-none px-6 sm:px-8 py-5 sm:py-6 shadow-[0_10px_20px_rgba(245,158,11,0.3)] hover:shadow-[0_15px_30px_rgba(245,158,11,0.5)] transition-all duration-500 rounded-full overflow-hidden text-xs sm:text-sm"
-                            >
-                                <span className="relative z-10 flex items-center justify-center gap-2">
-                                    AGREGAR {BRANDING.currencySymbol}
-                                    <span className="w-1.5 h-1.5 rounded-full bg-black/20 animate-ping" />
-                                </span>
-
-                                {/* Shine Effect */}
-                                <div className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-[45deg] -translate-x-[200%] group-hover:translate-x-[300%] transition-transform duration-1000 ease-in-out" />
-                            </MinimalButton>
-                        </div>
+                    {user?.roles?.includes('SYSTEM') && (
+                        <MinimalButton
+                            onClick={() => navigate('/dashboard/mint')}
+                            className="h-10 px-5 rounded-full bg-white text-black hover:bg-zinc-200 hover:text-black border-none flex items-center gap-2 shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)] transition-all duration-300 group"
+                        >
+                            <Zap className="w-3.5 h-3.5 fill-current group-hover:scale-110 transition-transform duration-300" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.15em]">Emitir {BRANDING.currencySymbol}</span>
+                        </MinimalButton>
                     )}
                 </PageHeader>
 
