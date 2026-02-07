@@ -109,7 +109,7 @@ export default function AdminCoinsPage() {
                                         <div className="text-4xl md:text-6xl font-black text-white tracking-tighter tabular-nums drop-shadow-2xl">
                                             {balance.toLocaleString()}
                                         </div>
-                                        <div className="text-zinc-400 font-medium tracking-widest uppercase text-[10px] md:text-xs">
+                                        <div className="text-white font-medium tracking-widest uppercase text-[10px] md:text-xs">
                                             {BRANDING.currencyNamePlural}
                                         </div>
                                     </div>

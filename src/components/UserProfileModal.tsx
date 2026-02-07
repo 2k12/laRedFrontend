@@ -4,7 +4,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { gsap } from 'gsap';
 import {
     Mail, Shield, Calendar, Wallet,
-    User, Fingerprint, Activity, Award, History
+    User, Fingerprint, Activity, Award, History, Sparkles
 } from 'lucide-react';
 import { API_BASE_URL } from '@/config/api';
 import { useAuth } from '@/context/AuthContext';
@@ -101,14 +101,14 @@ export default function UserProfileModal({ userId, isOpen, onClose }: UserProfil
     return (
         <>
             <Dialog open={isOpen} onOpenChange={onClose}>
-                <DialogContent className="bg-transparent border-none p-0 max-w-4xl w-full max-h-[95vh] overflow-y-auto custom-scrollbar shadow-none">
+                <DialogContent className="bg-transparent border-none p-0 max-w-[95vw] w-full max-h-[95vh] overflow-y-auto custom-scrollbar shadow-none">
                     <AnimatePresence>
                         {profile && (
-                            <div className="relative w-full flex flex-col md:flex-row gap-6 p-4 perspective-[1000px]">
+                            <div className="relative w-full flex flex-col gap-6 p-4 perspective-[1000px]">
                                 {/* main Card */}
                                 <motion.div
                                     ref={cardRef}
-                                    className="flex-1 bg-zinc-950/80 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] sm:rounded-[3rem] overflow-hidden shadow-2xl relative"
+                                    className="w-full bg-zinc-950/80 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] sm:rounded-[3rem] overflow-hidden shadow-2xl relative"
                                 >
                                     {/* Decorative elements */}
                                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[100px] -mr-32 -mt-32" />
@@ -211,45 +211,59 @@ export default function UserProfileModal({ userId, isOpen, onClose }: UserProfil
                                     </div>
                                 </motion.div>
 
-                                {/* Sidebar: Badges Nexus */}
+                                {/* Bottom: Badges Nexus (Horizontal Scroll) */}
                                 <motion.div
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
+                                    initial={{ opacity: 0, y: 50 }}
+                                    animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.3 }}
-                                    className="w-full md:w-80 bg-zinc-950/50 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] sm:rounded-[3rem] p-6 sm:p-8 flex flex-col"
+                                    className="w-full bg-zinc-950/80 backdrop-blur-2xl border border-white/10 rounded-[3rem] p-8 flex flex-col"
                                 >
-                                    <div className="flex items-center gap-3 mb-8">
-                                        <div className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
-                                            <Award className="w-5 h-5 text-amber-500" />
+                                    <div className="flex items-center gap-4 mb-2 px-2">
+                                        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 shadow-[0_0_15px_-5px_rgba(251,191,36,0.3)]">
+                                            <Award className="w-6 h-6 text-amber-500" />
                                         </div>
-                                        <h3 className="text-xl font-black uppercase tracking-tighter italic text-white">Nexo de Hitos</h3>
+                                        <div>
+                                            <h3 className="text-2xl font-black uppercase tracking-tighter italic text-white">Nexo de Hitos</h3>
+                                            <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-mono">
+                                                Colección Personal &bull; {badges.length} Desbloqueados
+                                            </p>
+                                        </div>
                                     </div>
 
                                     {badges.length === 0 ? (
-                                        <div className="flex-1 flex flex-col items-center justify-center text-center opacity-20">
+                                        <div className="h-40 flex flex-col items-center justify-center text-center opacity-30">
                                             <Activity className="w-12 h-12 mb-4" />
                                             <p className="text-[10px] font-black uppercase tracking-widest">Sin Medallas</p>
                                         </div>
                                     ) : (
-                                        <div ref={badgesRef} className="grid grid-cols-2 gap-4 flex-1 content-start">
-                                            {badges.map((badge) => {
-                                                const Icon = ICON_MAP[badge.icon_url] || ICON_MAP['default'];
-                                                const badgeColor = badge.color || 'text-zinc-500 fill-zinc-500/20';
+                                        <div className="w-full overflow-x-auto custom-scrollbar pb-6 pt-4">
+                                            <div ref={badgesRef} className="flex gap-8 px-8 min-w-full w-max">
+                                                {badges.map((badge) => {
+                                                    const Icon = ICON_MAP[badge.icon_url] || ICON_MAP['default'];
+                                                    const badgeColor = badge.color || 'text-zinc-500 fill-zinc-500/20';
 
-                                                return (
-                                                    <div
-                                                        key={badge.id}
-                                                        className="aspect-square rounded-3xl bg-zinc-900/50 border border-white/5 p-4 flex flex-col items-center justify-center text-center group hover:bg-zinc-800/80 transition-colors"
-                                                    >
-                                                        <div className={cn("mb-2 group-hover:scale-110 transition-transform duration-500", badgeColor)}>
-                                                            <Icon className="w-8 h-8 stroke-[1.5]" />
+                                                    return (
+                                                        <div key={badge.id} className="relative flex flex-col items-center justify-end h-48 w-32 shrink-0 group cursor-default perspective-[500px]">
+                                                            {/* Floor */}
+                                                            <div className="absolute bottom-8 w-24 h-24 bg-gradient-to-t from-white/5 to-transparent rounded-full opacity-30 group-hover:opacity-100 transform rotate-x-60 transition-all duration-500 blur-lg" />
+                                                            <div className="absolute bottom-10 w-16 h-5 border border-white/5 bg-white/[0.01] rounded-[100%] group-hover:border-amber-500/30 group-hover:bg-amber-500/5 transition-all duration-500" />
+
+                                                            {/* Icon */}
+                                                            <div className={cn("relative z-10 mb-10 transition-transform duration-500 group-hover:-translate-y-4 group-hover:scale-110", badgeColor)}>
+                                                                <Icon className="w-24 h-24 stroke-[1] drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] group-hover:drop-shadow-[0_20px_20px_rgba(251,191,36,0.2)]" />
+                                                            </div>
+
+                                                            {/* Label */}
+                                                            <div className="absolute bottom-2 bg-zinc-950/80 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-full group-hover:border-amber-500/30 transition-all duration-300 z-20 flex items-center gap-1.5 shadow-lg group-hover:shadow-amber-500/10">
+                                                                <Sparkles className="w-2.5 h-2.5 text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                                                <span className="text-[8px] font-black uppercase tracking-widest text-zinc-500 group-hover:text-white transition-colors">
+                                                                    {badge.name}
+                                                                </span>
+                                                            </div>
                                                         </div>
-                                                        <span className="text-[8px] font-black uppercase italic tracking-tighter text-zinc-500 group-hover:text-white transition-colors">
-                                                            {badge.name}
-                                                        </span>
-                                                    </div>
-                                                )
-                                            })}
+                                                    )
+                                                })}
+                                            </div>
                                         </div>
                                     )}
                                 </motion.div>

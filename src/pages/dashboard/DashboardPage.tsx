@@ -227,10 +227,7 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    {/* Badge System Section */}
-                    <div className="mt-8">
-                        <BadgeDisplay />
-                    </div>
+
                 </div>
 
                 {/* Right Column: Settings */}
@@ -391,6 +388,11 @@ export default function DashboardPage() {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Full Width Badge Section */}
+            <div className="mt-12">
+                <BadgeDisplay />
             </div>
 
             <HistoryModal
