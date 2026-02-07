@@ -15,7 +15,7 @@ import { MinimalButton } from "@/components/MinimalButton";
 import AdPurchaseModal from "@/components/AdPurchaseModal";
 import { BRANDING } from "@/config/branding";
 import { API_BASE_URL } from "@/config/api";
-import { cn } from "@/lib/utils";
+import { cn, isPointInPolygon } from "@/lib/utils";
 
 interface Category {
     slug: string;
@@ -833,7 +833,15 @@ export default function StoreProductsPage() {
                                         <GeofenceMap
                                             polygon={campusPolygon}
                                             initialLocation={formData.ghost_lat ? { lat: parseFloat(formData.ghost_lat), lng: parseFloat(formData.ghost_lng) } : null}
-                                            onLocationSelect={(lat, lng) => setFormData({ ...formData, ghost_lat: lat.toString(), ghost_lng: lng.toString() })}
+                                            onLocationSelect={(lat, lng) => {
+                                                if (campusPolygon.length > 0 && !isPointInPolygon({ lat, lng }, campusPolygon)) {
+                                                    toast.error("Ubicación No Permitida", {
+                                                        description: "Los Ghost Drops deben colocarse estrictamente dentro del campus universitario."
+                                                    });
+                                                    return;
+                                                }
+                                                setFormData({ ...formData, ghost_lat: lat.toString(), ghost_lng: lng.toString() });
+                                            }}
                                         />
                                     </div>
                                 </>)}
@@ -1430,7 +1438,15 @@ export default function StoreProductsPage() {
                                             <GeofenceMap
                                                 polygon={campusPolygon}
                                                 initialLocation={editingProduct.ghost_lat ? { lat: parseFloat(editingProduct.ghost_lat), lng: parseFloat(editingProduct.ghost_lng || '0') } : null}
-                                                onLocationSelect={(lat, lng) => setEditingProduct({ ...editingProduct, ghost_lat: lat.toString(), ghost_lng: lng.toString() })}
+                                                onLocationSelect={(lat, lng) => {
+                                                    if (campusPolygon.length > 0 && !isPointInPolygon({ lat, lng }, campusPolygon)) {
+                                                        toast.error("Ubicación No Permitida", {
+                                                            description: "Los Ghost Drops deben colocarse estrictamente dentro del campus universitario."
+                                                        });
+                                                        return;
+                                                    }
+                                                    setEditingProduct({ ...editingProduct, ghost_lat: lat.toString(), ghost_lng: lng.toString() });
+                                                }}
                                             />
                                         </div>
                                     </>
